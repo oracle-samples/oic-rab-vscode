@@ -22,7 +22,11 @@ To start from scratch, open any empty folder as your workspace then execute `RAB
 
 ## Documentation
 
-Full documentation is available [here](https://docs.oracle.com/en/cloud/paas/application-integration/index.html).
+Full documentation, including prerequisites, supported vscode versions and configuration instructions, is available [here](https://docs.oracle.com/en/cloud/paas/application-integration/index.html).
+
+## Contributing
+
+This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
 
 ## Security
 
