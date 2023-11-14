@@ -1,0 +1,74 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "Transform for dynamic input": {
+    "scope": "json",
+    "prefix": "RAB: jq to key-value array",
+    "body": [
+      "${ .${1} | map ( { key: .${2}, value: .${3} } ) }"
+    ]
+  },
+  "Insert action": {
+    "scope": "json",
+    "prefix": "RAB: insert action",
+    "body": [
+      "{",
+      "  \"displayName\": \"${1:Name your action}\",",
+      "  \"description\": \"${2:Write a brief description.}\",",
+      "  \"urn\": \"flow:${3:reference to flow}\",",
+      "  \"input\": {",
+      "    \"schemaType\": \"application/schema+json\",",
+      "    \"schema\": {",
+      "      \"\\$ref\": \"#/schemas/${4:reference to input schema}\"",
+      "    }",
+      "  },",
+      "  \"output\": {",
+      "    \"schemaType\": \"application/schema+json\",",
+      "    \"schema\": {",
+      "      \"\\$ref\": \"#/schemas/${5:reference to output schema}\"",
+      "    }",
+      "  }",
+      "}"
+    ]
+  },
+  "Insert object schema": {
+    "scope": "json",
+    "prefix": "RAB: insert object schema",
+    "body": [
+      "{",
+      "  \"type\": \"object\",",
+      "  \"properties\": {",
+      "    \"${1:key}\": ${2}",
+      "  }",
+      "}"
+    ]
+  },
+  "Insert array schema": {
+    "scope": "json",
+    "prefix": "RAB: insert array schema",
+    "body": [
+      "{",
+      "  \"type\": \"array\",",
+      "  \"items\": {",
+      "  }",
+      "}"
+    ]
+  },
+  "Insert string schema": {
+    "scope": "json",
+    "prefix": "RAB: insert string schema",
+    "body": [
+      "{",
+      "  \"type\": \"string\"",
+      "}"
+    ]
+  },
+  "Insert number schema": {
+    "scope": "json",
+    "prefix": "RAB: insert number schema",
+    "body": [
+      "{",
+      "  \"type\": \"number\"",
+      "}"
+    ]
+  }
+}

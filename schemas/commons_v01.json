@@ -1,0 +1,307 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#commons",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "nameString": {
+      "description": "Internal name has the following characteristics. (1) String must start with a character, (2) can contain alpha_numeric characters or '_' or '.', (3) Length between 1 and 64",
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_.]*$",
+      "examples": [
+        "accountid",
+        "account.id",
+        "account_1",
+        "account_id"
+      ],
+      "minLength": 1,
+      "maxLength": 32
+    },
+    "displayNameString": {
+      "description": "Display name has the following characteristics. (1) String can start and end with any char except space, (2) Length between 1 and 64",
+      "type": "string",
+      "pattern": "^\\S.*[^\\s]$",
+      "examples": [
+        "account id",
+        "$accountid",
+        "account#"
+      ],
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "shortText": {
+      "description": "Used in short description. (1) String can start and end with any char except space, (2) Length between 1 and 64",
+      "type": "string",
+      "pattern": "^\\S.*[^\\s]$",
+      "examples": [
+        "This text will appear in place as a short description."
+      ],
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "longText": {
+      "description": "Used in description.  (1) String can start and end with any char except space, (2) Length between 1 and 256",
+      "type": "string",
+      "pattern": "^\\S.*[^\\s]$",
+      "examples": [
+        "This text will appear as a detailed descriptor for the selected field."
+      ],
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "urlString": {
+      "description": "This type denotes a URL string. Length below 900 chars.",
+      "type": "string",
+      "format": "uri",
+      "examples": [
+        "http://json-schema.org/draft-07/schema"
+      ],
+      "minLength": 8,
+      "maxLength": 900
+    },
+    "emailString": {
+      "description": "This type denotes a description. Length below 64 chars.",
+      "type": "string",
+      "format": "email",
+      "examples": [
+        "john.doe@example.com"
+      ],
+      "minLength": 3,
+      "maxLength": 64
+    },
+    "hostNameString": {
+      "description": "This type denotes a hostname. Length below 64 chars.",
+      "type": "string",
+      "format": "hostname",
+      "examples": [
+        "www.example.com"
+      ],
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "versionString": {
+      "description": "string representation of a version number.",
+      "type": "string",
+      "pattern": "^(d+.)?(d+.)?(d+)$",
+      "examples": [
+        "22.06.01",
+        "1.0.0"
+      ],
+      "minLength": 5,
+      "maxLength": 8
+    },
+    "dateString": {
+      "description": "Date type string.",
+      "type": "string",
+      "format": "date",
+      "examples": [
+        "1970-01-01"
+      ]
+    },
+    "dateTimeString": {
+      "description": "Date type string.",
+      "type": "string",
+      "format": "date-time",
+      "examples": [
+        "1970-01-01T10:05:08",
+        "1970-01-01T10:05:08.10",
+        "1970-01-01T10:05:08+01:00"
+      ]
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "flowPattern": {
+      "type": "string",
+      "pattern": "^(flow:)([a-zA-Z0-9\\.\\-_]+)$",
+      "examples": [
+        "flow:flowName"
+      ],
+      "minLength": 6
+    },
+    "argumentsJQPattern": {
+      "$ref": "#/definitions/nonEmptyString",
+      "pattern": "^(flow:)([a-zA-Z0-9\\.\\-_]+)$",
+      "examples": [
+        "${.jqFilter}"
+      ],
+      "minLength": 6
+    },
+    "flowOrJQExpression": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/argumentsJQPattern"
+        },
+        {
+          "$ref": "#/definitions/flowPattern"
+        }
+      ]
+    },
+    "stringOrArgumentJQPattern": {
+      "$ref": "#/definitions/nonEmptyString"
+    },
+    "stringOrArgumentJQArray": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/stringOrArgumentJQPattern"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "integer"
+          }
+        ]
+      }
+    },
+    "singleOrMultiValuedList": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/stringOrArgumentJQPattern"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "$ref": "#/definitions/stringOrArgumentJQArray"
+        }
+      ]
+    },
+    "singleOrMultiValuedMap": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
+          "$ref": "#/definitions/singleOrMultiValuedList"
+        }
+      },
+      "minProperties": 0,
+      "maxProperties": 100
+    },
+    "singleValueMap": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/stringOrArgumentJQPattern"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        }
+      },
+      "minProperties": 0,
+      "maxProperties": 100
+    },
+    "httpHeaders": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/singleOrMultiValuedMap",
+          "examples": [
+            {
+              "header1Key": "header1Value",
+              "header2Key": "${.input.header2Value}",
+              "header3Key": [
+                "header3Value1",
+                "${.input.header3Value2}"
+              ]
+            }
+          ]
+        },
+        {
+          "$ref": "#/definitions/argumentsJQPattern",
+          "examples": [
+            "${.configuration.headers}"
+          ]
+        }
+      ]
+    },
+    "httpBody": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/stringOrArgumentJQPattern",
+          "examples": [
+            "dummyBody",
+            "${.input.body}"
+          ]
+        },
+        {
+          "$ref": "#/definitions/singleOrMultiValuedMap",
+          "examples": [
+            {
+              "key1": "dummyBody",
+              "key2": "${.input.bodyKey2}"
+            }
+          ]
+        },
+        {
+          "$ref": "#/definitions/stringOrArgumentJQArray",
+          "examples": [
+            [
+              "dummyBody",
+              "${.input.bodyPart}"
+            ]
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "examples": [
+            [
+              {
+                "Content-Type": "application/json; charset=UTF-8; name=metadata.json",
+                "Content-Transfer-Encoding": "binary",
+                "Content-Disposition": "form-data; name=\"metadata.json\"; filename=\"metadata.json\"",
+                "content": {
+                  "name": "${ .input.fileName }",
+                  "parents": [
+                    "${ .configuration.folderId }"
+                  ]
+                }
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    "httpResponse": {
+      "description": "Response Object.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "default": 201,
+          "type": "integer",
+          "description": "Override Status code in case request is ignored."
+        },
+        "headers": {
+          "$ref": "#/definitions/httpHeaders",
+          "description": "HTTP Headers. Object of key and value(s) or jq expression resolving to Object of key and value(s)"
+        },
+        "body": {
+          "$ref": "#/definitions/httpBody",
+          "description": "HTTP Body to be sent. Object, array or string or JQ expression or mix of these."
+        }
+      },
+      "examples": [
+        {
+          "status": 202,
+          "headers": {},
+          "body": {}
+        }
+      ]
+    }
+  }
+}

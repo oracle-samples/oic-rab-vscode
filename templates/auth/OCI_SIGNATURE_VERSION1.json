@@ -1,0 +1,71 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "connectionProperties": [
+      {
+        "name": "baseURL",
+        "type": "URL",
+        "displayName": "Base URL",
+        "description": "Endpoint base URL",
+        "shortDescription": "Endpoints base URL",
+        "default": "",
+        "required": true,
+        "hidden": true,
+        "scope": [
+          "ACTION"
+        ]
+      }
+    ],
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "policy": "OCI_SIGNATURE_VERSION1",
+        "displayName": "OCI Signature Version 1",
+        "description": "OCI Signature Version 1",
+        "scope": "ACTION",
+        "securityProperties": [
+          {
+            "name": "TenancyOCID",
+            "displayName": "Tenancy OCID",
+            "description": "Tenancy OCID of OCI",
+            "shortDescription": "Tenancy OCID of OCI",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "UserOCID",
+            "displayName": "User OCID",
+            "description": "User OCID of OCI",
+            "shortDescription": "User OCID of OCI",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "PrivateKey",
+            "displayName": "Private Key",
+            "description": "OCI Private Key",
+            "shortDescription": "OCI Private Key",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "FingerPrint",
+            "displayName": "Finger Print",
+            "description": "Finger Print",
+            "shortDescription": "Finger Print",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "PassPhrase",
+            "displayName": "Pass Phrase",
+            "description": "Password entered at the time of generating the public/private key.",
+            "shortDescription": "Password entered at the time of generating the public/private key.",
+            "hidden": false,
+            "required": true
+          }
+        ]
+      }
+    ]
+  }
+}

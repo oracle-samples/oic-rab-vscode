@@ -1,0 +1,146 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "$id": "#schemas",
+  "title": "Schemas",
+  "description": "Schema of Schema",
+  "type": "object",
+  "patternProperties": {
+    "^[a-zA-Z0-9\\.\\-_]{0,100}$": {
+      "$ref": "#/definitions/Schema"
+    }
+  },
+  "additionalProperties": false,
+  "minProperties": 0,
+  "maxProperties": 500,
+  "definitions": {
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "array",
+            "boolean",
+            "integer",
+            "number",
+            "object",
+            "string"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "binary"
+          ]
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Schema"
+            },
+            {
+              "$ref": "#/definitions/Reference"
+            }
+          ]
+        },
+        "allOf": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Schema"
+              },
+              {
+                "$ref": "#/definitions/Reference"
+              }
+            ]
+          }
+        },
+        "oneOf": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Schema"
+              },
+              {
+                "$ref": "#/definitions/Reference"
+              }
+            ]
+          }
+        },
+        "anyOf": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Schema"
+              },
+              {
+                "$ref": "#/definitions/Reference"
+              }
+            ]
+          }
+        },
+        "discriminator": {
+          "$ref": "#/definitions/Discriminator"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Schema"
+              },
+              {
+                "$ref": "#/definitions/Reference"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Reference": {
+      "type": "object",
+      "required": [
+        "$ref"
+      ],
+      "properties": {
+        "$ref": {
+          "type": "string",
+          "pattern": "^#/schemas/[\\w|-]+$",
+          "maxLength": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "Discriminator": {
+      "type": "object",
+      "required": [
+        "propertyName"
+      ],
+      "properties": {
+        "propertyName": {
+          "description": "The name of the property in the payload that will hold the discriminator value.",
+          "type": "string"
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "$id": "#schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ADD Specification",
+  "description": "ADD specification",
+  "type": "object",
+  "required": [
+    "info",
+    "connection"
+  ],
+  "properties": {
+    "info": {
+      "$ref": "info_v01.json"
+    },
+    "connection": {
+      "$ref": "connection_v01.json"
+    },
+    "schemas": {
+      "$ref": "schemas_v01.json"
+    },
+    "categories": {
+      "$ref": "categories_v01.json"
+    },
+    "actions": {
+      "$ref": "actions_v01.json"
+    },
+    "triggers": {
+      "$ref": "triggers_v01.json"
+    },
+    "flows": {
+      "$ref": "flows_v01.json"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {}
+}

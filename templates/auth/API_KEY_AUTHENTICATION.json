@@ -1,0 +1,47 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "connectionProperties": [
+      {
+        "name": "baseURL",
+        "type": "URL",
+        "displayName": "Base URL",
+        "description": "Endpoint base URL",
+        "shortDescription": "Endpoints base URL",
+        "default": "",
+        "required": true,
+        "hidden": true,
+        "scope": [
+          "ACTION"
+        ]
+      }
+    ],
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "policy": "API_KEY_AUTHENTICATION",
+        "description": "API Key Based Authentication",
+        "displayName": "API Key Based Authentication",
+        "scope": "ACTION",
+        "securityProperties": [
+          {
+            "name": "accessToken",
+            "displayName": "API Key",
+            "description": "Provide the API Key",
+            "shortDescription": "Example: <The generated api key>",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "accessTokenUsage",
+            "displayName": "API Key Usage",
+            "description": "Provide the API Key",
+            "hidden": false,
+            "required": false,
+            "default": "-H Authorization: Bearer ${api-key}"
+          }
+        ]
+      }
+    ]
+  }
+}

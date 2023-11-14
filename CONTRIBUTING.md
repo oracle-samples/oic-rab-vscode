@@ -1,6 +1,4 @@
-*Detailed instructions on how to contribute to the project, if applicable. Must include section about Oracle Contributor Agreement with link and instructions*
-
-# Contributing to this repository
+# Contributing to Oracle Integration Rapid Adapter Builder
 
 We welcome your contributions! There are multiple ways to contribute.
 

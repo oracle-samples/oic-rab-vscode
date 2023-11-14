@@ -1,0 +1,71 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "connectionProperties": [
+      {
+        "name": "baseURL",
+        "type": "URL",
+        "displayName": "Base URL",
+        "description": "Endpoint base URL",
+        "shortDescription": "Endpoints base URL",
+        "default": "",
+        "required": true,
+        "hidden": true,
+        "scope": [
+          "ACTION"
+        ]
+      }
+    ],
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "policy": "OAUTH_ONE_TOKEN_BASED",
+        "displayName": "OAuth 1.0 One Legged Authentication",
+        "description": "OAuth 1.0 One Legged Authentication",
+        "scope": "ACTION",
+        "securityProperties": [
+          {
+            "name": "oauth_consumer_key",
+            "displayName": "Consumer Key",
+            "description": "Used to identify the client that is making the request.",
+            "shortDescription": "Registered consumer key.",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "oauth_consumer_secret",
+            "displayName": "Consumer Secret",
+            "description": "Used to authorize the client that is making the request.",
+            "shortDescription": "Registered consumer Secret.",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "oauth_token",
+            "displayName": "Token",
+            "description": "Used to access protected resource.",
+            "shortDescription": "Registered token",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "oauth_token_secret",
+            "displayName": "Token Secret",
+            "description": "Used for generating signature for the request.",
+            "shortDescription": "Token secret provided by server.",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "realm",
+            "displayName": "Realm",
+            "description": "Used for identifying the account.",
+            "shortDescription": "Account identifier.",
+            "hidden": false,
+            "required": true
+          }
+        ]
+      }
+    ]
+  }
+}

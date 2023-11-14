@@ -1,0 +1,359 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "$id": "#actions",
+  "title": "Actions",
+  "description": "Actions are the user-facing list of capabilities of the adapter. This section contains information that powers the UI for designtime configuration. For example, it contains the name of actions, the description, the configuration options for the action, and the input and output schema that drives the mapping experience.",
+  "type": "object",
+  "patternProperties": {
+    "^[a-zA-Z0-9\\.\\-_]{0,100}$": {
+      "$ref": "#/definitions/Action"
+    }
+  },
+  "additionalProperties": false,
+  "minProperties": 0,
+  "maxProperties": 100,
+  "definitions": {
+    "Action": {
+      "type": "object",
+      "description": "An individual action models one specific capability of the adapter. There is some latitude around what the capability can do depending on the action designer. For example, an action can create an Order or an action can create a object and the configuration of the action requires the selection of a resource, which can drive the generated schema for that resource. An action may contain configuration options and input and output schema. From an adapter endpoint configuration experience, if only one action is defined, the user interface will not show the selection and will simply default the selection of the action automatically.",
+      "required": [
+        "displayName",
+        "execute"
+      ],
+      "properties": {
+        "displayName": {
+          "description": "The name of the action that shows up as a selectable item in the user interface. This name should be short but meaningful to a user of the application and not necessarily for developer.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the action that shows up in the user interface as a tooltip. This description should be meaningful for the end user of the application or technology.",
+          "maxLength": 1000
+        },
+        "configuration": {
+          "description": "The configuration section models the configuration option for an option to fully configure the action. Certain actions may need additional information that the user need to provide to allow runtime to function. The configuration options are modeled as user interface widgets with data either statically defined for fed by flows. Selections of a configuration field can drive one or more configuration field selections both in the values that are available or the set of configurations fields that are available.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConfigurationField"
+          },
+          "minItems": 0,
+          "maxItems": 20,
+          "uniqueItems": true
+        },
+        "group": {
+          "type": "string",
+          "description": "The name of the group which is defined in categories section. If this field is set, the adapter configuration endpoint screen will present the user with a group filter that can show subset of actions depending on actions association with the group. An action can only be associated with one group.",
+          "maxLength": 100
+        },
+        "execute": {
+          "description": "The reference to a flow that is defined in the flow section. The action flow can be considered the runtime implementation of the action. The action flow will be provided with all the configuration fields and the connection fields as parameters and the a structure of data corresponding to the input schema to execute the action logic, which typically entails invoking a third party API. The action flow also processes the response and transforms the structure to comply with the response schema as defined by the action.",
+          "type": "string",
+          "pattern": "^flow:[\\w|-]+$",
+          "maxLength": 100
+        },
+        "input": {
+          "$ref": "#/definitions/InputOutput"
+        },
+        "output": {
+          "$ref": "#/definitions/InputOutput"
+        },
+        "$refOpenapi": {
+          "type": "string",
+          "description": "The OpenAPI path referencing the specific path of used for generating input and output schemas as well the endpoint invoked by the action. This value should following the following format: '{method}:{resource path}'. For example: 'GET:/pet/findByStatus'. The header, query parameter, request structure as defined in the OpenAPI defines the input schema and output schema. If this property is set, the input and output is not required because they are driven by the OpenAPI.",
+          "maxLength": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "InputOutput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Schema defined in the schemas section that defines the contract of the ADD action.",
+          "required": [
+            "schemaType",
+            "schema"
+          ],
+          "properties": {
+            "schemaType": {
+              "type": "string",
+              "description": "Schema type describes the type of schema that is used to define the structure of the input and output of the action.",
+              "enum": [
+                "application/schema+json",
+                "avro/binary"
+              ]
+            },
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "schemas_v01.json#/definitions/Schema"
+                },
+                {
+                  "$ref": "schemas_v01.json#/definitions/Reference"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "string",
+          "description": "This field references a flow defined in the flow section that is the implementation for creation of the schema definition. For example, a third party may offer metadata APIs that can retrieve the schema of a given resource given the resource identifier. In this case, the schema does not need to be statically defined in the schema section of the document but instead can be dynamically create the JSON schema definition of that resource from calling the third party API. This field may also drive the schema from user defined schema derived from JSON sample.",
+          "pattern": "^flow:[\\w|-]+$|[Uu][Ss][Ee][Rr][Dd][Ee][Ff][Ii][Nn][Ee][Dd]",
+          "maxLength": 100
+        }
+      ]
+    },
+    "ConfigurationField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The internal name is the configuration field name. This name is used as the key to access the value of the configuration field in the flow. In the flow, this field is accessed in the following way: '.configuration.{configuration field name}'",
+          "type": "string",
+          "maxLength": 100
+        },
+        "displayName": {
+          "description": "The display name for the configuration field. This is the field that will display adapter endpoint configuration when configuring this action.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": {
+          "description": "The description of the configuration field. This field will show up as tool tip that describes the purpose of the configuration field if set.",
+          "type": "string",
+          "maxLength": 500
+        },
+        "type": {
+          "description": "The type models the user interface widget to use for rendering the configuration data. Each widget has a specific experience in terms of selection. Most widgets model one selection and map to one value that can be accessed in the flow. However, other widgets may return more than one value.",
+          "type": "string",
+          "enum": [
+            "COMBO_BOX",
+            "RADIO",
+            "TEXT_BOX",
+            "LIST_BOX",
+            "TEXT_AREA",
+            "BUTTON",
+            "CHECK_BOX",
+            "SHUTTLE_BOX",
+            "TABLE",
+            "LABEL",
+            "FILE"
+          ]
+        },
+        "validation": {
+          "description": "The field references a flow that can provide the validation result of the field. For example, if a user enters a value in the textbox widget, this flow will execute logic to validate the value based on the logic modeled by the developer. For example, a user may enter a value that is not numeric between 0 and 30 and any value beyond the range should throw a validation error.",
+          "type": "string",
+          "pattern": "^flow:[\\w|-]+$",
+          "maxLength": 100
+        },
+        "default": {
+          "description": "The default value of the configuration field. If the user does not enter a value for the configuration field and the developer enters this value for the default, the default field value will be available in the flow for access.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "required": {
+          "description": "This field models whether this configuration selection is required. If this setting is set to true, the user must set a value for the configuration to proceed.",
+          "type": "boolean"
+        },
+        "options": {
+          "$ref": "#/definitions/Options"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "This field represents the column name. This name will be used as the key to access the column value.",
+                "type": "string",
+                "maxLength": 100
+              },
+              "displayName": {
+                "description": "This field represents the display name. This name will display as the column name in the adapter endpoint configuration.",
+                "type": "string",
+                "maxLength": 100
+              },
+              "type": {
+                "description": "The type models column type. Setting this field can control the type of display for the column.",
+                "type": "string",
+                "enum": [
+                  "COMBO_BOX",
+                  "TEXT_BOX"
+                ]
+              },
+              "options": {
+                "type": "array",
+                "description": "This is the set of data that drives the table column. This data is likely driven by the return results of a flow.",
+                "items": {
+                  "$ref": "#/definitions/Option"
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "name",
+              "displayName",
+              "type"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "COMBO_BOX"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "options"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "dependencies": {
+          "$ref": "#/definitions/Dependencies"
+        }
+      },
+      "required": [
+        "name",
+        "displayName",
+        "type"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "COMBO_BOX"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "RADIO"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "LIST_BOX"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "SHUTTLE_BOX"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "TABLE"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "columns"
+            ]
+          }
+        }
+      ]
+    },
+    "Options": {
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "The set of data that drives the configuration field.",
+          "items": {
+            "$ref": "#/definitions/Option"
+          },
+          "uniqueItems": true
+        },
+        {
+          "type": "string",
+          "description": "This field references a flow defined in the flow section that is the implementation for the action. Or this field may drive their schema from user defined schema derived from JSON sample.",
+          "pattern": "^flow:[\\w|-]+$",
+          "maxLength": 100
+        }
+      ]
+    },
+    "Option": {
+      "type": "object",
+      "properties": {
+        "keyName": {
+          "description": "The key that will be saved as the user selection to drive the runtime. The value corresponding to this key name will be available to the runtime flow for this action. It can be referenced in the follwoing way in the action: '.configuration.{configuration field name}'",
+          "type": "string",
+          "maxLength": 100
+        },
+        "displayName": {
+          "description": "The user display name that will show up in the user interface for the key that drives runtime.",
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "Dependencies": {
+      "type": "object",
+      "description": "Dependencies model way configuration fields drive each other. A field that depends on the selection of another field before it can show its data declares the other field as its dependency.",
+      "patternProperties": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
+          "$ref": "#/definitions/Dependency"
+        }
+      }
+    },
+    "Dependency": {
+      "type": "object",
+      "description": "A dependency models the specific a dependence of one field from the selection of another. A Value dependency describes a field's specific value driving the visibility and field values of one or more subsequent fields. Field dependency describes a field selection that will drive one or more dependent field's values. A Value dependency describes a field's specific value driving the visibility and field values of one or more subsequent fields. If the dependency array value is empty, that denotes a field dependency. A Value dependency describes a field's specific value driving the visibility and field values of one or more subsequent fields. If the dependency array value has values, that denotes that the configuration field's visibility and values are driven by the specified set of values from the parent.",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
