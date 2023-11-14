@@ -1,0 +1,18 @@
+# select which profile to use.
+active: instance01
+
+# multiple profiles can be defined.
+profiles:  
+  - name: instance01 # this is the name of your profile.
+    # Publisher ID is an unique identifier of your organization.
+    publisherId: ""
+    # Host to OIC service
+    host: 
+    # This is your service instance (SI)
+    integrationInstance: 
+    # This is the IDCS credentials for retrieving access token.
+    auth:
+      tokenUrl: 
+      clientId: 
+      clientSecret: 
+      scope: 

@@ -1,0 +1,17 @@
+out
+out-test
+dist
+node_modules
+.vscode-test/
+*.vsix
+.DS_Store
+webview/static/js/node_modules_web-vitals_dist_web-vitals_js.chunk.js
+webview/static/js/node_modules_web-vitals_dist_web-vitals_js.chunk.js.LICENSE.txt
+webview/favicon.ico
+webview/logo192.png
+webview/logo512.png
+webview/robots.txt
+test-resources
+vscode*
+.tmp.env
+glob-copy.js*

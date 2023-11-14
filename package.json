@@ -1,0 +1,380 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "name": "oic-rapid-adapter-builder",
+  "displayName": "OIC Rapid Adapter Builder",
+  "description": "OIC Rapid Adapter Builder is a set of tools that makes it easier for you to validate, develop and deploy the next-gen RAB adapters for Oracle Integration Cloud (OIC) straight from VS Code.",
+  "publisher": "Oracle",
+  "license": "UPL",
+  "version": "1.0.0",
+  "icon": "resources/logo.png",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Linters",
+    "Snippets",
+    "Other"
+  ],
+  "homepage": "https://docs.oracle.com/en/cloud/paas/application-integration/index.html",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oracle-samples/oic-rab-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/oracle-samples/oic-rab-vscode/issues"
+  },
+  "galleryBanner": {
+    "color": "#FFFFFF",
+    "theme": "light"
+  },
+  "keywords": [
+    "Oracle",
+    "OIC",
+    "RAB",
+    "Integration",
+    "iPaaS"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "OIC Rapid Adapter Builder",
+      "properties": {
+        "RAB.logLevel": {
+          "type": "string",
+          "default": "info",
+          "description": "The log level for output channel.",
+          "enum": [
+            "debug",
+            "info"
+          ]
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "orab.initWorkspace",
+        "title": "RAB: Initialize Workspace"
+      },
+      {
+        "command": "orab.insertAuthenticationScheme",
+        "title": "RAB: Set Authentication Scheme...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "orab.insertTestConnection",
+        "title": "RAB: Set Test Connection Flow...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "orab.add.publish",
+        "title": "RAB: Publish"
+      },
+      {
+        "command": "orab.add.delete",
+        "title": "Delete ADD"
+      },
+      {
+        "command": "orab.add.get",
+        "title": "Get ADD"
+      },
+      {
+        "command": "orab.add.validate",
+        "title": "RAB: Validate"
+      },
+      {
+        "command": "orab.add.version-check",
+        "title": "RAB: Version Check"
+      },
+      {
+        "command": "orab.convert.postman.document",
+        "title": "RAB: Convert Document"
+      },
+      {
+        "command": "orab.webview.copilot.open.postman.convert",
+        "title": "RAB: Add Requests..."
+      },
+      {
+        "command": "orab.explorer.add.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "orab.explorer.profile.edit",
+        "title": "Edit...",
+        "icon": "$(pencil)"
+      },
+      {
+        "command": "orab.explorer.profile.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "orab.explorer.outline.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "orab.explorer.outline.triggers.new",
+        "title": "New Trigger...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "orab.explorer.outline.actions.new",
+        "title": "New Action...",
+        "icon": "$(add)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "orab.add.publish",
+          "when": "false"
+        },
+        {
+          "command": "orab.add.delete",
+          "when": "false"
+        },
+        {
+          "command": "orab.add.get",
+          "when": "false"
+        },
+        {
+          "command": "orab.add.validate",
+          "when": "false"
+        },
+        {
+          "command": "orab.add.version-check",
+          "when": "false"
+        },
+        {
+          "command": "orab.convert.postman.document",
+          "when": "false"
+        },
+        {
+          "command": "orab.webview.copilot.open.postman.convert",
+          "when": "false"
+        },
+        {
+          "command": "orab.explorer.add.refresh",
+          "when": "false"
+        },
+        {
+          "command": "orab.explorer.profile.edit",
+          "when": "false"
+        },
+        {
+          "command": "orab.explorer.profile.refresh",
+          "when": "false"
+        },
+        {
+          "command": "orab.explorer.outline.refresh",
+          "when": "false"
+        },
+        {
+          "command": "orab.explorer.outline.triggers.new",
+          "when": "false"
+        },
+        {
+          "command": "orab.explorer.outline.actions.new",
+          "when": "false"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.add.validate",
+          "group": "orab"
+        },
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.add.version-check",
+          "group": "orab"
+        },
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.add.publish",
+          "group": "orab"
+        },
+        {
+          "when": "resourceFilename =~ /(?<!\\.add)\\.json$/",
+          "command": "orab.convert.postman.document",
+          "group": "orab"
+        },
+        {
+          "when": "resourceFilename =~ /(?<!\\.add).json$/",
+          "command": "orab.webview.copilot.open.postman.convert",
+          "group": "orab"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.insertTestConnection",
+          "group": "orab"
+        },
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.insertAuthenticationScheme",
+          "group": "orab"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.insertAuthenticationScheme",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "when": "view == adaptersTreeView && viewItem == addRecord",
+          "command": "orab.add.get"
+        },
+        {
+          "when": "view == adaptersTreeView && viewItem == addRecord",
+          "command": "orab.add.delete"
+        },
+        {
+          "when": "view == outlineTreeView && viewItem == triggers",
+          "command": "orab.explorer.outline.triggers.new",
+          "group": "inline"
+        },
+        {
+          "when": "view == outlineTreeView && viewItem == actions",
+          "command": "orab.explorer.outline.actions.new",
+          "group": "inline"
+        }
+      ],
+      "view/title": [
+        {
+          "when": "view == adaptersTreeView",
+          "command": "orab.explorer.add.refresh",
+          "group": "navigation"
+        },
+        {
+          "when": "view == profilesTreeView",
+          "command": "orab.explorer.profile.edit",
+          "group": "navigation"
+        },
+        {
+          "when": "view == profilesTreeView",
+          "command": "orab.explorer.profile.refresh",
+          "group": "navigation"
+        },
+        {
+          "when": "view == outlineTreeView",
+          "command": "orab.explorer.outline.refresh",
+          "group": "navigation"
+        }
+      ]
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "*.add.json",
+          "*.add"
+        ],
+        "url": "./schemas/mainADD_v01.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "json",
+        "path": "./snippets/add.json"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "orab-explorer",
+          "icon": "resources/activitybar.svg",
+          "title": "OIC Rapid Adapter Builder"
+        }
+      ]
+    },
+    "views": {
+      "orab-explorer": [
+        {
+          "id": "adaptersTreeView",
+          "name": "Registered Adapters"
+        },
+        {
+          "id": "profilesTreeView",
+          "name": "Publisher Profiles"
+        },
+        {
+          "id": "outlineTreeView",
+          "name": "Outline"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "adaptersTreeView",
+        "contents": "No adapters found."
+      },
+      {
+        "view": "profilesTreeView",
+        "contents": "No publisher profile found.\n[Edit Profile](command:orab.explorer.profile.edit)"
+      },
+      {
+        "view": "outlineTreeView",
+        "contents": "No adapter definition found."
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run -S esbuild-base -- --minify",
+    "esbuild-base": "rm -rf out && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "build": "npm run -S esbuild-base -- --sourcemap",
+    "watch": "npm run -S esbuild-base -- --sourcemap --watch",
+    "fmt": "prettier --write \"src/**/*.ts\"&& npm run test -- --fix",
+    "test": "npm run lint && cd src; tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "package": "./node_modules/.bin/vsce package"
+  },
+  "devDependencies": {
+    "chai": "^4.3.8",
+    "@types/chai": "^4.3.6",
+    "@types/fs-extra": "^11.0.2",
+    "@types/glob": "^8.1.0",
+    "@types/js-yaml": "^4.0.5",
+    "@types/json-to-ast": "^2.1.2",
+    "@types/lodash": "^4.14.191",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/object-hash": "^3.0.2",
+    "@types/vscode": "^1.73.0",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "@vscode/test-electron": "^2.2.3",
+    "@vscode/vsce": "^2.19.0",
+    "esbuild": "^0.17.19",
+    "eslint": "^8.34.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5",
+    "vscode-extension-tester": "^5.9.1"
+  },
+  "dependencies": {
+    "axios": "1.5.0",
+    "fs-extra": "11.1.1",
+    "handlebars": "4.7.7",
+    "json-to-ast-ext": "2.1.3",
+    "js-yaml": "4.1.0",
+    "lodash": "4.17.21",
+    "object-hash": "3.0.0",
+    "rxjs": "7.8.0"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "arrowParens": "avoid"
+  }
+}

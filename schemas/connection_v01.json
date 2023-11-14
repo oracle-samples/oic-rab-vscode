@@ -1,0 +1,2449 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "#connection",
+  "title": "connectionDefinition",
+  "description": "Oracle Integration cloud facilitates connectivity with external applications. This connectivity can be divided into how external applications can invoke an OIC integration (a.k.a. trigger) an how OIC can invoke external applications (a.k.a. invoke). OIC provides a re-usable connection that helps in securely connecting and invoking external applications as part of an invoke.  OIC also provides a trigger connection that can be used to securely expose integration flows to external applications.  Connection Definition comprises of the following: Connection name, Connection role (Trigger | Invoke), Connection properties and one or more security policies. ",
+  "type": "object",
+  "properties": {
+    "connectionProperties": {
+      "$ref": "#/definitions/connectionProperties_type"
+    },
+    "securityPolicies": {
+      "$ref": "#/definitions/securityPolicies_type"
+    },
+    "test": {
+      "description": "Test is used to validate the connection configuration. An ideal way to validate a connection configuration would be to call an actual API on the target system. The choice of API should be an idempotent API with no business impact so that the test action doesn't have any implications and simply allows the adapter user to validate the connection and security configuration. \nA test connection failure may point to several things like the instance not reachable or the security information not sufficient to authenticate or obtain tokens or in some cases, the acquired tokens are not sufficient to access a given resource or are forbidden. The cause of failure therefore is just as important as a success for the user to proceed. \nADD developers using managed security policies automatically inherit the validation built into the managed security policies. For example, in the case of OAuth, this would mean that the relevant tokens are acquired and refreshed. ADD developers however are required to provide additional information about idempotent APIs to call for further validation. They are also required to provide information about how to assert these calls. ",
+      "type": "string",
+      "pattern": "^flow:[\\w|-]+$",
+      "examples": [
+        "flow:testConnectionFlow"
+      ],
+      "minLength": 6,
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "securityPolicies"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "keys_type": {
+      "type": "array",
+      "description": "Keys are used to represent items within a choice group. This will render as a combo-box in the connection UI where the users will be able to select one of the listed keys.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "keyName": {
+            "type": "string",
+            "description": "Internal name of the keys that will appear in the combo-box in the connection UI.",
+            "examples": [
+              "TLSv1",
+              "TLSv2"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Internal name of the keys that will appear in the combo-box in the connection UI",
+            "examples": [
+              "TLSv1",
+              "TLSv2"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "connectionProperties_type": {
+      "description": "Zero or more properties pointing to the co-ordinates or the source or target system, directly or indirectly. Connection properties are optional and are required to get the user input for connecting to target applications. Adapter developers should look to minimise the user input. Max permissible properties is fixed to 10. Thus it is a good idea to get only the logical and minimal information and derive connection information, if possible.",
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "commons_v01.json#/definitions/nameString"
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString"
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText"
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText"
+          },
+          "type": {
+            "type": "string",
+            "description": "The following restrictions apply:  STRING (128), TEXT (4000), PASSWORD (4000)",
+            "enum": [
+              "STRING",
+              "NUMBER",
+              "URL",
+              "PASSWORD",
+              "TEXT",
+              "CHOICE",
+              "BOOLEAN"
+            ]
+          },
+          "required": {
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property.",
+            "type": "boolean"
+          },
+          "hidden": {
+            "description": "When set to true, a given property is masked from the connection page. If a property is marked as hidden, then it must have a default value. Example, releaseVersion is marked as hidden and bears the default value of 1A.",
+            "type": "boolean"
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          },
+          "scope": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "description": "Properties used on the trigger side are scoped as TRIGGER while properties on the invoke side are scoped as ACTION.",
+              "type": "string",
+              "enum": [
+                "TRIGGER",
+                "ACTION"
+              ]
+            }
+          },
+          "options": {
+            "$ref": "#/definitions/keys_type"
+          }
+        },
+        "required": [
+          "name",
+          "displayName",
+          "type",
+          "required",
+          "hidden",
+          "scope"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "CHOICE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "options": {
+                  "$ref": "#/definitions/keys_type"
+                }
+              },
+              "required": [
+                "options"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "hidden": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "default": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "default"
+              ]
+            }
+          }
+        ],
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "securityPolicies_type": {
+      "description": "One ore more Security Policies can be exposed by a given adapter. Security policy is used to access protected endpoints.",
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Managed indicates that a pre-defined managed security policy is being used. Even while using a manged security policy, ADD developers can (1) hide security policy properties and provide a default value instead. (2) Change the displayName and description of a managed security policy. The provided values will be displayed on the connection page. ",
+            "type": "string",
+            "enum": [
+              "composite",
+              "managed",
+              "selfManaged"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "The visible name of a security policy on the connection page."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "TRIGGER",
+              "ACTION"
+            ],
+            "description": "Properties used on the trigger side are scoped as TRIGGER while properties on the invoke side are scoped as ACTION."
+          },
+          "policy": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "policyInbound": {
+            "$ref": "#/definitions/policyInbound_type"
+          },
+          "policyOutbound": {
+            "$ref": "#/definitions/policyOutbound_type"
+          },
+          "securityProperties": {},
+          "authflow": {
+            "type": "string",
+            "description": "Deprecated. Use extensible OAUTH2.0 security policies. The default implementation of this policy is rfc-6749 compatible. However, in practice we have seen that many implementations are different from how the RFC illustrates. Using the property, you can change one or more of the following steps of this security policy: getAuthorizationURI, requestAccessToken, refreshAccessToken, accessTokenUsage"
+          }
+        },
+        "required": [
+          "type",
+          "description",
+          "displayName",
+          "scope"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "managed"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "policy": {
+                  "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
+                  "type": "string",
+                  "enum": [
+                    "NONE",
+                    "BASIC_AUTH",
+                    "OAUTH_INBOUND",
+                    "OAUTH2.0_TOKEN_VALIDATION",
+                    "MULTI_TOKEN_INBOUND",
+                    "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
+                    "DIGITAL_SIGNATURE",
+                    "HMAC_SIGNATURE_VALIDATION",
+                    "RSA_SIGNATURE_VALIDATION",
+                    "JWT_VALIDATION",
+                    "CUSTOM_SINGLE_TOKEN",
+                    "API_KEY_AUTHENTICATION",
+                    "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
+                    "OAUTH_CLIENT_CREDENTIALS",
+                    "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                    "OCI_SIGNATURE_VERSION1",
+                    "OAUTH_ONE_TOKEN_BASED",
+                    "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
+                    "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
+                    "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
+                    "ADD_OAUTH_CLIENT_CREDENTIALS",
+                    "OAUTH2.0_CLIENT_CREDENTIALS",
+                    "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                    "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                  ]
+                }
+              },
+              "required": [
+                "policy"
+              ],
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "DIGITAL_SIGNATURE"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope": {
+                        "const": "TRIGGER"
+                      },
+                      "securityProperties": {
+                        "$ref": "#/definitions/DigitalSignatureSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "HMAC_SIGNATURE_VALIDATION"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope": {
+                        "const": "TRIGGER"
+                      },
+                      "securityProperties": {
+                        "$ref": "#/definitions/HmacValidationSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "RSA_SIGNATURE_VALIDATION"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope": {
+                        "const": "TRIGGER"
+                      },
+                      "securityProperties": {
+                        "$ref": "#/definitions/RsaValidationSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "JWT_VALIDATION"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope": {
+                        "const": "TRIGGER"
+                      },
+                      "securityProperties": {
+                        "$ref": "#/definitions/JwtValidationSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "MULTI_TOKEN_INBOUND"
+                          },
+                          {
+                            "const": "OAUTH2.0_OR_BASIC_AUTH_VALIDATION"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope": {
+                        "const": "TRIGGER"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "OAUTH_INBOUND"
+                          },
+                          {
+                            "const": "OAUTH2.0_TOKEN_VALIDATION"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope": {
+                        "const": "TRIGGER"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "BASIC_AUTH"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/BasicSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "CUSTOM_SINGLE_TOKEN"
+                          },
+                          {
+                            "const": "API_KEY_AUTHENTICATION"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/ApiKeySecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "OAUTH_AUTHORIZATION_CODE_CREDENTIALS"
+                      }
+                    },
+                    "required": [
+                      "policy"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/AuthCodeSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "OAUTH_CLIENT_CREDENTIALS"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/ClientCredentialsSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/ROPCSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "OCI_SIGNATURE_VERSION1"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/OCISignatureV1SecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "OAUTH_ONE_TOKEN_BASED"
+                          },
+                          {
+                            "const": "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/OAuth1.0SecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/OAuth2.0AuthorizationSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "OAUTH2.0_CLIENT_CREDENTIALS"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/OAuth2.0ClientCredentialsSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "oneOf": [
+                          {
+                            "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/OAuth2.0ROPCSecurityProperties_type"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "composite"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "composite"
+                  ]
+                },
+                "description": {
+                  "$ref": "commons_v01.json#/definitions/longText"
+                },
+                "displayName": {
+                  "$ref": "commons_v01.json#/definitions/displayNameString"
+                },
+                "scope": {
+                  "description": "Composite policies are only applicable on the TRIGGER scope.",
+                  "type": "string",
+                  "enum": [
+                    "TRIGGER"
+                  ]
+                },
+                "policyInbound": {
+                  "$ref": "#/definitions/policyInbound_type"
+                },
+                "policyOutbound": {
+                  "$ref": "#/definitions/policyOutbound_type"
+                }
+              },
+              "required": [
+                "scope",
+                "policyInbound",
+                "policyOutbound"
+              ],
+              "not": {
+                "required": [
+                  "policy"
+                ]
+              }
+            }
+          }
+        ],
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "securityProperties_type": {
+      "type": "array",
+      "description": "For managed security policies, the security properties are pre-defined. Users can however override and change the name of security policy properties or they can hide security policy properties and provide a default value instead.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "commons_v01.json#/definitions/nameString",
+            "description": "Managed security policies have pre-defined properties. Each of these properties have an internal name that is immutable and used to reference this property. For nonManaged security policies, users can define the properties.",
+            "examples": [
+              "username",
+              "password"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "The user wants to use a managed security policy called BASIC_AUTH but in their domain context accountID is used as the userName. The user can go to the securityProperty section and change the displayName to accountID."
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page."
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy properties section on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "DigitalSignatureSecurityProperties_type": {
+      "type": "array",
+      "description": "HTTP Digital Signature is a simple authentication scheme built into the HTTP protocol. The client sends HTTP requests with the Signature that contains the string constructed byparts of request. Signing can be done via hmac/rsa.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Digital Signature policies need information on how to compute signature, location of signature in request, shared key/secret and optional timestamp validation logic. For this it has pre-defined properties called signatureFunction, signatureLocation, timestampValidator and signKey. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "signatureFunction",
+              "signatureLocation",
+              "timestampValidator",
+              "signKey"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Signature Statement",
+              "Request Signature Location(s)",
+              "Timestamp Validation Strategy",
+              "Shared Secret"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "JQ Expression or Flow indicating how to compute signature",
+              "JQ Expression or Flow to extract signature(s) from request",
+              "JQ Expression or Flow to extract timestamp and validate",
+              "Shared Secret or keystore alias of certificate."
+            ]
+          },
+          "shortDescription": {
+            "type": "string",
+            "examples": [
+              "Example: .request.headers.\"x-signature\"",
+              "Value or alias"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "HmacValidationSecurityProperties_type": {
+      "type": "array",
+      "description": "HTTP HMAC Validation is a signature based authentication mechanism. The client sends HTTP requests that contain HMAC Signature constructed using parts of request",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "HMAC Validation policy needs information on how to compute signature, location of signature in request, shared secret and optional timestamp validation logic. For this it has pre-defined properties called `signatureFunction`, `signatureLocation`, `timestampValidator` and `secret`. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "signatureString",
+              "signature",
+              "secret",
+              "signatureAlgorithm",
+              "timestampValidator"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Signature Statement",
+              "Request Signature Location(s)",
+              "Timestamp Validation Strategy",
+              "Shared Secret"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "JQ Expression or Flow to build signing string",
+              "JQ Expression or Flow to extract signature(s) from request",
+              "JQ Expression or Flow to extract timestamp and validate",
+              "Text,JQ Expression or Flow Shared Secret."
+            ]
+          },
+          "shortDescription": {
+            "type": "string",
+            "examples": [
+              "Example: connectivity::hmac(\"HMACSHA256\"; .securityProperties.signKey; .request.body)",
+              "Example: .request.headers.\"x-signature\"",
+              "Value"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "RsaValidationSecurityProperties_type": {
+      "type": "array",
+      "description": "HTTP RSA Validation is a signature based authentication mechanism. The client sends HTTP requests that contain RSA Signature constructed using parts of request.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "RSA Validation policy needs information on where to look for signature, Signature Algorithm, signing key and optional timestamp validation logic. For this it has pre-defined properties called `signedString`, `signAlgorithm`, `timestampValidator` and `signKey`. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "signature",
+              "signatureString",
+              "signatureAlgorithm",
+              "signatureKey",
+              "timestampValidator"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Signature Lookup Expression",
+              "Timestamp Validation Strategy",
+              "Signature key alias"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "JQ Expression or Flow to extract RSA signature",
+              "JQ Expression or Flow to extract timestamp and validate",
+              "Signature key alias."
+            ]
+          },
+          "shortDescription": {
+            "type": "string",
+            "examples": [
+              "Example: connectivity::rsa(\"SHA256withRSA\"; .securityProperties.signKey; .request.headers.authorization, .request.body)",
+              "alias"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "JwtValidationSecurityProperties_type": {
+      "type": "array",
+      "description": "HTTP JWT Validation is a signature based authentication mechanism to validate JWT tokens. The client sends HTTP requests that contain JWT token signed using hmac/rsa.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "JWT Validation policy needs information on where JWT lookup and its validation logic and signing key. For this it has pre-defined properties called `jwtToken`, `subjectClaim`, `customClaimsValidation` and `signKey`. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "jwtToken",
+              "subjectClaim",
+              "signatureKey",
+              "customClaimsValidation"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "JWT validation Expression",
+              "Signature key alias"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "JQ Expression or Flow to extract and validate JWT token",
+              "Signature key alias or JWK location.",
+              "Shared secret"
+            ]
+          },
+          "shortDescription": {
+            "type": "string",
+            "examples": [
+              "Example: connectivity::jwtVerify(.request.headers.authorization; .securityProperties.signKey)",
+              "alias",
+              "http://hostPort/context/jwk"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "BasicSecurityProperties_type": {
+      "type": "array",
+      "description": "HTTP Basic authentication is a simple authentication scheme built into the HTTP protocol. The client sends HTTP requests with the Authorization header that contains the word Basic followed by a space and a base64-encoded string username:password.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Basic Auth managed security policies has pre-defined properties called usename and password. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "username",
+              "password"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Username",
+              "Password"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "A username credential",
+              "A password credential"
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "Use UserName",
+              "Enter Password"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "ApiKeySecurityProperties_type": {
+      "type": "array",
+      "description": "API Key Based Authentication. In order to consume APIs protected using an API-Key, integration developers should use the API Key Based Authentication security policy.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "API Key Based Authentication managed security policies has pre-defined properties called accessToken and accessTokenUsage. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "accessToken",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "API Key",
+              "API Key Usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Generated API Key used to identify the client that is making the request.",
+              "API Key Usage. URI syntax to illustrate how the API KEY should be passed to access a protected resource. \nExample: To pass the API-KEY as a query parameter \"?<query-param-name>=${api-key}\" \nor To pass the API-KEY as a Header \"-H Authorization: Bearer ${api-key}\" without quotes."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "Generated API key.",
+              "Default: -H Authorization: Bearer ${api-key}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "AuthCodeSecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth  Authorization Code Credentials. The authorization code grant is an OAuth flow where the resource owner is required to provide consent before an access token can be granted to the client application.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Authorization Code Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.auth.code.uri",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "clientAuthentication"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Authorization Code URI",
+              "Access Token URI",
+              "Scope"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "This endpoint is the target of the initial request. \nIt handles active session lookup, authenticating the user, and user consent.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/auth",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write."
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "ClientCredentialsSecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth Client Credentials. The client application directly obtains access on its own without the resource owner’s intervention using its Client Id and Client Secret.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Client Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "clientAuthentication",
+              "oauth.request.content.type"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Access Token URI",
+              "Scope"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write."
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "ROPCSecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth  Resource Owner Password Credentials. The resource owner's password credentials can be used directly as an authorization grant to obtain an access token. Since the resource owner shares its credentials with the client, this policy is used when there is a high degree of trust between the resource owner and the client.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Resource Owner Password Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "username",
+              "password",
+              "clientAuthentication",
+              "oauth.request.content.type"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Access Token URI",
+              "Scope",
+              "username",
+              "password"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "resource owner username",
+              "resource owner password"
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/auth",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write."
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OCISignatureV1SecurityProperties_type": {
+      "type": "array",
+      "description": "OCI Signature Version 1. You can call the Oracle Cloud Infrastructure (OCI) REST API by using the OCI Signature Version 1 security policy.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OCI Signature Version 1 property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "TenancyOCID",
+              "UserOCID",
+              "PrivateKey",
+              "FingerPrint",
+              "PassPhrase"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Tenancy OCID",
+              "User OCID",
+              "Private Key",
+              "Finger Print",
+              "Pass Phrase"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Tenancy OCID of OCI",
+              "User OCID of OCI",
+              "OCI Private Key",
+              "Finger Print",
+              "Password entered at the time of generating the public/private key."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "Tenancy OCID of OCI",
+              "User OCID of OCI",
+              "OCI Private Key",
+              "Finger Print",
+              "Password entered at the time of generating the public/private key."
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OAuth1.0SecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth 1.0 One-legged Authentication. OAuth 1.0a (One-legged) enables a client to make authenticated HTTP requests to gain access to protected resources by using their credentials. The method is designed to include two sets of credentials with each request, one to identify the client, and another to identify the resource owner. Before a client can make authenticated requests on behalf of the resource owner, it must obtain a token authorized by the resource owner.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Authorization Code Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth_consumer_key",
+              "oauth_consumer_secret",
+              "oauth_token",
+              "oauth_token_secret",
+              "realm"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Consumer Key",
+              "Consumer Secret",
+              "Token",
+              "Token Secret",
+              "Realm"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client that is making the request.",
+              "Used to authorize the client that is making the request.",
+              "Used to access protected resource.",
+              "Used for generating signature for the request.",
+              "Used for identifying the account."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "Registered consumer key.",
+              "Registered consumer Secret.",
+              "Registered token",
+              "Token secret provided by server.",
+              "Account identifier."
+            ]
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OAuth2.0AuthorizationSecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth  Authorization Code Credentials. The authorization code grant is an OAuth flow where the resource owner is required to provide consent before an access token can be granted to the client application.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Authorization Code Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.auth.code.uri",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "authRequest",
+              "accessTokenRequest",
+              "refreshTokenRequest",
+              "$auth_code",
+              "$access_token",
+              "$refresh_token",
+              "$expiry",
+              "$token_type",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Authorization Code URI",
+              "Access Token URI",
+              "Scope",
+              "Authorization Request",
+              "Access Token Request",
+              "Refresh Token Request",
+              "regex_auth_code",
+              "regex_access_token",
+              "regex_refresh_token",
+              "regex_expiry",
+              "regex_token_type",
+              "access_token_usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "This endpoint is the target of the initial request. \nIt handles active session lookup, authenticating the user, and user consent.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "Authorization url where the user will be redirected to provide consent.",
+              "Access Token Request that should be used to fetch the access token.",
+              "Refresh Token Request that should be used to fetch the access token.",
+              "Regex that identifies the authorization code.",
+              "Regex that identifies the access token.",
+              "Regex that identifies the refresh token.",
+              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
+              "Regex that identifies the access token type.",
+              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/auth",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write.",
+              "Example : <authUri>?<queryParams>",
+              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
+              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
+              "Default: code",
+              "Default: access.[tT]oken",
+              "Default: refresh.[tT]oken",
+              "Default: expires_in",
+              "Default: token.?[tT]ype",
+              "Default: -H Authorization ${token_type} ${access_token}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OAuth2.0ClientCredentialsSecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth Client Credentials. The client application directly obtains access on its own without the resource owner’s intervention using its Client Id and Client Secret.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Client Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "accessTokenRequest",
+              "refreshTokenRequest",
+              "$auth_code",
+              "$access_token",
+              "$refresh_token",
+              "$expiry",
+              "$token_type",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Access Token URI",
+              "Scope",
+              "Access Token Request",
+              "Refresh Token Request",
+              "regex_auth_code",
+              "regex_access_token",
+              "regex_refresh_token",
+              "regex_expiry",
+              "regex_token_type",
+              "access_token_usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "Access Token Request that should be used to fetch the access token.",
+              "Refresh Token Request that should be used to fetch the access token.",
+              "Regex that identifies the authorization code.",
+              "Regex that identifies the access token.",
+              "Regex that identifies the refresh token.",
+              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
+              "Regex that identifies the access token type.",
+              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write.",
+              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
+              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
+              "Default: code",
+              "Default: access.[tT]oken",
+              "Default: refresh.[tT]oken",
+              "Default: expires_in",
+              "Default: token.?[tT]ype",
+              "Default: -H Authorization ${token_type} ${access_token}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OAuth2.0ROPCSecurityProperties_type": {
+      "type": "array",
+      "description": "OAuth  Resource Owner Password Credentials. The resource owner password credentials can be used directly as an authorization grant to obtain an access token. Since the resource owner shares its credentials with the client, this policy is used when there is a high degree of trust between the resource owner and the client.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Resource Owner Password Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "username",
+              "password",
+              "accessTokenRequest",
+              "refreshTokenRequest",
+              "$auth_code",
+              "$access_token",
+              "$refresh_token",
+              "$expiry",
+              "$token_type",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Access Token URI",
+              "Scope",
+              "username",
+              "password",
+              "Access Token Request",
+              "Refresh Token Request",
+              "regex_auth_code",
+              "regex_access_token",
+              "regex_refresh_token",
+              "regex_expiry",
+              "regex_token_type",
+              "access_token_usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "resource owner username",
+              "resource owner password",
+              "Access Token Request that should be used to fetch the access token.",
+              "Refresh Token Request that should be used to fetch the access token.",
+              "Regex that identifies the authorization code.",
+              "Regex that identifies the access token.",
+              "Regex that identifies the refresh token.",
+              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
+              "Regex that identifies the access token type.",
+              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/auth",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write.",
+              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
+              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
+              "Default: code",
+              "Default: access.[tT]oken",
+              "Default: refresh.[tT]oken",
+              "Default: expires_in",
+              "Default: token.?[tT]ype",
+              "Default: -H Authorization ${token_type} ${access_token}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "policyInbound_type": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Managed indicates that a pre-defined managed security policy is being used. Even while using a manged security policy, ADD developers can (1) hide security policy properties and provide a default value instead. (2) Change the displayName and description of a managed security policy. The provided values will be displayed on the connection page. ",
+          "type": "string",
+          "enum": [
+            "managed",
+            "nonManaged"
+          ]
+        },
+        "policy": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "securityProperties": {}
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "managed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "policy": {
+                "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
+                "type": "string",
+                "enum": [
+                  "DIGITAL_SIGNATURE",
+                  "HMAC_SIGNATURE_VALIDATION",
+                  "RSA_SIGNATURE_VALIDATION",
+                  "JWT_VALIDATION",
+                  "OAUTH_INBOUND",
+                  "OAUTH2.0_TOKEN_VALIDATION",
+                  "MULTI_TOKEN_INBOUND",
+                  "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
+                  "BASIC_AUTH"
+                ]
+              }
+            },
+            "required": [
+              "policy"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "DIGITAL_SIGNATURE"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope": {
+                      "const": "TRIGGER"
+                    },
+                    "securityProperties": {
+                      "$ref": "#/definitions/DigitalSignatureSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "HMAC_SIGNATURE_VALIDATION"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope": {
+                      "const": "TRIGGER"
+                    },
+                    "securityProperties": {
+                      "$ref": "#/definitions/HmacValidationSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "RSA_SIGNATURE_VALIDATION"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope": {
+                      "const": "TRIGGER"
+                    },
+                    "securityProperties": {
+                      "$ref": "#/definitions/RsaValidationSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "JWT_VALIDATION"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope": {
+                      "const": "TRIGGER"
+                    },
+                    "securityProperties": {
+                      "$ref": "#/definitions/JwtValidationSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "MULTI_TOKEN_INBOUND"
+                        },
+                        {
+                          "const": "OAUTH2.0_OR_BASIC_AUTH_VALIDATION"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope": {
+                      "const": "TRIGGER"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "OAUTH_INBOUND"
+                        },
+                        {
+                          "const": "OAUTH2.0_TOKEN_VALIDATION"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope": {
+                      "const": "TRIGGER"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "policyOutbound_type": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Managed indicates that a pre-defined managed security policy is being used. Even while using a manged security policy, ADD developers can (1) hide security policy properties and provide a default value instead. (2) Change the displayName and description of a managed security policy. The provided values will be displayed on the connection page. ",
+          "type": "string",
+          "enum": [
+            "managed",
+            "nonManaged"
+          ]
+        },
+        "policy": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "securityProperties": {}
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "managed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "policy": {
+                "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
+                "type": "string",
+                "enum": [
+                  "NONE",
+                  "BASIC_AUTH",
+                  "CUSTOM_SINGLE_TOKEN",
+                  "API_KEY_AUTHENTICATION",
+                  "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
+                  "OAUTH_CLIENT_CREDENTIALS",
+                  "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                  "OCI_SIGNATURE_VERSION1",
+                  "OAUTH_ONE_TOKEN_BASED",
+                  "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
+                  "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
+                  "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
+                  "ADD_OAUTH_CLIENT_CREDENTIALS",
+                  "OAUTH2.0_CLIENT_CREDENTIALS",
+                  "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                  "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                ]
+              }
+            },
+            "required": [
+              "policy"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "BASIC_AUTH"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/BasicSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "CUSTOM_SINGLE_TOKEN"
+                        },
+                        {
+                          "const": "API_KEY_AUTHENTICATION"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/ApiKeySecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "OAUTH_AUTHORIZATION_CODE_CREDENTIALS"
+                    }
+                  },
+                  "required": [
+                    "policy"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/AuthCodeSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "OAUTH_CLIENT_CREDENTIALS"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/ClientCredentialsSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/ROPCSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "OCI_SIGNATURE_VERSION1"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/OCISignatureV1SecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "OAUTH_ONE_TOKEN_BASED"
+                        },
+                        {
+                          "const": "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/OAuth1.0SecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/OAuth2.0AuthorizationSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/OAuth2.0ROPCSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "oneOf": [
+                        {
+                          "const": "OAUTH2.0_CLIENT_CREDENTIALS"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/OAuth2.0ClientCredentialsSecurityProperties_type"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

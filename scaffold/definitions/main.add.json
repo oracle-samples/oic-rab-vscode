@@ -1,0 +1,31 @@
+{
+  "info": {
+    "specVersion": "1.0",
+    "id": "",
+    "displayName": "",
+    "description": "",
+    "version": "1.0.0",
+    "categories": [],
+    "appInfo": {
+      "name": "",
+      "description": "",
+      "contactUS": "",
+      "supportURL": "",
+      "documentationURL": ""
+    },
+    "publisherInfo": {
+      "name": "",
+      "description": "",
+      "contactUS": "",
+      "supportURL": "",
+      "documentationURL": ""
+    },
+    "settings": {
+      "supportsConnectivityAgent": false
+    }
+  },
+  "connection": {},
+  "actions": {},
+  "flows": {},
+  "schemas": {}
+}

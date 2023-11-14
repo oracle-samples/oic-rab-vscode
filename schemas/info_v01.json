@@ -1,0 +1,259 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "$id": "#info",
+  "title": "Adapter Information",
+  "description": "The basic information of the adapter that models the identity, branding, and capabilities supported.",
+  "type": "object",
+  "required": [
+    "specVersion",
+    "id",
+    "displayName",
+    "description",
+    "version",
+    "appInfo",
+    "publisherInfo"
+  ],
+  "properties": {
+    "id": {
+      "title": "Adapter ID",
+      "description": "The 'id' field identifies the adapter universally. The 'id' MUST have a namespace prefix separated from an identifier with a colon. The format is '<publisher_namespace>:<adapter_id>'.",
+      "type": "string",
+      "pattern": "^[0-9a-z-]{4,80}:[0-9a-z-]{2,100}$"
+    },
+    "type": {
+      "title": "Adapter Type",
+      "description": "The type of system or class of application for which this adapter provides integration capabilities.",
+      "type": "string",
+      "enum": [
+        "Technology",
+        "Enterprise Messaging",
+        "Storage",
+        "Third Party",
+        "IaaS Services (Third Party & OCI)",
+        "Database",
+        "Block Chain"
+      ]
+    },
+    "displayName": {
+      "title": "Display Name",
+      "description": "The name of the adapter that would show up in the adapter registry landing page, in the connection creation selection, and various other places in the UI. This can change if the third party decides on an identity or name change.",
+      "type": "string",
+      "maxLength": 100
+    },
+    "description": {
+      "title": "Description",
+      "description": "This is the description of the adapter that will show up in the adapter registry page to describe the adapter functionality and the third party.",
+      "type": "string",
+      "maxLength": 1000
+    },
+    "version": {
+      "title": "Adapter Version",
+      "description": "This field models the version of the adapter. Version should abide by semantic version rules where the first digit represents a major version, which is backward incompatible with the last major version. The next digit represents backward compatible functional additions and the third digit presents fixes that do not change the contract of the adapter actions and triggers. Note that the RAB platform will validate any new changes against existing adapter to enforce versioning. The 3-digit semantic version should comply with the following pattern: '<major>.<minor>.<patch>'",
+      "type": "string",
+      "pattern": "^[1-9]\\d{0,1}\\.(0|[1-9]\\d{0,1})\\.(0|[1-9]\\d{0,1})$"
+    },
+    "specVersion": {
+      "title": "Specification Version",
+      "description": "This field is used to specify the language version used by the ADD document. There may be a need to support more than one language version and this field will be used by the engine to tell which language version to execute.",
+      "type": "string",
+      "enum": [
+        "1.0"
+      ]
+    },
+    "categories": {
+      "title": "Categories",
+      "description": "The categories that applies to the adapter's capabilities, typically associated with the third party system for which the adapter provides integration functionality.",
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "ERP",
+          "HCM & HRMS",
+          "CRM & CX",
+          "Industries",
+          "On-premises Enterprise",
+          "SOA Connectivity",
+          "Social and Productivity",
+          "Database",
+          "Supply Chain Management",
+          "E-Commerce",
+          "Enterprise Messaging",
+          "Technology",
+          "Health Care",
+          "IaaS Services & OCI Services"
+        ]
+      }
+    },
+    "appInfo": {
+      "$ref": "#/definitions/AppInfo"
+    },
+    "publisherInfo": {
+      "$ref": "#/definitions/PublisherInfo"
+    },
+    "settings": {
+      "$ref": "#/definitions/Settings"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "AppInfo": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "contactUS"
+      ],
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "The name for this section is meant to describe the application, technology that the adapter provides integration capabilities for. The name should comply with the third party branding requirements.  This will show up the adapter registry landing page in Oracle Integration Cloud.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": {
+          "title": "Description",
+          "description": "The description tells the user of the adapter more about the app that the adapter provides integration capabilities for. This will show up the adapter registry landing page in Oracle Integration Cloud.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "contactUS": {
+          "title": "Contact Us",
+          "description": "This field allows the adapter developer to enter contact information for the third party, typically derived from the app's third party web site. This an be a URL, an email, or other form of contact information.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "supportURL": {
+          "title": "Support Information",
+          "description": "This field allows the adapter developer to enter support destination for the third party, typically derived from the app's third party web site. This allows the adapter user to contact the third party if there are issues that seem to relate to the third party application behavior or API.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "documentationURL": {
+          "title": "Documentation Information",
+          "description": "This field allows the adapter developer to enter documentation URL destination for the third party, typically derived from the app's third party web site. This allows the adapter user to review the third party documentation to gain more insight about the application behavior or API.",
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "additionalProperties": false
+    },
+    "PublisherInfo": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "contactUS"
+      ],
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "The name for this section is meant to describe the entity that authors, owns and maintains the adapter.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": {
+          "title": "Description",
+          "description": "The description tells the user of the adapter more about the app that the publisher or owner of the adapter.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "contactUS": {
+          "title": "Contact Us",
+          "description": "This field contains the contact information for the publisher of the adapter.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "supportURL": {
+          "title": "Support Information",
+          "description": "This field allows the adapter developer to enter contact information for the publisher or owner of the adapter, where the user can send support request to either report issues or request enhancements.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "documentationURL": {
+          "title": "Documentation Information",
+          "description": "This field allows the adapter developer to enter documentation URL destination for the adapter that may be hosted on the publisher's web site. This allows the adapter user to review the third party documentation to gain more insight about the adapter's behavior, usage, or known issues.",
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "additionalProperties": false
+    },
+    "Settings": {
+      "title": "Adapter Settings",
+      "description": "Set of properties that govern the capabilities to enable for the adapter.",
+      "type": "object",
+      "properties": {
+        "supportsConnectivityAgent": {
+          "title": "Support Connectivity Agent",
+          "description": "This setting enables the adapter with the connectivity agent if set to true, allowing the adapter to function in an on-premise deployed environment through the agent.",
+          "type": "boolean"
+        },
+        "supportsRegeneration": {
+          "title": "Support Regeneration",
+          "description": "This setting enables the adapter to support regeneration of configured endpoint if set to true. Regeneration of endpoint enables the schemas for the configured action to be refreshed with new schema information for the request and response based on changes to the backend metadata object model of the third party.",
+          "type": "boolean"
+        },
+        "_debug": {
+          "title": "Enable Debug Mode",
+          "description": "Internal to debug context in development. This setting will enable additional logging to help diagnose during development if set to true.",
+          "type": "boolean"
+        },
+        "allowNonSSL": {
+          "type": "boolean",
+          "title": "Allow Non-SSL Request",
+          "description": "This setting allows the adapter to make outbound request to endpoints that are not SSL protected if set to true."
+        },
+        "disableOutboundPayloadSanitization": {
+          "type": "boolean",
+          "title": "Disable Outbound Payload Sanitization",
+          "description": "This setting will disable sanitization for outbound request payload if set to true."
+        },
+        "allowedDomains": {
+          "type": "array",
+          "title": "Allowable Domains",
+          "description": "The property models the array of domains allowed for outbound requests.",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "followRedirects": {
+          "$ref": "#/definitions/Redirects"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Redirects": {
+      "title": "Redirect Settings",
+      "description": "Set of properties for redirect behavior.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "title": "Enable Following of Redirects",
+          "description": "The setting enables the following of redirects for request to endpoint. Third party endpoints may forward redirects to replacement endpoints and send the redirect to the client. This setting allows the client to follow these redirects.",
+          "type": "boolean"
+        },
+        "allowCrossDomainRedirect": {
+          "title": "Allow Cross Domain Redirect",
+          "description": "The setting enables the cross domain redirects for request to endpoint.",
+          "type": "boolean"
+        },
+        "followOriginalHttpMethod": {
+          "title": "Follow Original HTTP Method Domains",
+          "description": "The setting enables the following of original HTTP method during redirect.",
+          "type": "boolean"
+        },
+        "followAuthorizationHeader": {
+          "title": "Follow Authorization Header",
+          "description": "The setting enables the forwarding of authorization header during redirect.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

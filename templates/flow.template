@@ -1,0 +1,37 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "id": "{{flowId}}",
+  "version": "0.1",
+  "start": "startState",
+  "specVersion": "0.8",
+  "functions": [
+    {
+      "name": "{{flowId}}Function",
+      "operation": "connectivity::rest",
+      "type": "custom"
+    }
+  ],
+  "states": [
+    {
+      "actions": [
+        {
+          "functionRef": {
+            "refName": "{{flowId}}Function",
+            "arguments": {
+              "method": "GET",
+              "uri": "${\"https:/\"+\"/\"+.connectionProperties.hostName+\"/path/to/your/api\"}",
+              "parameters": "${ .input.parameters }"
+            }
+          },
+          "actionDataFilter": {
+            "results": "${ { body: .body, headers: .headers } }",
+            "toStateData": "${ .output }"
+          }
+        }
+      ],
+      "name": "startState",
+      "type": "operation",
+      "end": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "test": "flow:testConnectionFlow"
+  },
+  "flows": {
+    "testConnectionFlow": {
+      "id": "TestConnectionFlow",
+      "version": "0.1",
+      "start": "startState",
+      "specVersion": "0.8",
+      "functions": [
+        {
+          "name": "TestConnectionFunction",
+          "operation": "connectivity::rest",
+          "type": "custom"
+        }
+      ],
+      "states": [
+        {
+          "actions": [
+            {
+              "functionRef": {
+                "refName": "TestConnectionFunction",
+                "arguments": {
+                  "method": "GET",
+                  "uri": "${ .connectionProperties.baseURL + \"/your/api\" }"
+                }
+              },
+              "actionDataFilter": {
+                "results": "${ { success: (.status==200), message: .body.error.message } }",
+                "toStateData": "${ .output }"
+              }
+            }
+          ],
+          "name": "startState",
+          "type": "operation",
+          "end": true
+        }
+      ]
+    }
+  }
+}
