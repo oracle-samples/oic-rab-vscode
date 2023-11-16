@@ -30,3 +30,8 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - run: npm run package
+    - name: Package Extension
+      uses: actions/upload-artifact@v3
+      with:
+        name: package-artifact
+        path: oic-rapid-adapter-builder-*.vsix
