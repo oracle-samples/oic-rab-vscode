@@ -2,12 +2,12 @@ name: Package Extension
 
 on:
   push:
-    branches: [ "main", "update-ci" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  build:
+  package:
 
     runs-on: ubuntu-latest
 
