@@ -8,9 +8,9 @@ import * as vscode from 'vscode';
 import { SharedNs } from './webview-shared-lib';
 
 vscode.workspace.onDidChangeConfiguration(event => {
-  let affected = event.affectsConfiguration("orab.logLevel");
+  let affected = event.affectsConfiguration("RAB.logLevel");
   if (affected) {
-    log.level = vscode.workspace.getConfiguration("orab").get("logLevel") || 'info';
+    log.level = vscode.workspace.getConfiguration("RAB").get("logLevel") || 'info';
   }
 });
 
@@ -25,7 +25,7 @@ class Logger {
 
   constructor() {
     this.outputChannel = vscode.window.createOutputChannel("OIC Rapid Adapter Builder", "log");
-    this.level = vscode.workspace.getConfiguration("orab").get("logLevel") || 'info';
+    this.level = vscode.workspace.getConfiguration("RAB").get("logLevel") || 'info';
   }
 
   get level(): string {
