@@ -1,6 +1,6 @@
-# Oracle Integration Rapid Adapter Builder
+# Oracle Integration Cloud Rapid Adapter Builder
 
-Rapid Adapter Builder is a set of tools with rich support for Oracle Integration's next gen adapter development including features such as linting, code navigation, code formatting, refactoring, lifecycle management and more!
+Rapid Adapter Builder is a set of tools with rich support for Oracle Integration Cloud's next gen adapter development including features such as linting, code navigation, code formatting, refactoring, lifecycle management and more!
 
 ## Quick start
 

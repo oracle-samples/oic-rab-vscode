@@ -1,8 +1,8 @@
 {
   "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "name": "oic-rapid-adapter-builder",
-  "displayName": "Oracle Integration Rapid Adapter Builder",
-  "description": "Oracle Integration Rapid Adapter Builder is a set of tools that makes it easier for you to validate, develop and deploy the next-gen RAB adapters for Oracle Integration (OIC) straight from VS Code.",
+  "displayName": "Oracle Integration Cloud Rapid Adapter Builder",
+  "description": "Oracle Integration Cloud Rapid Adapter Builder is a set of tools that makes it easier for you to validate, develop and deploy the next-gen RAB adapters for Oracle Integration Cloud (OIC) straight from VS Code.",
   "publisher": "Oracle",
   "license": "UPL",
   "version": "1.0.0",
