@@ -15,6 +15,8 @@ import { log } from './logger';
 
 import { PostmanNs, RabAddNs } from './webview-shared-lib';
 
+import { get as getProfileManager } from './profile-manager-provider';
+
 export const defaultApiCallTimeoutInSeconds = 120;
 
 export namespace helpers {
@@ -74,7 +76,7 @@ export namespace workspace {
           message: `⏱ Converting document in progress.... This may take 5-${defaultApiCallTimeoutInSeconds} seconds.`,
           hidePromise,
           context,
-          isBlocking: true
+          isBlocking: false
         }
       )
       ),
@@ -115,7 +117,7 @@ export namespace workspace {
             message: `⏱ Working on the adapter definition '${fs.parseFilename(file!)}'.... This may take 5-${defaultApiCallTimeoutInSeconds} seconds.`,
             hidePromise,
             context,
-            isBlocking: true
+            isBlocking: false
           }
         )
         ),
@@ -162,10 +164,12 @@ export namespace workspace {
     return undefined;
   }
 
-  export const detectOverrideAndOpenADDDocumentDialogOptions = {
+  export const detectOverrideAndOpenADDDocumentDialogOptions: message.ConfirmProp = {
     yesText: `Update main`,
-    noText: `Save new`
-  }
+    noText: `Save new`,
+    useNotification: true
+
+  };
 
   export const detectOverrideAndOpenADDDocument = (addFileName?: string, defaultFileContent?: string) => of(getAddFile()).pipe(
 
@@ -299,12 +303,12 @@ export namespace workspace {
 
     );
 
-  export const showPublisherYaml = () => of(getPublisherYaml())
-    .pipe(
-      filter(publisherYamlPath => !!publisherYamlPath),
-      switchMap((publisherYamlPath) => vscode.workspace.openTextDocument(publisherYamlPath!)),
-      switchMap((doc) => vscode.window.showTextDocument(doc!, vscode.ViewColumn.One)),
-    );
+  // export const showPublisherYaml = () => of(getPublisherYaml())
+  //   .pipe(
+  //     filter(publisherYamlPath => !!publisherYamlPath),
+  //     switchMap((publisherYamlPath) => vscode.workspace.openTextDocument(publisherYamlPath!)),
+  //     switchMap((doc) => vscode.window.showTextDocument(doc!, vscode.ViewColumn.One)),
+  //   );
 
   export function getPublisherYaml() {
     let root = fs.getWorkspaceRoot();
@@ -435,14 +439,14 @@ export namespace fs {
     return name.replace(/[^a-zA-Z0-9-. ]/g, '_');
   };
 
-  export const checkWorkspaceInitialized = () => of(isWorkSpaceInitialized())
+  export const checkWorkspaceInitialized = () => from(isWorkSpaceInitialized())
     .pipe(
       filter(initialized => !initialized),
 
       switchMap(
         (addFile) => message
           .confirm(`Your workspace is not intialized or was impaired. You must initialize/repair it before continue`, {
-            yesText: `Intialize/Repair`,
+            yesText: `Intialize/Repair`
           })
       ),
 
@@ -452,7 +456,7 @@ export namespace fs {
           of(
             null
           ).pipe(
-            tap(() => initWorkspace()),
+            switchMap(() => initWorkspace()),
             map(() => false)
           ),
           of(false)
@@ -466,7 +470,7 @@ export namespace fs {
 
     );
 
-  export const isWorkSpaceInitialized = () => {
+  export const isWorkSpaceInitialized = async () => {
     let ws = getWorkspaceRoot() || '';
     const ingoreList = [
       workspace.presetFileMapAbs.api,
@@ -486,7 +490,7 @@ export namespace fs {
         (filePath) => _fs.existsSync(
           filePath
         )
-      );
+    ) && await getProfileManager().isPresent();
   };
 
   export const ensureAddFile = (addFileName: string = '', defaultFileContent?: string) => {
@@ -530,13 +534,13 @@ export namespace fs {
     }
   }
 
-  export const initWorkspace = () => {
+  export const initWorkspace = async () => {
 
     log.showOutputChannel();
 
     let ws = getWorkspaceRoot() || '';
 
-    if (isWorkSpaceInitialized()) {
+    if (await isWorkSpaceInitialized()) {
       log.warn(`[initWorkspace] The workspace is already intialized at [${ws}]`);
       return;
     }
@@ -549,14 +553,9 @@ export namespace fs {
     log.debug("Workspace initialized.");
     vscode.commands.executeCommand('orab.explorer.profile.refresh');
 
-    workspace.showPublisherYaml()
-      .subscribe(
-        () => {
-          log.info("📝 Please review the publisher settings.");
-        }
-      );
+    log.info("📝 Please review the publisher settings.");
 
-    ;
+    vscode.commands.executeCommand('orab.explorer.profile.edit');
   };
 
   /**
@@ -633,6 +632,7 @@ export namespace fs {
               .pipe(
                 switchMap((fileName) => message.confirm(`'${fileName}' is not the main document '${workspace.presetFileMap.definitionsMainAddJson}'. Are you sure`, {
                   yesText: operation,
+                  useNotification: true
                 })
                 ),
                 filter(confirmed => !!confirmed),
@@ -657,6 +657,7 @@ export namespace fs {
                 map((file) => file.path.split('/').pop()!),
                 switchMap((fileName) => message.confirm(`${fileName} should be saved before continue.`, {
                   yesText: "Save and proceed",
+                  useNotification: true
                 })
                 ),
                 filter(isToSave => !!isToSave),
@@ -738,10 +739,15 @@ export namespace ext {
 
 export namespace message {
 
-  export const confirmV2 = (getMsg: () => string, opts: {
+  export type ConfirmProp = {
     yesText?: string;
     noText?: string;
-  } = {}) => of(null)
+    useNotification?: boolean;
+  };
+
+  export const confirmV2 = (getMsg: () => string, opts: ConfirmProp = {
+    
+  }) => of(null)
     .pipe(
       switchMap(
         () => confirm(getMsg(), opts)
@@ -750,15 +756,17 @@ export namespace message {
 
   export async function confirm(msg: string, {
     yesText = "Yes",
-    noText
-  }: {
-    yesText?: string;
-    noText?: string;
-  } = {}): Promise<boolean> {
+    noText,
+    useNotification
+  }: ConfirmProp = {
+    
+  }): Promise<boolean> {
+    log.showOutputChannel();
+    log.info(`${msg}`);
     return (noText ? vscode.window
-      .showInformationMessage(msg, { modal: true }, yesText, noText)
+      .showInformationMessage(msg, { modal: !useNotification }, yesText, noText)
       : vscode.window
-        .showInformationMessage(msg, { modal: true }, yesText)
+        .showInformationMessage(msg, { modal: !useNotification }, yesText)
     )
       .then(
         str => { return str === yesText; },
@@ -781,7 +789,7 @@ export namespace message {
     log.showOutputChannel();
     log.error(msg);
     return vscode.window
-      .showErrorMessage(msg, { ...options, modal: true }, ...items);
+      .showErrorMessage(msg, { ...options }, ...items);
   }
 
   export function pop(msg: string, duration: number = 2) {
