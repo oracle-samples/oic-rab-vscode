@@ -12,7 +12,7 @@ import { bindNodeCallback, catchError, firstValueFrom, from, map, switchMap, tap
 import * as api from '../api';
 
 import { log } from '../logger';
-import { constants, fs, workspace } from '../utils';
+import { fs, workspace } from '../utils';
 import { PostmanNs, SharedNs } from '../webview-shared-lib';
 
 const revealADDDocument = () => switchMap(
@@ -40,7 +40,7 @@ const getPostmanCollectionNameAsFileName = (postmanFile: vscode.Uri) => getPostm
   map(postmanCollectionName => fs.getFileNameFromPostmanCollectionName(postmanCollectionName))
 );
 
-export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, addFile?: vscode.Uri, selectedItems?: string[]) => 
+export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, addFile?: vscode.Uri,) => 
   fs.checkWorkspaceInitialized()
   
   .pipe(
@@ -50,7 +50,7 @@ export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, addFil
     ),
   
     switchMap(
-      (postmanCollectionName) => from(api.conversion.postman(postmanFile, !!addFile ? addFile : undefined, selectedItems)).pipe(
+      (postmanCollectionName) => from(api.conversion.postman(postmanFile, postmanConfig, !!addFile ? addFile : undefined,)).pipe(
         map(response => ({
           postmanCollectionName,
           response,
@@ -92,14 +92,14 @@ export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, addFil
     })
   );
 
-function callback(file: vscode.Uri, context: vscode.ExtensionContext) {
+export function convertCallback(file: vscode.Uri, context: vscode.ExtensionContext, postmanConfig: SharedNs.WebviewCommandPayloadPostmanSelectRequests) {
 
   const observable = fs.checkWorkspaceInitialized().pipe(
     switchMap(
       () => workspace.detectIsPostmanFileWithUILoading(
         context,
         file, 
-        () => callConversionApiAndShowDocument(file)
+        () => callConversionApiAndShowDocument(file, postmanConfig)
       )
     )
   ) ;
@@ -109,8 +109,8 @@ function callback(file: vscode.Uri, context: vscode.ExtensionContext) {
   return promise;
 }
 
-export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand(constants.commands.orabConvertPostmanDocument, (file: vscode.Uri) => callback(file, context));
-  context.subscriptions.push(disposable);
-  return disposable;
-}
+// export function register(context: vscode.ExtensionContext) {
+//   let disposable = vscode.commands.registerCommand(constants.commands.orabConvertPostmanDocument, (file: vscode.Uri) => callback(file, context));
+//   context.subscriptions.push(disposable);
+//   return disposable;
+// }
