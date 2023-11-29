@@ -8,7 +8,7 @@ import * as vscode from 'vscode';
 import { log } from './logger';
 
 import * as addLocate from './commands/add-locate';
-import * as convertPostmanCollection from './commands/convert-postman-collection';
+// import * as convertPostmanCollection from './commands/convert-postman-collection';
 import * as deleteAdd from './commands/delete-add';
 import * as explorerOutlineActionsNew from './commands/explorer-outline-actions-new';
 import * as explorerOutlineTriggersNew from './commands/explorer-outline-triggers-new';
@@ -29,7 +29,7 @@ import { init as initProfileManager } from './profile-manager-provider';
 
 async function registerCommands(context: vscode.ExtensionContext) {
   addLocate.register(context);
-  convertPostmanCollection.register(context);
+  // convertPostmanCollection.register(context);
   deleteAdd.register(context);
   explorerOutlineActionsNew.register(context);
   explorerOutlineTriggersNew.register(context);

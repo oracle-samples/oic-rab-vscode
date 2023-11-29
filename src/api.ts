@@ -15,7 +15,7 @@ import { log } from './logger';
 import { get as getProfileManager } from './profile-manager-provider';
 import * as utils from './utils';
 import { AddCreateUpdateResponseNs, AddListReponseNs, AddValidateReponseNs } from './utils';
-import { PostmanNs, RabAddNs } from './webview-shared-lib';
+import { PostmanNs, RabAddNs, SharedNs } from './webview-shared-lib';
 
 
 let client: AxiosInstance;
@@ -210,7 +210,7 @@ export namespace registration {
 
 export namespace conversion {
 
-  export async function postman(postmanCollection: vscode.Uri | string, add?: vscode.Uri | string, requests?: string[]) {
+  export async function postman(postmanCollection: vscode.Uri | string, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, add?: vscode.Uri | string) {
     let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=postman`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
@@ -223,19 +223,40 @@ export namespace conversion {
       form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
       log.debug("Set 'targetADD'");
     }
+
+    const postmanConfigEntries: [string, any][] = [];
+
     // part 3
-    if (requests) {
-      form.append('postmanConfigRequest', JSON.stringify({
-        "postman_requests": requests.map(name => {
-          return {
-            "name": name,
-            "actionImport": true,
-            "flowImport": true,
-            "schemaImport": true
-          };
-        })
-      }));
+    if (postmanConfig?.items) {
+      postmanConfigEntries.push(
+        [
+          'postman_requests',
+          postmanConfig.items.map(name => {
+            return {
+              "name": name,
+              "actionImport": true,
+              "flowImport": true,
+              "schemaImport": true
+            };
+          })
+        ]
+      );
+    }
+
+    if (postmanConfig?.selectedItemForTestConnection) {
+      postmanConfigEntries.push(
+        [
+          'postman_request_as_test_connection',
+          {
+            name: postmanConfig.selectedItemForTestConnection
+          }
+        ]
+      );
+    }
+
+    if (postmanConfigEntries.length) {
       log.debug("Set 'postmanConfigRequest'");
+      form.append('postmanConfigRequest', JSON.stringify(Object.fromEntries(postmanConfigEntries)));
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<PostmanNs.Root>>, (err) => {
