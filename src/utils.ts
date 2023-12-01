@@ -124,7 +124,11 @@ export namespace workspace {
         switchMap(
           successCallback
         ),
-        tap(() => externalResolve(true))
+        tap(() => externalResolve(true)),
+        catchError((err) => {
+          externalResolve(true);
+          throw err;
+        })
 
       );
   };
@@ -799,12 +803,12 @@ export namespace message {
 
   export function loading({ message, hidePromise, context, isBlocking }: { message: string, hidePromise: Promise<any>, context: vscode.ExtensionContext, isBlocking?: boolean }) {
 
-    const myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    myStatusBarItem.text = `$(sync~spin) ${message}`;
+    // const myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    // myStatusBarItem.text = `$(sync~spin) ${message}`;
 
-    myStatusBarItem.show();
+    // myStatusBarItem.show();
 
-    context.subscriptions.push(myStatusBarItem);
+    // context.subscriptions.push(myStatusBarItem);
 
     if (isBlocking) {
 
@@ -818,8 +822,8 @@ export namespace message {
 
     const hideStatusItem = () => {
       showInfoWithLog(`Done`);
-      myStatusBarItem.hide();
-      myStatusBarItem.dispose();
+      // myStatusBarItem.hide();
+      // myStatusBarItem.dispose();
     };
 
     hidePromise.then(
