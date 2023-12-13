@@ -1,5 +1,5 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+"_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$id": "#flows",
   "title": "Flows",
   "description": "Flows",
@@ -212,9 +212,14 @@
                   "connectivity::oauth",
                   "connectivity::avroSchemaToJsonSchema",
                   "connectivity::avroEncode",
-                  "connectivity::avroDecode"
+                  "connectivity::avroDecode",
+                  "connectivity::jsonPayloadToXMLPayload",
+                  "connectivity::xmlPayloadToJsonPayload",
+                  "connectivity::xmlPayloadToJsonSchema",
+                  "connectivity::updateSecurityProperty",
+                  "connectivity::getSecurityProperty"
                 ],
-                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data"
+                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. `connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property."
               }
             }
           }
@@ -598,6 +603,88 @@
             "avroEncodedData": {
               "$ref": "#/definitions/stringOrArgumentJQPattern",
               "description": "AVRO Encoded Data"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "jsonPayload"
+          ],
+          "properties": {
+            "jsonPayload": {
+              "$ref": "#/definitions/stringOrArgumentJQPattern",
+              "description": "JSON payload converted to XML payload"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "XMLPayload"
+          ],
+          "properties": {
+            "XMLPayload": {
+              "$ref": "#/definitions/stringOrArgumentJQPattern",
+              "description": "XML Payload converted to JSON Payload"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name of property to be updated.",
+              "$ref": "#/definitions/stringOrArgumentJQPattern",
+              "examples": [
+                "secret"
+              ]
+            },
+            "value": {
+              "description": "Value of the property",
+              "$ref": "#/definitions/stringOrArgumentJQPattern",
+              "examples": [
+                "secretValue"
+              ]
+            },
+            "scope": {
+              "description": "Scope of the property",
+              "enum": [
+                "inbound",
+                "outbound"
+              ],
+              "examples": [
+                "inbound"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name of property to read.",
+              "$ref": "#/definitions/stringOrArgumentJQPattern",
+              "examples": [
+                "secret"
+              ]
+            },
+            "scope": {
+              "description": "Scope of the property",
+              "enum": [
+                "inbound",
+                "outbound"
+              ],
+              "examples": [
+                "inbound"
+              ]
             }
           },
           "additionalProperties": false
