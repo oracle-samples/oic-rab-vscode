@@ -2,9 +2,9 @@ name: Package Extension
 
 on:
   push:
-    branches: [ "main", "release/**" ]
+    branches: [ "main", "develop", "release/**" ]
   pull_request:
-    branches: [ "main", "release/**" ]
+    branches: [ "main", "develop", "release/**" ]
 
 jobs:
   package:
