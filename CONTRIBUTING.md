@@ -1,4 +1,4 @@
-# Contributing to Oracle Integration Rapid Adapter Builder
+# Contributing to Oracle Integration Cloud Rapid Adapter Builder
 
 We welcome your contributions! There are multiple ways to contribute.
 

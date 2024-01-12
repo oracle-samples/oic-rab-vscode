@@ -20,29 +20,40 @@ export class SecretStorageProfileManager implements ProfileManager {
 
   readonly secretKey: string = 'publisher-profiles';
 
-  readonly tmpFile: string = path.resolve(os.tmpdir(), 'oic-rab-vscode/publisher-profiles.yaml');
+  readonly tmpFile: string;
+
+  readonly tmpFileUri: vscode.Uri;
 
   readonly onUpdateCallbacks: Callback[] = [];
 
   constructor(context: vscode.ExtensionContext) {
+
     this.context = context;
     this.secrets = context.secrets;
 
+    this.tmpFile = path.resolve(os.tmpdir(), 'oic-rab-vscode/publisher-profiles.yaml');
+    this.tmpFileUri = vscode.Uri.parse(`file:${this.tmpFile}`);
+
     context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(evt => {
-      if (evt.uri.path === this.tmpFile) {
-        fs.rmSync(this.tmpFile);
-        console.log('tmp file deleted.');
+      if (evt.uri.fsPath === this.tmpFileUri.fsPath) {
+        this._deleteTmpFile();
       }
     }));
 
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async document => {
-      if (document.uri.path === this.tmpFile) {
+
+      if (document.uri.fsPath === this.tmpFileUri.fsPath) {
+        log.debug(`detected file save '${document.fileName}'`);
         await this.secrets.store(this.secretKey, document.getText());
         vscode.window.showInformationMessage("Profiles updated.");
-        this.onUpdateCallbacks.forEach(cb => { cb(document.getText()); })
-        return;
+        log.debug('Profiles updated.');
+        this.onUpdateCallbacks.forEach(cb => { cb(document.getText()); });
       }
     }));
+  }
+
+  dispose(): void {
+    this._deleteTmpFile();
   }
 
   onUpdate(callback: Callback): void {
@@ -65,17 +76,18 @@ export class SecretStorageProfileManager implements ProfileManager {
     let content = await this.secrets.get(this.secretKey);
     if (content == undefined || content.trim() == '') {
       content = utils.ext.readTextFile(`templates/publisher-template.yaml`);
+      log.debug('no content read from secret storage, using default template.');
     }
 
     try {
-      fs.mkdirSync(path.dirname(this.tmpFile), { recursive: true });
-      fs.writeFileSync(this.tmpFile, content || "");
+      this._deleteTmpFile();
+      this._createTmpFile(content);
     } catch (err) {
-      console.log(`Cannot create tmp file '${this.tmpFile}'`);
+      log.warn(`Cannot create tmp file '${this.tmpFile}'`);
     }
 
-    let uri = vscode.Uri.parse(`file:${this.tmpFile}`);
-    let doc = await vscode.workspace.openTextDocument(uri);
+    log.debug(`opening ${this.tmpFileUri}`);
+    let doc = await vscode.workspace.openTextDocument(this.tmpFileUri);
     return await vscode.window.showTextDocument(doc);
   }
 
@@ -118,5 +130,21 @@ export class SecretStorageProfileManager implements ProfileManager {
     }
   }
 
+  private _createTmpFile(content: string): void {
+    try {
+      fs.mkdirSync(path.dirname(this.tmpFile), { recursive: true });
+      fs.writeFileSync(this.tmpFile, content);
+    } catch (err) {
+      log.warn(`Cannot create tmp file '${this.tmpFile}'`);
+    }
+  }
+  private _deleteTmpFile(): void {
+    try {
+      fs.rmSync(this.tmpFile);
+      log.debug(`deleted tmp file ${this.tmpFile}`);
+    } catch (err) {
+      log.warn(`cannot delete ${this.tmpFile}`);
+    }
+  }
 }
 

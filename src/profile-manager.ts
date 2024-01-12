@@ -36,6 +36,8 @@ export interface ProfileManager {
    * Register a callback to be called when profiles yaml is updated.
    */
   onUpdate(callback: Callback): void
+
+  dispose(): void
 }
 
 export declare type Callback = (content: string) => void;
