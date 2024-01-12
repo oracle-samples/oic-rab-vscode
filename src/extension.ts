@@ -25,7 +25,7 @@ import * as addOutlineProvider from './providers/add-outline-provider';
 import * as postmanSelectRequrestWebview from './providers/copilot-webview';
 import * as profileListProvider from './providers/profile-list-provider';
 
-import { init as initProfileManager } from './profile-manager-provider';
+import { init as initProfileManager, get as getProfileManager } from './profile-manager-provider';
 
 async function registerCommands(context: vscode.ExtensionContext) {
   addLocate.register(context);
@@ -67,5 +67,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {
+  getProfileManager().dispose();
   log.info(`Extension "OIC Rapid Adapter Builder" is now deactivated!`);
 }
