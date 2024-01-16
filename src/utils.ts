@@ -12,6 +12,7 @@ import { Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } fr
 import { catchError, defaultIfEmpty, delay, filter, map, skipWhile, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
 import { log } from './logger';
+import { ensureOpenWorkspace } from './workspace-manager';
 
 import { PostmanNs, RabAddNs } from './webview-shared-lib';
 
@@ -532,13 +533,15 @@ export namespace fs {
 
   function copyRecursiveNoOverride(src: string, dest: string) {
     try {
-       fsExtra.copySync(src, dest, { overwrite: false});
+      fsExtra.copySync(src, dest, { overwrite: false });
     } catch (error) {
       log.warn(`${error}`);
     }
   }
 
   export const initWorkspace = async () => {
+
+    ensureOpenWorkspace();
 
     log.showOutputChannel();
 

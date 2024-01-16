@@ -19,6 +19,7 @@ import * as insertTestConnection from './commands/insert-test-connection';
 import * as publishAdd from './commands/publish-add';
 import * as validateAdd from './commands/validate-add';
 import * as versionCheck from './commands/version-check';
+import * as createRabBundle from './commands/create-rab-bundle';
 
 import * as addListProvider from './providers/add-list-provider';
 import * as addOutlineProvider from './providers/add-outline-provider';
@@ -40,6 +41,7 @@ async function registerCommands(context: vscode.ExtensionContext) {
   publishAdd.register(context);
   validateAdd.register(context);
   versionCheck.register(context);
+  createRabBundle.register(context);
 }
 
 async function registerProviders(context: vscode.ExtensionContext) {
