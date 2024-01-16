@@ -31,7 +31,7 @@ async function callback(): Promise<any> {
     const triggerId = await vscode.window.showInputBox({
       placeHolder: 'Please enter an ID...',
       validateInput: (val) => {
-        if (Object.keys(add.triggers).includes(val)) {
+        if (_.has(add, 'triggers') && Object.keys(add.triggers).includes(val)) {
           return 'already exists.';
         } else {
           return null;
@@ -43,8 +43,8 @@ async function callback(): Promise<any> {
       let props = {
         outputSchemaId: generateUniqueId(Object.keys(add.schemas), `${triggerId}OutputSchema`)
       };
-      add.triggers[triggerId] = _.omit(JSON.parse(template(props)), '_comment');
-      add.schemas[props.outputSchemaId] = { "type": "object" };
+      _.set(add, ['triggers', triggerId], _.omit(JSON.parse(template(props)), '_comment'));
+      _.set(add, ['schemas', props.outputSchemaId], { "type": "object" });
 
       let editor = await vscode.window.showTextDocument(doc);
       let source = editor.document.getText();

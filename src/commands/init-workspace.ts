@@ -7,6 +7,14 @@ import * as vscode from 'vscode';
 import * as utils from '../utils';
 
 export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand("orab.initWorkspace", () => utils.fs.initWorkspace());
+  let disposable = vscode.commands.registerCommand("orab.initWorkspace", () => {
+    try {
+      utils.fs.initWorkspace();
+    } catch (err) {
+      if (err instanceof Error) {
+        vscode.window.showErrorMessage("Cannot initialize workspace: " + err.message);
+      }
+    }
+  });
   context.subscriptions.push(disposable);
 }
