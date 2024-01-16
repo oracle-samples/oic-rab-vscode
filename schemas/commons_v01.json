@@ -302,6 +302,65 @@
           "body": {}
         }
       ]
+    },
+    "httpMethod": {
+      "description": "A String representing an HTTP request method. Many of these are not frequently used in practice. In practice, Simple HTTP method contains the frequently used http methods.",
+      "type": "string",
+      "enum": [
+        "GET",
+        "HEAD",
+        "PUT",
+        "POST",
+        "PATCH",
+        "DELETE",
+        "CONNECT",
+        "OPTIONS",
+        "TRACE"
+      ]
+    },
+    "simpleHttpMethod": {
+      "description": "A String representing a simple HTTP request method..",
+      "type": "string",
+      "enum": [
+        "GET",
+        "PUT",
+        "POST",
+        "PATCH"
+      ]
+    },
+    "params_type": {
+      "description": "collection of template an query params",
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/singleValueMap"
+        },
+        "query": {
+          "$ref": "#/definitions/singleValueMap"
+        }
+      }
+    },
+    "httpRequest": {
+      "description": "A JSON representation of an http request.",
+      "type": "object",
+      "properties": {
+        "method": {
+          "$ref": "#/definitions/simpleHttpMethod"
+        },
+        "uri": {
+          "description": "The HTTP Uri",
+          "$ref": "#/definitions/stringOrArgumentJQPattern"
+        },
+        "params": {
+          "$ref": "#/definitions/params_type"
+        },
+        "headers": {
+          "$ref": "#/definitions/httpHeaders"
+        },
+        "body": {
+          "$ref": "#/definitions/httpBody"
+        }
+      }
     }
   }
 }

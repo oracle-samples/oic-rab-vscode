@@ -97,6 +97,10 @@
             "description": "When set to true, a given property is masked from the connection page. If a property is marked as hidden, then it must have a default value. Example, releaseVersion is marked as hidden and bears the default value of 1A.",
             "type": "boolean"
           },
+          "tokenized": {
+            "description": "When set to true, the value of the given property will not be exported",
+            "type": "boolean"
+          },
           "default": {
             "description": "Default value of a property if none is supplied.",
             "type": "string"
@@ -216,7 +220,11 @@
           "securityProperties": {},
           "authflow": {
             "type": "string",
-            "description": "Deprecated. Use extensible OAUTH2.0 security policies. The default implementation of this policy is rfc-6749 compatible. However, in practice we have seen that many implementations are different from how the RFC illustrates. Using the property, you can change one or more of the following steps of this security policy: getAuthorizationURI, requestAccessToken, refreshAccessToken, accessTokenUsage"
+            "description": "(Deprecated - Use AuthExtension instead)."
+          },
+          "authExtension": {
+            "description": "The default implementation of this policy is rfc-6749 compatible. However, in practice we have seen that many implementations are different from how the RFC illustrates. Using the authExtension, you can extend the steps of the oauth flow in the security policy.",
+            "$ref": "#/definitions/authExtension_type"
           }
         },
         "required": [
@@ -263,7 +271,8 @@
                     "ADD_OAUTH_CLIENT_CREDENTIALS",
                     "OAUTH2.0_CLIENT_CREDENTIALS",
                     "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                    "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                    "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                    "AWS_SIGNATURE_VERSION4"
                   ]
                 }
               },
@@ -578,6 +587,22 @@
                     "properties": {
                       "securityProperties": {
                         "$ref": "#/definitions/OAuth2.0ROPCSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "AWS_SIGNATURE_VERSION4"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/awsSignatureVersion4SecurityProperties_type"
                       }
                     }
                   }
@@ -1646,375 +1671,6 @@
       },
       "additionalItems": false
     },
-    "OAuth2.0AuthorizationSecurityProperties_type": {
-      "type": "array",
-      "description": "OAuth  Authorization Code Credentials. The authorization code grant is an OAuth flow where the resource owner is required to provide consent before an access token can be granted to the client application.",
-      "minItems": 0,
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "OAuth Authorization Code Credentials property name. The name attribute is immutable and used to reference this property.",
-            "enum": [
-              "oauth.client.id",
-              "oauth.client.secret",
-              "oauth.auth.code.uri",
-              "oauth.access.token.uri",
-              "oauth.scope",
-              "authRequest",
-              "accessTokenRequest",
-              "refreshTokenRequest",
-              "$auth_code",
-              "$access_token",
-              "$refresh_token",
-              "$expiry",
-              "$token_type",
-              "accessTokenUsage"
-            ]
-          },
-          "displayName": {
-            "$ref": "commons_v01.json#/definitions/displayNameString",
-            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
-            "examples": [
-              "Client Id",
-              "Client Secret",
-              "Authorization Code URI",
-              "Access Token URI",
-              "Scope",
-              "Authorization Request",
-              "Access Token Request",
-              "Refresh Token Request",
-              "regex_auth_code",
-              "regex_access_token",
-              "regex_refresh_token",
-              "regex_expiry",
-              "regex_token_type",
-              "access_token_usage"
-            ]
-          },
-          "description": {
-            "$ref": "commons_v01.json#/definitions/longText",
-            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
-            "examples": [
-              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
-              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
-              "This endpoint is the target of the initial request. \nIt handles active session lookup, authenticating the user, and user consent.",
-              "A request should be sent to this URI for obtaining an access token.",
-              "Permissions your application is requesting on behalf of the user.",
-              "Authorization url where the user will be redirected to provide consent.",
-              "Access Token Request that should be used to fetch the access token.",
-              "Refresh Token Request that should be used to fetch the access token.",
-              "Regex that identifies the authorization code.",
-              "Regex that identifies the access token.",
-              "Regex that identifies the refresh token.",
-              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
-              "Regex that identifies the access token type.",
-              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
-            ]
-          },
-          "shortDescription": {
-            "$ref": "commons_v01.json#/definitions/shortText",
-            "examples": [
-              "for example: 123-xxx.apps.googleusercontent.com",
-              "<unique random string matches your API console project>",
-              "for example: https://accounts.google.com/o/oauth2/auth",
-              "for example: https://accounts.google.com/o/oauth2/token",
-              "for example: read,write.",
-              "Example : <authUri>?<queryParams>",
-              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
-              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
-              "Default: code",
-              "Default: access.[tT]oken",
-              "Default: refresh.[tT]oken",
-              "Default: expires_in",
-              "Default: token.?[tT]ype",
-              "Default: -H Authorization ${token_type} ${access_token}"
-            ],
-            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
-          },
-          "hidden": {
-            "type": "boolean",
-            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
-          },
-          "required": {
-            "type": "boolean",
-            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
-          },
-          "default": {
-            "description": "Default value of a property if none is supplied.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "hidden",
-          "required"
-        ],
-        "if": {
-          "properties": {
-            "hidden": {
-              "const": true
-            }
-          }
-        },
-        "then": {
-          "properties": {
-            "default": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "default"
-          ]
-        },
-        "additionalProperties": false
-      },
-      "additionalItems": false
-    },
-    "OAuth2.0ClientCredentialsSecurityProperties_type": {
-      "type": "array",
-      "description": "OAuth Client Credentials. The client application directly obtains access on its own without the resource owner’s intervention using its Client Id and Client Secret.",
-      "minItems": 0,
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "OAuth Client Credentials property name. The name attribute is immutable and used to reference this property.",
-            "enum": [
-              "oauth.client.id",
-              "oauth.client.secret",
-              "oauth.access.token.uri",
-              "oauth.scope",
-              "accessTokenRequest",
-              "refreshTokenRequest",
-              "$auth_code",
-              "$access_token",
-              "$refresh_token",
-              "$expiry",
-              "$token_type",
-              "accessTokenUsage"
-            ]
-          },
-          "displayName": {
-            "$ref": "commons_v01.json#/definitions/displayNameString",
-            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
-            "examples": [
-              "Client Id",
-              "Client Secret",
-              "Access Token URI",
-              "Scope",
-              "Access Token Request",
-              "Refresh Token Request",
-              "regex_auth_code",
-              "regex_access_token",
-              "regex_refresh_token",
-              "regex_expiry",
-              "regex_token_type",
-              "access_token_usage"
-            ]
-          },
-          "description": {
-            "$ref": "commons_v01.json#/definitions/longText",
-            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
-            "examples": [
-              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
-              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
-              "A request should be sent to this URI for obtaining an access token.",
-              "Permissions your application is requesting on behalf of the user.",
-              "Access Token Request that should be used to fetch the access token.",
-              "Refresh Token Request that should be used to fetch the access token.",
-              "Regex that identifies the authorization code.",
-              "Regex that identifies the access token.",
-              "Regex that identifies the refresh token.",
-              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
-              "Regex that identifies the access token type.",
-              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
-            ]
-          },
-          "shortDescription": {
-            "$ref": "commons_v01.json#/definitions/shortText",
-            "examples": [
-              "for example: 123-xxx.apps.googleusercontent.com",
-              "<unique random string matches your API console project>",
-              "for example: https://accounts.google.com/o/oauth2/token",
-              "for example: read,write.",
-              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
-              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
-              "Default: code",
-              "Default: access.[tT]oken",
-              "Default: refresh.[tT]oken",
-              "Default: expires_in",
-              "Default: token.?[tT]ype",
-              "Default: -H Authorization ${token_type} ${access_token}"
-            ],
-            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
-          },
-          "hidden": {
-            "type": "boolean",
-            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
-          },
-          "required": {
-            "type": "boolean",
-            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
-          },
-          "default": {
-            "description": "Default value of a property if none is supplied.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "hidden",
-          "required"
-        ],
-        "if": {
-          "properties": {
-            "hidden": {
-              "const": true
-            }
-          }
-        },
-        "then": {
-          "properties": {
-            "default": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "default"
-          ]
-        },
-        "additionalProperties": false
-      },
-      "additionalItems": false
-    },
-    "OAuth2.0ROPCSecurityProperties_type": {
-      "type": "array",
-      "description": "OAuth  Resource Owner Password Credentials. The resource owner password credentials can be used directly as an authorization grant to obtain an access token. Since the resource owner shares its credentials with the client, this policy is used when there is a high degree of trust between the resource owner and the client.",
-      "minItems": 0,
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "OAuth Resource Owner Password Credentials property name. The name attribute is immutable and used to reference this property.",
-            "enum": [
-              "oauth.client.id",
-              "oauth.client.secret",
-              "oauth.access.token.uri",
-              "oauth.scope",
-              "username",
-              "password",
-              "accessTokenRequest",
-              "refreshTokenRequest",
-              "$auth_code",
-              "$access_token",
-              "$refresh_token",
-              "$expiry",
-              "$token_type",
-              "accessTokenUsage"
-            ]
-          },
-          "displayName": {
-            "$ref": "commons_v01.json#/definitions/displayNameString",
-            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
-            "examples": [
-              "Client Id",
-              "Client Secret",
-              "Access Token URI",
-              "Scope",
-              "username",
-              "password",
-              "Access Token Request",
-              "Refresh Token Request",
-              "regex_auth_code",
-              "regex_access_token",
-              "regex_refresh_token",
-              "regex_expiry",
-              "regex_token_type",
-              "access_token_usage"
-            ]
-          },
-          "description": {
-            "$ref": "commons_v01.json#/definitions/longText",
-            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
-            "examples": [
-              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
-              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
-              "A request should be sent to this URI for obtaining an access token.",
-              "Permissions your application is requesting on behalf of the user.",
-              "resource owner username",
-              "resource owner password",
-              "Access Token Request that should be used to fetch the access token.",
-              "Refresh Token Request that should be used to fetch the access token.",
-              "Regex that identifies the authorization code.",
-              "Regex that identifies the access token.",
-              "Regex that identifies the refresh token.",
-              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
-              "Regex that identifies the access token type.",
-              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
-            ]
-          },
-          "shortDescription": {
-            "$ref": "commons_v01.json#/definitions/shortText",
-            "examples": [
-              "for example: 123-xxx.apps.googleusercontent.com",
-              "<unique random string matches your API console project>",
-              "for example: https://accounts.google.com/o/oauth2/auth",
-              "for example: https://accounts.google.com/o/oauth2/token",
-              "for example: read,write.",
-              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
-              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
-              "Default: code",
-              "Default: access.[tT]oken",
-              "Default: refresh.[tT]oken",
-              "Default: expires_in",
-              "Default: token.?[tT]ype",
-              "Default: -H Authorization ${token_type} ${access_token}"
-            ],
-            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
-          },
-          "hidden": {
-            "type": "boolean",
-            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
-          },
-          "required": {
-            "type": "boolean",
-            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
-          },
-          "default": {
-            "description": "Default value of a property if none is supplied.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "hidden",
-          "required"
-        ],
-        "if": {
-          "properties": {
-            "hidden": {
-              "const": true
-            }
-          }
-        },
-        "then": {
-          "properties": {
-            "default": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "default"
-          ]
-        },
-        "additionalProperties": false
-      },
-      "additionalItems": false
-    },
     "policyInbound_type": {
       "type": "object",
       "properties": {
@@ -2243,7 +1899,8 @@
                   "ADD_OAUTH_CLIENT_CREDENTIALS",
                   "OAUTH2.0_CLIENT_CREDENTIALS",
                   "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                  "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+                  "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                  "AWS_SIGNATURE_VERSION4"
                 ]
               }
             },
@@ -2439,11 +2096,558 @@
                     }
                   }
                 }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "AWS_SIGNATURE_VERSION4"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/awsSignatureVersion4SecurityProperties_type"
+                    }
+                  }
+                }
               }
             ]
           }
         }
       ]
+    },
+    "accessTokenUsage_type": {
+      "description": "Define how access token and other information should be passed to access a protected resource.",
+      "type": "object",
+      "properties": {
+        "headers": {
+          "$ref": "commons_v01.json#/definitions/httpHeaders"
+        },
+        "params": {
+          "$ref": "commons_v01.json#/definitions/singleValueMap"
+        }
+      }
+    },
+    "fetchRules_type": {
+      "type": "object",
+      "properties": {
+        "auth_code": {
+          "default": "code",
+          "type": "string",
+          "description": "Regex that identifies the authorization code."
+        },
+        "access_token": {
+          "default": "access.[tT]oken",
+          "type": "string",
+          "description": "Regex that identifies the access token."
+        },
+        "refresh_token": {
+          "default": "refresh.[tT]oken",
+          "type": "string",
+          "description": "Regex that identifies the refresh token."
+        },
+        "expiry": {
+          "default": "expires.*",
+          "type": "string",
+          "description": "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires."
+        },
+        "token_type": {
+          "default": "token.?[tT]ype",
+          "type": "string",
+          "description": "Regex that identifies the access token type."
+        }
+      }
+    },
+    "authExtension_type": {
+      "type": "object",
+      "properties": {
+        "authorizationURL": {
+          "description": "This object is used to define an authorization url where the user will be redirected to provide consent.",
+          "type": "object",
+          "properties": {
+            "uri": {
+              "description": "The authorization url. Query params may be added to this authorization URL to provide additional context as part of the redirect.",
+              "$ref": "commons_v01.json#/definitions/stringOrArgumentJQPattern"
+            },
+            "params": {
+              "description": "This object is used to define an authorization url where the user will be redirected to provide consent.",
+              "$ref": "commons_v01.json#/definitions/params_type"
+            }
+          }
+        },
+        "accessTokenRequest": {
+          "description": "HTTP request that should be used to fetch the access token.",
+          "$ref": "commons_v01.json#/definitions/httpRequest"
+        },
+        "refreshTokenRequest": {
+          "description": "HTTP request that should be used to refresh the access token.",
+          "$ref": "commons_v01.json#/definitions/httpRequest"
+        },
+        "fetchRules": {
+          "description": "How to retrieve information from the various steps of an oauth flow.",
+          "$ref": "#/definitions/fetchRules_type"
+        },
+        "accessTokenUsage": {
+          "$ref": "#/definitions/accessTokenUsage_type"
+        }
+      }
+    },
+    "OAuth2.0AuthorizationSecurityProperties_type": {
+      "type": "array",
+      "description": "(Deprecated) OAuth  Authorization Code Credentials. The authorization code grant is an OAuth flow where the resource owner is required to provide consent before an access token can be granted to the client application.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Authorization Code Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.auth.code.uri",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "authRequest",
+              "accessTokenRequest",
+              "refreshTokenRequest",
+              "$auth_code",
+              "$access_token",
+              "$refresh_token",
+              "$expiry",
+              "$token_type",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Authorization Code URI",
+              "Access Token URI",
+              "Scope",
+              "Authorization Request",
+              "Access Token Request",
+              "Refresh Token Request",
+              "regex_auth_code",
+              "regex_access_token",
+              "regex_refresh_token",
+              "regex_expiry",
+              "regex_token_type",
+              "access_token_usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "This endpoint is the target of the initial request. \nIt handles active session lookup, authenticating the user, and user consent.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "Authorization url where the user will be redirected to provide consent.",
+              "Access Token Request that should be used to fetch the access token.",
+              "Refresh Token Request that should be used to fetch the access token.",
+              "Regex that identifies the authorization code.",
+              "Regex that identifies the access token.",
+              "Regex that identifies the refresh token.",
+              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
+              "Regex that identifies the access token type.",
+              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/auth",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write.",
+              "Example : <authUri>?<queryParams>",
+              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
+              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
+              "Default: code",
+              "Default: access.[tT]oken",
+              "Default: refresh.[tT]oken",
+              "Default: expires_in",
+              "Default: token.?[tT]ype",
+              "Default: -H Authorization ${token_type} ${access_token}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OAuth2.0ClientCredentialsSecurityProperties_type": {
+      "type": "array",
+      "description": "(Deprecated) OAuth Client Credentials. The client application directly obtains access on its own without the resource owner’s intervention using its Client Id and Client Secret.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Client Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "accessTokenRequest",
+              "refreshTokenRequest",
+              "$auth_code",
+              "$access_token",
+              "$refresh_token",
+              "$expiry",
+              "$token_type",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Access Token URI",
+              "Scope",
+              "Access Token Request",
+              "Refresh Token Request",
+              "regex_auth_code",
+              "regex_access_token",
+              "regex_refresh_token",
+              "regex_expiry",
+              "regex_token_type",
+              "access_token_usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "Access Token Request that should be used to fetch the access token.",
+              "Refresh Token Request that should be used to fetch the access token.",
+              "Regex that identifies the authorization code.",
+              "Regex that identifies the access token.",
+              "Regex that identifies the refresh token.",
+              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
+              "Regex that identifies the access token type.",
+              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write.",
+              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
+              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
+              "Default: code",
+              "Default: access.[tT]oken",
+              "Default: refresh.[tT]oken",
+              "Default: expires_in",
+              "Default: token.?[tT]ype",
+              "Default: -H Authorization ${token_type} ${access_token}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "OAuth2.0ROPCSecurityProperties_type": {
+      "type": "array",
+      "description": "(Deprecated) OAuth  Resource Owner Password Credentials. The resource owner password credentials can be used directly as an authorization grant to obtain an access token. Since the resource owner shares its credentials with the client, this policy is used when there is a high degree of trust between the resource owner and the client.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "OAuth Resource Owner Password Credentials property name. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "oauth.client.id",
+              "oauth.client.secret",
+              "oauth.access.token.uri",
+              "oauth.scope",
+              "username",
+              "password",
+              "accessTokenRequest",
+              "refreshTokenRequest",
+              "$auth_code",
+              "$access_token",
+              "$refresh_token",
+              "$expiry",
+              "$token_type",
+              "accessTokenUsage"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Client Id",
+              "Client Secret",
+              "Access Token URI",
+              "Scope",
+              "username",
+              "password",
+              "Access Token Request",
+              "Refresh Token Request",
+              "regex_auth_code",
+              "regex_access_token",
+              "regex_refresh_token",
+              "regex_expiry",
+              "regex_token_type",
+              "access_token_usage"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Used to identify the client(the software requesting an access token) that is making the request. \nThe value passed in this parameter must exactly match the value shown in your API console project.",
+              "Used to authorize the client(the software requesting an access token) that is making the request. The value passed in this parameter must exactly match the value shown in your API console project.",
+              "A request should be sent to this URI for obtaining an access token.",
+              "Permissions your application is requesting on behalf of the user.",
+              "resource owner username",
+              "resource owner password",
+              "Access Token Request that should be used to fetch the access token.",
+              "Refresh Token Request that should be used to fetch the access token.",
+              "Regex that identifies the authorization code.",
+              "Regex that identifies the access token.",
+              "Regex that identifies the refresh token.",
+              "Numeric value (in seconds)that specifies the expiry interval or a regex that identifies when the access token expires.",
+              "Regex that identifies the access token type.",
+              "Access token usage. A curl type syntax to illustrate how access token should be passed to access a protected resource."
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "for example: 123-xxx.apps.googleusercontent.com",
+              "<unique random string matches your API console project>",
+              "for example: https://accounts.google.com/o/oauth2/auth",
+              "for example: https://accounts.google.com/o/oauth2/token",
+              "for example: read,write.",
+              "Example: -X <Method> -H <headers> -d <string-data> <access-token-uri>?<query params>",
+              "Example: -X <Method> -H <headers> -d <string-data> <refresh-token-uri>?<query params>",
+              "Default: code",
+              "Default: access.[tT]oken",
+              "Default: refresh.[tT]oken",
+              "Default: expires_in",
+              "Default: token.?[tT]ype",
+              "Default: -H Authorization ${token_type} ${access_token}"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "awsSignatureVersion4SecurityProperties_type": {
+      "type": "array",
+      "description": "Signature Version 4 is the process to add authentication information to AWS requests sent by HTTP. For security, most requests to AWS must be signed with an access key, which consists of an access key ID and secret access key. These two keys are commonly referred to as your security credentials.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "AWS Signature Version 4 managed security policies has pre-defined properties called AccessKey, SecretKey, AWSRegion and ServiceName. The name attribute is immutable and used to reference this property.",
+            "enum": [
+              "AccessKey",
+              "SecretKey",
+              "AWSRegion",
+              "ServiceName"
+            ]
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "Access Key",
+              "Secret Key",
+              "AWS Region",
+              "Service Name"
+            ]
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "Access Key of AWS",
+              "Secret Key of AWS",
+              "AWS Region",
+              "Service Name like S3"
+            ]
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "examples": [
+              "Access Key of AWS",
+              "Secret Key of AWS",
+              "AWS Region",
+              "Service Name like S3"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
     }
   }
 }
