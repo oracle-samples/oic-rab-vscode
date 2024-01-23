@@ -20,6 +20,7 @@ import * as publishAdd from './commands/publish-add';
 import * as validateAdd from './commands/validate-add';
 import * as versionCheck from './commands/version-check';
 import * as createRabBundle from './commands/create-rab-bundle';
+import * as convertADD from './commands/convert-add';
 
 import * as addListProvider from './providers/add-list-provider';
 import * as addOutlineProvider from './providers/add-outline-provider';
@@ -30,7 +31,7 @@ import { init as initProfileManager, get as getProfileManager } from './profile-
 
 async function registerCommands(context: vscode.ExtensionContext) {
   addLocate.register(context);
-  // convertPostmanCollection.register(context);
+  convertADD.register(context);
   deleteAdd.register(context);
   explorerOutlineActionsNew.register(context);
   explorerOutlineTriggersNew.register(context);

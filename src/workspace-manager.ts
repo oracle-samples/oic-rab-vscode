@@ -27,6 +27,11 @@ export function ensureOpenWorkspace(): vscode.WorkspaceFolder {
   return vscode.workspace.workspaceFolders[0];
 }
 
+/**
+ * 
+ * @returns The absolute file system path to the workspace root.
+ * @throws if no open workspace.
+ */
 function getWorkspacePath(): string {
   let workspaceFolder = ensureOpenWorkspace();
   return workspaceFolder.uri.fsPath;
@@ -103,7 +108,9 @@ class AdapterBundleBuilder {
 
   async build(): Promise<vscode.Uri> {
     const content = await this.zip.generateAsync({ type: "nodebuffer" });
-    const filepath = path.resolve(getWorkspacePath(), 'bundle.rab');
+
+    let filename = `${this.adapterId.replace(":", "_")}_${this.adapterVersion}.rab`;
+    const filepath = path.resolve(getWorkspacePath(), filename);
     fs.writeFileSync(filepath, content);
     return vscode.Uri.file(filepath);
   }
@@ -145,3 +152,48 @@ export async function createRabBundle(): Promise<vscode.Uri> {
     return Promise.reject(err);
   }
 }
+
+const mainAddFileName = `main`;
+
+const presetFileMap = {
+  definitions: `definitions`,
+  api: `api`,
+  resources: `resources`,
+  definitionsMainAddJson: `${mainAddFileName}.add.json`,
+  publisherYaml: `publisher.yaml`,
+};
+
+const presetFileMapAbs = {
+  definitions: presetFileMap.definitions,
+  api: presetFileMap.api,
+  resources: presetFileMap.resources,
+  resourcesLogo: `${presetFileMap.resources}/logo.svg`,
+  definitionsMainAddJson: `${presetFileMap.definitions}/${presetFileMap.definitionsMainAddJson}`,
+  publisherYaml: presetFileMap.publisherYaml,
+};
+
+export const isWorkSpaceInitialized = async () => {
+  let ws: string;
+  try {
+    ws = getWorkspacePath();
+  } catch (err) {
+    ws = "";
+  }
+  const ingoreList = [
+    presetFileMapAbs.api,
+    presetFileMapAbs.publisherYaml,
+  ];
+
+  return Object.values(presetFileMapAbs)
+    .filter(
+      fileRelativePath => !ingoreList.includes(
+        fileRelativePath
+      )
+    )
+    .map(
+      fileRelativePath => path.resolve(ws, fileRelativePath)
+    )
+    .every(
+      (filePath) => fs.existsSync(filePath)
+    )
+};

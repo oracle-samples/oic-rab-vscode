@@ -1,5 +1,5 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2023, 2024 Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -262,5 +262,16 @@ export namespace conversion {
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<PostmanNs.Root>>, (err) => {
       utils.message.showErrorWithLog(`❌ Convert failed: Failed to call API at ${endpoint}`);
     });
+  }
+
+  export async function openapi(document: vscode.Uri | string) {
+    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=openapi`;
+    log.debug(`Calling '${endpoint}'`);
+    let client = await getClient();
+    const form = new FormData();
+    // part 1
+    form.append('sourceFile', document instanceof vscode.Uri ? fs.readFileSync(document.fsPath, 'utf8') : document);
+
+    return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<any>>);
   }
 }

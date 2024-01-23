@@ -16,7 +16,7 @@ import { ensureOpenWorkspace } from './workspace-manager';
 
 import { PostmanNs, RabAddNs } from './webview-shared-lib';
 
-import { get as getProfileManager } from './profile-manager-provider';
+import { isWorkSpaceInitialized } from './workspace-manager';
 
 export const defaultApiCallTimeoutInSeconds = 120;
 
@@ -176,6 +176,12 @@ export namespace workspace {
 
   };
 
+  /**
+   * 
+   * @param addFileName The filename if user choose to save the result as new file.
+   * @param defaultFileContent 
+   * @returns 
+   */
   export const detectOverrideAndOpenADDDocument = (addFileName?: string, defaultFileContent?: string) => of(getAddFile()).pipe(
 
     switchMap(
@@ -475,28 +481,7 @@ export namespace fs {
 
     );
 
-  export const isWorkSpaceInitialized = async () => {
-    let ws = getWorkspaceRoot() || '';
-    const ingoreList = [
-      workspace.presetFileMapAbs.api,
-      workspace.presetFileMapAbs.publisherYaml,
-    ];
 
-    return Object.values(workspace.presetFileMapAbs)
-      .filter(
-        fileRelativePath => !ingoreList.includes(
-          fileRelativePath
-        )
-      )
-      .map(
-        fileRelativePath => path.resolve(ws, fileRelativePath)
-      )
-      .every(
-        (filePath) => _fs.existsSync(
-          filePath
-        )
-    ) && await getProfileManager().isPresent();
-  };
 
   export const ensureAddFile = (addFileName: string = '', defaultFileContent?: string) => {
 
