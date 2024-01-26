@@ -93,12 +93,16 @@
         "title": "RAB: Version Check"
       },
       {
+        "command": "orab.add.convert",
+        "title": "RAB: Convert OpenAPI document"
+      },
+      {
         "command": "orab.convert.postman.document",
-        "title": "RAB: Convert Document"
+        "title": "RAB: Convert Postman Collection"
       },
       {
         "command": "orab.webview.copilot.open.postman.convert",
-        "title": "RAB: Add Requests..."
+        "title": "RAB: Add Requests from Postman Collection..."
       },
       {
         "command": "orab.explorer.add.refresh",
@@ -160,6 +164,10 @@
           "when": "false"
         },
         {
+          "command": "orab.add.convert",
+          "when": "false"
+        },
+        {
           "command": "orab.convert.postman.document",
           "when": "false"
         },
@@ -211,12 +219,17 @@
         {
           "when": "resourceFilename =~ /(?<!\\.add)\\.json$/",
           "command": "orab.convert.postman.document",
-          "group": "orab"
+          "group": "orab@1"
         },
         {
           "when": "resourceFilename =~ /(?<!\\.add).json$/",
           "command": "orab.webview.copilot.open.postman.convert",
-          "group": "orab"
+          "group": "orab@2"
+        },
+        {
+          "when": "resourceDirname =~ /\\/api$/ && resourceExtname == .json",
+          "command": "orab.add.convert",
+          "group": "orab@3"
         }
       ],
       "editor/context": [
