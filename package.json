@@ -217,19 +217,14 @@
           "group": "orab"
         },
         {
-          "when": "resourceFilename =~ /(?<!\\.add)\\.json$/",
+          "when": "resourceDirname =~ /\\/misc$/ && resourceFilename =~ /(?<!\\.add)\\.json$/",
           "command": "orab.convert.postman.document",
           "group": "orab@1"
         },
         {
-          "when": "resourceFilename =~ /(?<!\\.add).json$/",
+          "when": "resourceDirname =~ /\\/misc$/ && resourceFilename =~ /(?<!\\.add).json$/",
           "command": "orab.webview.copilot.open.postman.convert",
           "group": "orab@2"
-        },
-        {
-          "when": "resourceDirname =~ /\\/api$/ && resourceExtname == .json",
-          "command": "orab.add.convert",
-          "group": "orab@3"
         }
       ],
       "editor/context": [
