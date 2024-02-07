@@ -29,13 +29,13 @@ let authSchemes = [
   // "RSA_SIGNATURE_VALIDATION",
   // "JWT_VALIDATION",
   // "CUSTOM_SINGLE_TOKEN",
-  // "API_KEY_AUTHENTICATION",
-  "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
+  "API_KEY_AUTHENTICATION",
+  // "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
   // "OAUTH_CLIENT_CREDENTIALS",
   // "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
   "OCI_SIGNATURE_VERSION1",
-  "OAUTH_ONE_TOKEN_BASED",
-  // "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
+  // "OAUTH_ONE_TOKEN_BASED",
+  "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
   // "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
   "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
   // "ADD_OAUTH_CLIENT_CREDENTIALS",
@@ -114,7 +114,7 @@ async function callback(textEditor: vscode.TextEditor, edit: vscode.TextEditorEd
   if (!editor) {return;}
 
   let i = 0;
-  const result = await vscode.window.showQuickPick(authSchemes.map(e => e.replace("_", " ")), {
+  const result = await vscode.window.showQuickPick(authSchemes.map(e => e.replace(/_/g, " ")), {
     placeHolder: 'Please select an authentication scheme...'
   });
   if (!result) {return;}
