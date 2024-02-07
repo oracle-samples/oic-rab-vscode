@@ -5,7 +5,7 @@
 
 import * as vscode from 'vscode';
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { log } from '../logger';
 import * as utils from '../utils';
@@ -17,31 +17,24 @@ import * as utils from '../utils';
  * Supported policies come from
  * https://confluence.oraclecorp.com/confluence/display/ICS/ADD+Connection+Definition#ADDConnectionDefinition-SupportedManagedSecurityPolicies:
  */
-let authSchemes = [
+
+let actionSchemes = [
   "NONE",
   "BASIC_AUTH",
-  // "OAUTH_INBOUND",
-  // "OAUTH2.0_TOKEN_VALIDATION",
-  // "MULTI_TOKEN_INBOUND",
-  // "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
-  // "DIGITAL_SIGNATURE",
-  // "HMAC_SIGNATURE_VALIDATION",
-  // "RSA_SIGNATURE_VALIDATION",
-  // "JWT_VALIDATION",
-  // "CUSTOM_SINGLE_TOKEN",
-  // "API_KEY_AUTHENTICATION",
-  "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
-  // "OAUTH_CLIENT_CREDENTIALS",
-  // "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+  "API_KEY_AUTHENTICATION",
   "OCI_SIGNATURE_VERSION1",
   "OAUTH_ONE_TOKEN_BASED",
-  // "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
-  // "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
-  "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
-  // "ADD_OAUTH_CLIENT_CREDENTIALS",
-  "OAUTH2.0_CLIENT_CREDENTIALS",
-  // "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-  "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+  "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
+  "OAUTH_CLIENT_CREDENTIALS",
+  "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
+];
+
+let triggerSchemes = [
+  "BASIC_AUTH_VALIDATION",
+  "OAUTH2.0_TOKEN_VALIDATION",
+  "HMAC_SIGNATURE_VALIDATION",
+  "RSA_SIGNATURE_VALIDATION",
+  "JWT_VALIDATION",
 ];
 
 /**
@@ -55,8 +48,8 @@ function setBaseURL(addDoc: any, template: any) {
       addDoc.connection.connectionProperties.push(template.connection.connectionProperties[0]);
     }
   } else {
-    if (!addDoc.connection) {addDoc.connection = {};}
-    if (!Array.isArray(addDoc.connection.connectionProperties)) {addDoc.connection.connectionProperties = [];}
+    if (!addDoc.connection) { addDoc.connection = {}; }
+    if (!Array.isArray(addDoc.connection.connectionProperties)) { addDoc.connection.connectionProperties = []; }
     addDoc.connection.connectionProperties.push(template.connection.connectionProperties[0]);
   }
 }
@@ -78,26 +71,24 @@ function readTemplate(policyId: string): any | undefined {
  * @param policyId 
  * @returns 
  */
-async function apply(editor: vscode.TextEditor, policyId: string) {
-
-  let template = readTemplate(policyId);
-  if (!template) {
-    utils.message.pop("Policy 'policyId' not supported yet.");
-    return;
-  }
+async function applyToEditor(editor: vscode.TextEditor, policyId: string, scope: string, template: any) {
 
   let addDoc = JSON.parse(editor.document.getText());
   let policyObj = Array.isArray(addDoc?.connection?.securityPolicies) ? addDoc.connection.securityPolicies.find((e: { policy: string; }) => e.policy === policyId) : undefined;
   if (policyObj) {
     let confirm = await utils.message.confirm(`${policyId} already exists. Do you want to override?`);
     if (confirm) {
-      setBaseURL(addDoc, template);
+      if (scope === 'ACTION') {
+        setBaseURL(addDoc, template);
+      }
       _.merge(policyObj, template.connection.securityPolicies[0]);
     }
   } else {
-    setBaseURL(addDoc, template);
-    if (!addDoc.connection) {addDoc.connection = {};}
-    if (!Array.isArray(addDoc.connection.securityPolicies)) {addDoc.connection.securityPolicies = [];}
+    if (scope === 'ACTION') {
+      setBaseURL(addDoc, template);
+    }
+    if (!addDoc.connection) { addDoc.connection = {}; }
+    if (!Array.isArray(addDoc.connection.securityPolicies)) { addDoc.connection.securityPolicies = []; }
     addDoc.connection.securityPolicies.push(template.connection.securityPolicies[0]);
   }
 
@@ -108,21 +99,69 @@ async function apply(editor: vscode.TextEditor, policyId: string) {
   });
 }
 
+class SchemeItem implements vscode.QuickPickItem {
+
+  label: string;
+
+  description?: string | undefined;
+
+  policyId: string;
+
+  scope: string;
+
+  template: string;
+
+  constructor(label: string, description: string, policyId: string, scope: string, template: string) {
+    this.label = label;
+    this.description = description;
+    this.policyId = policyId;
+    this.scope = scope;
+    this.template = template;
+  }
+}
+
+class SeparatorItem implements vscode.QuickPickItem {
+
+  label: string;
+
+  kind?: vscode.QuickPickItemKind;
+
+  constructor(label: string) {
+    this.label = label;
+    this.kind = vscode.QuickPickItemKind.Separator;
+  }
+}
+
+function createSchemeItem(policyId: string): SchemeItem | undefined {
+  let template = readTemplate(policyId);
+  if (!template) {
+    return;
+  }
+  let policy = template.connection.securityPolicies[0];
+  return new SchemeItem(policy.displayName, policy.description, policyId, policy.scope, template);
+}
+
 async function callback(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]): Promise<any> {
 
   let editor = vscode.window.activeTextEditor;
-  if (!editor) {return;}
+  if (!editor) { return; }
 
-  let i = 0;
-  const result = await vscode.window.showQuickPick(authSchemes.map(e => e.replace("_", " ")), {
+  let items: (SchemeItem | SeparatorItem)[] = [];
+  items.push(new SeparatorItem("Actions"));
+  items = items.concat(actionSchemes.map(e => createSchemeItem(e)).filter(e => e instanceof SchemeItem) as SchemeItem[]);
+  items.push(new SeparatorItem("Triggers"));
+  items = items.concat(triggerSchemes.map(e => createSchemeItem(e)).filter(e => e instanceof SchemeItem) as SchemeItem[]);
+
+  const result = await vscode.window.showQuickPick<SchemeItem | SeparatorItem>(items, {
     placeHolder: 'Please select an authentication scheme...'
   });
-  if (!result) {return;}
+  if (!result) { return; }
   try {
-    apply(editor, result.replace(" ", "_"));
+    if (result instanceof SchemeItem) {
+      applyToEditor(editor, result.policyId, result.scope, result.template);
+    }
   } catch (err) {
-    
-   }
+  }
 }
 
 export function register(context: vscode.ExtensionContext) {

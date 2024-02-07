@@ -1,0 +1,32 @@
+{
+  "_comment": "Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "policy": "BASIC_AUTH",
+        "displayName": "Basic Authentication",
+        "description": "Validate Basic Authentication token",
+        "scope": "TRIGGER",
+        "securityProperties": [
+          {
+            "name": "username",
+            "description": "A username credential",
+            "shortDescription": "Enter Username",
+            "hidden": true,
+            "required": false,
+            "default": "NA"
+          },
+          {
+            "name": "password",
+            "description": "A password credential",
+            "shortDescription": "Enter Password",
+            "hidden": true,
+            "required": false,
+            "default": "NA"
+          }
+        ]
+      }
+    ]
+  }
+}

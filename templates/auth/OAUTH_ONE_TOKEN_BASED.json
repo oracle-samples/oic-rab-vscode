@@ -44,7 +44,7 @@
             "name": "oauth_token",
             "displayName": "Token",
             "description": "Used to access protected resource.",
-            "shortDescription": "Registered token",
+            "shortDescription": "Registered token.",
             "hidden": false,
             "required": true
           },
@@ -62,7 +62,7 @@
             "description": "Used for identifying the account.",
             "shortDescription": "Account identifier.",
             "hidden": false,
-            "required": true
+            "required": false
           }
         ]
       }

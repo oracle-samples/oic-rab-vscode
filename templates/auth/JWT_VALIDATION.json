@@ -1,0 +1,44 @@
+{
+  "_comment": "Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "policy": "JWT_VALIDATION",
+        "displayName": "JWT Validation",
+        "description": "Validates JWT token",
+        "scope": "TRIGGER",
+        "securityProperties": [
+          {
+            "name": "jwtToken",
+            "displayName": "JWT Token",
+            "hidden": true,
+            "required": true,
+            "default": "${.request.headers.authorization|split(\" \")|.[1]}"
+          },
+          {
+            "name": "signatureKey",
+            "displayName": "JWK URL",
+            "hidden": true,
+            "required": true,
+            "default": "https://www.demosvc.com/oauth2/v3/certs"
+          },
+          {
+            "name": "subjectClaim",
+            "displayName": "Subject claim Override",
+            "hidden": true,
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "customClaimsValidation",
+            "displayName": "Custom Claims Validation",
+            "hidden": true,
+            "required": false,
+            "default": ""
+          }
+        ]
+      }
+    ]
+  }
+}
