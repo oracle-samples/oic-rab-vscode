@@ -27,15 +27,16 @@
           {
             "name": "accessToken",
             "displayName": "API Key",
-            "description": "Provide the API Key",
-            "shortDescription": "Example: <The generated api key>",
+            "description": "Generated API Key used to identify the client that is making the request.",
+            "shortDescription": "Generated API key.",
             "hidden": false,
             "required": true
           },
           {
             "name": "accessTokenUsage",
             "displayName": "API Key Usage",
-            "description": "Provide the API Key",
+            "description": "API Key Usage. URI syntax to illustrate how the API KEY should be passed to access a protected resource. Example: To pass the API-KEY as a query parameter \"?<query-param-name>=${api-key}\" or To pass the API-KEY as a Header \"-H Authorization: Bearer ${api-key}\" without quotes.",
+            "shortDescription": "Default: -H Authorization: Bearer ${api-key}",
             "hidden": false,
             "required": false,
             "default": "-H Authorization: Bearer ${api-key}"

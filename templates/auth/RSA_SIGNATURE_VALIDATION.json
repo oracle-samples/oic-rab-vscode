@@ -1,0 +1,50 @@
+{
+  "_comment": "Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "refName": "RSA_SIGNATURE_VALIDATION",
+        "description": "Validates RSA Signature",
+        "displayName": "RSA SIGNATURE VALIDATION",
+        "scope": "TRIGGER",
+        "securityProperties": [
+          {
+            "name": "signatureString",
+            "displayName": "Signature Statement",
+            "hidden": true,
+            "required": true,
+            "default": "${.request.body)}"
+          },
+          {
+            "name": "signature",
+            "displayName": "Signature Statement",
+            "hidden": true,
+            "required": true,
+            "default": "${connectivity::base64URLDecode(.request.query.signature)}"
+          },
+          {
+            "name": "signatureAlgorithm",
+            "displayName": "Request Signature Location",
+            "hidden": true,
+            "required": true,
+            "default": "SHA256withRSA"
+          },
+          {
+            "name": "signKey",
+            "displayName": "Certificate Alias",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "timestampValidator",
+            "displayName": "Request Signature Location",
+            "hidden": true,
+            "required": true,
+            "default": ""
+          }
+        ]
+      }
+    ]
+  }
+}
