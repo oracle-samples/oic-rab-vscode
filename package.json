@@ -227,7 +227,7 @@
           "group": "orab@2"
         },
         {
-          "when": "resourceDirname =~ /\\/api$/ && resourceExtname == .json",
+          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceExtname == .json",
           "command": "orab.add.convert",
           "group": "orab@3"
         }
