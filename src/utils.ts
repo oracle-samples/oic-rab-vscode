@@ -525,7 +525,10 @@ export namespace fs {
           log.debug(`Ensures dir: ${e}`);
           fsExtra.ensureDirSync(path.resolve(dest, e));
         });
-      fsExtra.copySync(src, dest, { overwrite: false });
+      fsExtra.copySync(src, dest, {
+        overwrite: false,
+        filter: e => !path.basename(e).startsWith('.')
+      });
     } catch (error) {
       log.warn(`${error}`);
     }
