@@ -518,6 +518,13 @@ export namespace fs {
 
   function copyRecursiveNoOverride(src: string, dest: string) {
     try {
+      fsExtra
+        .readdirSync(src)
+        .forEach(e => {
+          if (fsExtra.statSync(path.resolve(src, e)).isDirectory()) {
+            fsExtra.ensureDirSync(path.resolve(dest, e));
+          }
+        });
       fsExtra.copySync(src, dest, { overwrite: false });
     } catch (error) {
       log.warn(`${error}`);
@@ -738,7 +745,7 @@ export namespace message {
   };
 
   export const confirmV2 = (getMsg: () => string, opts: ConfirmProp = {
-    
+
   }) => of(null)
     .pipe(
       switchMap(
@@ -751,8 +758,8 @@ export namespace message {
     noText,
     useNotification
   }: ConfirmProp = {
-    
-  }): Promise<boolean> {
+
+    }): Promise<boolean> {
     log.showOutputChannel();
     log.info(`${msg}`);
     return (noText ? vscode.window

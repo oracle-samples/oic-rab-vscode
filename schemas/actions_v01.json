@@ -159,6 +159,10 @@
           "description": "When set to true, a given field is readonly from the configuration page.",
           "type": "boolean"
         },
+        "hidden": {
+          "description": "When set to true, a given field is not showing from the configuration page.",
+          "type": "boolean"
+        },
         "options": {
           "$ref": "#/definitions/Options"
         },
