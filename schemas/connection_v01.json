@@ -272,7 +272,9 @@
                     "OAUTH2.0_CLIENT_CREDENTIALS",
                     "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                     "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                    "AWS_SIGNATURE_VERSION4"
+                    "AWS_SIGNATURE_VERSION4",
+                    "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW",
+                    "CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW"
                   ]
                 }
               },
@@ -1900,7 +1902,9 @@
                   "OAUTH2.0_CLIENT_CREDENTIALS",
                   "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                   "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                  "AWS_SIGNATURE_VERSION4"
+                  "AWS_SIGNATURE_VERSION4",
+                  "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW",
+                  "CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW"
                 ]
               }
             },
