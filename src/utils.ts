@@ -520,10 +520,10 @@ export namespace fs {
     try {
       fsExtra
         .readdirSync(src)
+        .filter(e => fsExtra.statSync(path.resolve(src, e)).isDirectory())
         .forEach(e => {
-          if (fsExtra.statSync(path.resolve(src, e)).isDirectory()) {
-            fsExtra.ensureDirSync(path.resolve(dest, e));
-          }
+          log.debug(`Ensures dir: ${e}`);
+          fsExtra.ensureDirSync(path.resolve(dest, e));
         });
       fsExtra.copySync(src, dest, { overwrite: false });
     } catch (error) {
