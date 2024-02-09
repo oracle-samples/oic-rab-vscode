@@ -9,10 +9,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import JSZip from 'jszip';
+import _ from 'lodash';
 
 import { log } from './logger';
-import * as utils from './utils';
-import { get } from 'lodash';
 
 /**
  * This function ensures one open workspace otherwise throw error with specify message intended to be shown in UI.
@@ -52,8 +51,7 @@ class AdapterBundleBuilder {
   }
 
   addDefinition(file: string) {
-
-    log.debug(`Adding entry '${file}'`);
+    const entry = "definitions/main.add.json";
     let buf = this._readFile(file);
     if (!buf) {
       throw new Error(`Cannot read file '${file}'`);
@@ -63,8 +61,8 @@ class AdapterBundleBuilder {
       const def = JSON.parse(buf.toString('utf-8'));
       //TODO validate against the schema.
 
-      this.adapterId = def.info.id;
-      this.adapterVersion = def.info.version;
+      this.adapterId = _.get(def, ['info', 'id']);
+      this.adapterVersion = _.get(def, ['info', 'version']);
       if (!this.adapterId || !this.adapterVersion) {
         throw new Error(`definition is missing 'id' and/or 'version'.`);
       }
@@ -76,33 +74,22 @@ class AdapterBundleBuilder {
       }
     }
 
-    this.zip.file("definitions/main.add.json", buf);
+    this._addEntry(entry, buf);
     this.containsDefinition = true;
-    log.debug(`Added entry '${file}'`);
     return this;
   }
 
   addLogo(file: string) {
-
+    const entry = 'logo.svg';
     let buf = this._readFile(file);
-    if (buf) {
-      this.zip.file("logo.svg", buf);
-      log.debug(`Added entry '${file}'`);
-    } else {
-      log.debug(`file not found '${file}'`);
-    }
+    this._addEntry(entry, buf);
     return this;
   }
 
   addOpenAPI(file: string) {
-
+    const entry = 'api/openapi.resource.json';
     let buf = this._readFile(file);
-    if (buf) {
-      this.zip.file("api/openapi.resource.json", buf);
-      log.debug(`Added entry '${file}'`);
-    } else {
-      log.debug(`file not found '${file}'`);
-    }
+    this._addEntry(entry, buf);
     return this;
   }
 
@@ -112,7 +99,17 @@ class AdapterBundleBuilder {
     let filename = `${this.adapterId.replace(":", "_")}_${this.adapterVersion}.rab`;
     const filepath = path.resolve(getWorkspacePath(), filename);
     fs.writeFileSync(filepath, content);
+    log.info(`Bundle created (${filepath})`);
     return vscode.Uri.file(filepath);
+  }
+
+  private _addEntry(entry: string, buf: Buffer | undefined) {
+    if (buf) {
+      this.zip.file(entry, buf);
+      log.debug(`Added entry '${entry}'`);
+    } else {
+      log.debug(`Skipped entry '${entry}'`);
+    }
   }
 
   private _readFile(filepath: string): Buffer | undefined {
@@ -143,9 +140,10 @@ export async function createRabBundle(): Promise<vscode.Uri> {
   }
 
   try {
+    log.info("Collecting files for the bundle...")
     return new AdapterBundleBuilder()
       .addDefinition(path.resolve(getWorkspacePath(), 'definitions', 'main.add.json'))
-      .addLogo(path.resolve(getWorkspacePath(), 'resources', 'logo.svg'))
+      .addLogo(path.resolve(getWorkspacePath(), 'logo.svg'))
       .addOpenAPI(path.resolve(getWorkspacePath(), 'api', 'openapi.resource.json'))
       .build();
   } catch (err) {
@@ -153,23 +151,17 @@ export async function createRabBundle(): Promise<vscode.Uri> {
   }
 }
 
-const mainAddFileName = `main`;
-
 const presetFileMap = {
   definitions: `definitions`,
   api: `api`,
-  resources: `resources`,
-  definitionsMainAddJson: `${mainAddFileName}.add.json`,
-  publisherYaml: `publisher.yaml`,
+  definitionsMainAddJson: `main.add.json`
 };
 
 const presetFileMapAbs = {
   definitions: presetFileMap.definitions,
   api: presetFileMap.api,
-  resources: presetFileMap.resources,
-  resourcesLogo: `${presetFileMap.resources}/logo.svg`,
-  definitionsMainAddJson: `${presetFileMap.definitions}/${presetFileMap.definitionsMainAddJson}`,
-  publisherYaml: presetFileMap.publisherYaml,
+  resourcesLogo: `logo.svg`,
+  definitionsMainAddJson: `${presetFileMap.definitions}/${presetFileMap.definitionsMainAddJson}`
 };
 
 export const isWorkSpaceInitialized = async () => {
@@ -180,8 +172,7 @@ export const isWorkSpaceInitialized = async () => {
     ws = "";
   }
   const ingoreList = [
-    presetFileMapAbs.api,
-    presetFileMapAbs.publisherYaml,
+    presetFileMapAbs.api
   ];
 
   return Object.values(presetFileMapAbs)

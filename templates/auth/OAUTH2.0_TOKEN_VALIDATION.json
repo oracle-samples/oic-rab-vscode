@@ -1,0 +1,14 @@
+{
+  "_comment": "Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "refName": "OAUTH2.0_TOKEN_VALIDATION",
+        "displayName": "OAuth2.0",
+        "description": "Validates OAuth2.0 token",
+        "scope": "TRIGGER"
+      }
+    ]
+  }
+}

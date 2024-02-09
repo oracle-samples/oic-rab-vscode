@@ -48,7 +48,7 @@ async function callback(): Promise<any> {
 
       _.set(add, ['actions', actionId], _.omit(JSON.parse(template(props)), '_comment'));
       _.set(add, ['schemas', props.inputSchemaId], { "type": "object" });
-      _.set(add, ['schemas'], props.outputSchemaId), { "type": "object" };
+      _.set(add, ['schemas', props.outputSchemaId], { "type": "object" });
       _.set(add, ['flows', props.flowId], _.omit(JSON.parse(Handlebars.compile(utils.ext.readTextFile('templates/flow.template'))(props)), '_comment'));
 
       let editor = await vscode.window.showTextDocument(doc);

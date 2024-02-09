@@ -1,0 +1,49 @@
+{
+  "_comment": "Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "connection": {
+    "securityPolicies": [
+      {
+        "type": "managed",
+        "policy": "HMAC_SIGNATURE_VALIDATION",
+        "description": "Validates HMAC Signature",
+        "displayName": "HMAC SIGNATURE VALIDATION",
+        "scope": "TRIGGER",
+        "securityProperties": [
+          {
+            "name": "signature",
+            "hidden": true,
+            "required": true,
+            "default": "${connectivity::hexDecode(.request.headers.digest)}"
+          },
+          {
+            "name": "signatureString",
+            "displayName": "Request Signature Location",
+            "hidden": true,
+            "required": true,
+            "default": "${.request.body}"
+          },
+          {
+            "name": "signatureAlgorithm",
+            "displayName": "Request Signature Location",
+            "hidden": true,
+            "required": true,
+            "default": "HMACSHA256"
+          },
+          {
+            "name": "secret",
+            "displayName": "Shared Secret",
+            "hidden": false,
+            "required": true
+          },
+          {
+            "name": "timestampValidator",
+            "displayName": "Timestamp Validation",
+            "hidden": true,
+            "required": true,
+            "default": ""
+          }
+        ]
+      }
+    ]
+  }
+}
