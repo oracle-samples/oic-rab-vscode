@@ -21,7 +21,7 @@ function callback(file: vscode.Uri): any {
         if (same) {
           log.info(`Version check complete. Documents are identical.`);
         } else {
-          log.info(`Version check complete.  Recommanded version change: ${res.data.minVersionUpgrade}`);
+          log.info(`Version check complete. Recommended version change: ${res.data.minLevelUpdate}`);
         }
         log.debug(`Result: ${log.formatJSON(res.data)}`);
       }

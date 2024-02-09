@@ -150,10 +150,10 @@ export namespace registration {
     const form = new FormData();
     form.append('document', fs.readFileSync(file.fsPath, 'utf8'));
 
-    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources')).find(e => e.endsWith('.svg'));
+    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "")).find(e => e.endsWith('.svg'));
     if (name) {
-      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources', name);
-      log.info(`Included icon 'resources/${name}'`);
+      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", name);
+      log.info(`Included icon '${name}'`);
       form.append('icon', fs.createReadStream(logoFile));
     }
 
@@ -167,10 +167,10 @@ export namespace registration {
     const form = new FormData();
     form.append('document', fs.readFileSync(file.fsPath, 'utf8'));
 
-    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources')).find(e => e.endsWith('.svg'));
+    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "")).find(e => e.endsWith('.svg'));
     if (name) {
-      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources', name);
-      log.info(`Included icon 'resources/${name}'`);
+      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", name);
+      log.info(`Included icon '${name}'`);
       form.append('icon', fs.createReadStream(logoFile));
     }
     return callAPI(() => client.put(url, form) as Promise<AxiosResponse<AddCreateUpdateResponseNs.Root>>);
