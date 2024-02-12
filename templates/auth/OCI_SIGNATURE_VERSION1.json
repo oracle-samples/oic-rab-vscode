@@ -27,32 +27,32 @@
           {
             "name": "TenancyOCID",
             "displayName": "Tenancy OCID",
-            "description": "Tenancy OCID of OCI",
-            "shortDescription": "Tenancy OCID of OCI",
+            "description": "Tenancy OCID of OCI.",
+            "shortDescription": "Example: ocid1.tenancy.oc1..mockId",
             "hidden": false,
             "required": true
           },
           {
             "name": "UserOCID",
             "displayName": "User OCID",
-            "description": "User OCID of OCI",
-            "shortDescription": "User OCID of OCI",
+            "description": "User OCID of OCI.",
+            "shortDescription": "Example: ocid1.user.oc1..mockUser",
             "hidden": false,
             "required": true
           },
           {
             "name": "PrivateKey",
             "displayName": "Private Key",
-            "description": "OCI Private Key",
-            "shortDescription": "OCI Private Key",
+            "description": "OCI Private Key File.",
+            "shortDescription": "Upload the private key file",
             "hidden": false,
             "required": true
           },
           {
             "name": "FingerPrint",
             "displayName": "Finger Print",
-            "description": "Finger Print",
-            "shortDescription": "Finger Print",
+            "description": "Key Finger Print.",
+            "shortDescription": "Example: 4c:8e:79:e3:a3:31:b3:8f:18:71:93:0c:c4:49:52:1c",
             "hidden": false,
             "required": true
           },

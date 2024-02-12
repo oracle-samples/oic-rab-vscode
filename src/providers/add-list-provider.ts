@@ -27,10 +27,6 @@ class AddListProvider implements vscode.TreeDataProvider<AddRecord> {
 
   getChildren(element?: AddRecord): Thenable<AddRecord[]> {
 
-    if (!this.workspaceRoot) {
-      return Promise.resolve([]);
-    }
-
     if (element) {
       return Promise.resolve([]);
     } else {

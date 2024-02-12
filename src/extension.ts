@@ -8,7 +8,7 @@ import * as vscode from 'vscode';
 import { log } from './logger';
 
 import * as addLocate from './commands/add-locate';
-import * as convertPostmanCollection from './commands/convert-postman-collection';
+// import * as convertPostmanCollection from './commands/convert-postman-collection';
 import * as deleteAdd from './commands/delete-add';
 import * as explorerOutlineActionsNew from './commands/explorer-outline-actions-new';
 import * as explorerOutlineTriggersNew from './commands/explorer-outline-triggers-new';
@@ -19,6 +19,8 @@ import * as insertTestConnection from './commands/insert-test-connection';
 import * as publishAdd from './commands/publish-add';
 import * as validateAdd from './commands/validate-add';
 import * as versionCheck from './commands/version-check';
+import * as createRabBundle from './commands/create-rab-bundle';
+import * as convertADD from './commands/convert-add';
 
 import * as addListProvider from './providers/add-list-provider';
 import * as addOutlineProvider from './providers/add-outline-provider';
@@ -29,7 +31,7 @@ import { init as initProfileManager, get as getProfileManager } from './profile-
 
 async function registerCommands(context: vscode.ExtensionContext) {
   addLocate.register(context);
-  convertPostmanCollection.register(context);
+  convertADD.register(context);
   deleteAdd.register(context);
   explorerOutlineActionsNew.register(context);
   explorerOutlineTriggersNew.register(context);
@@ -40,6 +42,7 @@ async function registerCommands(context: vscode.ExtensionContext) {
   publishAdd.register(context);
   validateAdd.register(context);
   versionCheck.register(context);
+  createRabBundle.register(context);
 }
 
 async function registerProviders(context: vscode.ExtensionContext) {

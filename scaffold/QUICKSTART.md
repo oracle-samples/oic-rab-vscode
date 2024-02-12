@@ -1,17 +1,20 @@
-# OIC Rapid Adapter Builder (RAB) Project
+# OIC Rapid Adapter Builder (RAB) Workspace
 
-A RAB project is a resource bundle that holds everything for specific adapter's development. The extenstion will detect such structure and enable the workspace for various features.
+The workspace represents a RAB bundle that holds everything for specific adapter's development. RAB extenstion will detect such structure and enable the workspace for various features.
 
-## Project Structure
+To generate RAB bundle, use `RAB: Create RAB Bundle` command.
+
+## Workspace Structure
 
 ```shell
 .
-├── api                                <-- documents that describes the 3rd-party API like OpenAPI, Postman collection etc. (Optional)
-│  └── app.postman_collection.json     <-- Postman collection must have suffix of '.postman_collection.json'
-├── definitions                        <-- RAB definitions. Must have suffix of '.add.json'
-│  └── main.add.json                   <-- The main adapter definition document for your adapter.
-├── resources                          <-- resources like logo and i18n files.
-   └── logo.svg
+├── api                                <-- Folder that contains machine-readable documents for describing the 3rd-party API. Currently supports OpenAPI.
+│  └── openapi.resource.json           <-- OpenAPI document must be named to 'openapi.resource.json' (Optional)
+├── definitions                        <-- Folder that contains the adapter definitions.
+│  └── main.add.json                   <-- The main adapter definition document must be named 'main.add.json'.
+├── misc                               <-- Folder that contains intermediate resources which will not be persisted in OIC.
+│  └── app.postman_collection.json     <-- Postman collection must have suffix of '.postman_collection.json' (Optional)
+└── logo.svg                           <-- The logo file for the adapter. Must be SVG format. (Optional)
 ```
 
 For more information, please check the documentations.

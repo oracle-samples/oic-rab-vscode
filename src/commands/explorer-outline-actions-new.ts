@@ -31,8 +31,7 @@ async function callback(): Promise<any> {
     const actionId = await vscode.window.showInputBox({
       placeHolder: 'Please enter an action ID...',
       validateInput: (val) => {
-
-        if (Object.keys(add.actions).includes(val)) {
+        if (_.has(add, 'actions') && Object.keys(add.actions).includes(val)) {
           return 'already exists.';
         } else {
           return null;
@@ -46,10 +45,11 @@ async function callback(): Promise<any> {
         inputSchemaId: generateUniqueId(Object.keys(add.schemas), `${actionId}InputSchema`),
         outputSchemaId: generateUniqueId(Object.keys(add.schemas), `${actionId}OutputSchema`)
       };
-      add.actions[actionId] = _.omit(JSON.parse(template(props)), '_comment');
-      add.schemas[props.inputSchemaId] = { "type": "object" };
-      add.schemas[props.outputSchemaId] = { "type": "object" };
-      add.flows[props.flowId] = _.omit(JSON.parse(Handlebars.compile(utils.ext.readTextFile('templates/flow.template'))(props)), '_comment');
+
+      _.set(add, ['actions', actionId], _.omit(JSON.parse(template(props)), '_comment'));
+      _.set(add, ['schemas', props.inputSchemaId], { "type": "object" });
+      _.set(add, ['schemas', props.outputSchemaId], { "type": "object" });
+      _.set(add, ['flows', props.flowId], _.omit(JSON.parse(Handlebars.compile(utils.ext.readTextFile('templates/flow.template'))(props)), '_comment'));
 
       let editor = await vscode.window.showTextDocument(doc);
       let source = editor.document.getText();

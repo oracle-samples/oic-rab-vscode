@@ -20,23 +20,23 @@
       {
         "type": "managed",
         "policy": "BASIC_AUTH",
-        "displayName": "Basic Auth",
-        "description": "Basic Auth",
+        "displayName": "HTTP Basic Authentication",
+        "description": "HTTP Basic Authentication",
         "scope": "ACTION",
         "securityProperties": [
           {
             "name": "username",
             "displayName": "Username",
-            "description": "Username",
-            "shortDescription": "Username",
+            "description": "Registered username.",
+            "shortDescription": "Example: AC1234",
             "hidden": false,
             "required": true
           },
           {
             "name": "password",
             "displayName": "Password",
-            "description": "Password",
-            "shortDescription": "Password",
+            "description": "Password for the registered user.",
+            "shortDescription": "Example: <password for the user>",
             "hidden": false,
             "required": true
           }

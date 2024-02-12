@@ -10,6 +10,7 @@ export namespace SharedNs {
     webviewLifecycle: 'webviewLifecycle' as 'webviewLifecycle',
 
     postmanSelectRequests: 'postmanSelectRequests' as 'postmanSelectRequests',
+    postmanDoneConvertDocument: 'postmanDoneConvertDocument' as 'postmanDoneConvertDocument',
     postmanSelectReady: 'postmanSelectReady' as 'postmanSelectReady',
 
     rabAddReady: 'rabAddReady' as 'rabAddReady',
@@ -19,8 +20,10 @@ export namespace SharedNs {
   }
   export const ExtensionCommandEnum = {
     openCopilotPostmanConvert: 'orab.webview.copilot.open.postman.convert' as 'openCopilotPostmanConvert',
+    openPostmanConvertConverDocument: 'orab.convert.postman.document' as 'openPostmanConvertConverDocument',
     openCopilotAssistant: 'orab.webview.copilot.open.assistant' as 'openCopilotAssistant',
     updatePostmanRawData: 'updatePostmanRawData' as 'updatePostmanRawData',
+    updateEntryType: 'updateEntryType' as 'updateEntryType',
     loadRabAddData: 'loadRabAddData' as 'loadRabAddData',
     routerNavigateTo: 'routerNavigateTo' as 'routerNavigateTo',
   }
@@ -38,6 +41,7 @@ export namespace SharedNs {
 
   export interface WebviewCommandPayloadPostmanSelectRequests {
     items: string[];
+    selectedItemForTestConnection?: string;
   }
   export interface WebviewCommandPayloadRabAddSave {
     addToSave: RabAddNs.Root;
@@ -49,10 +53,11 @@ export namespace SharedNs {
     webviewLifecycle: {
       type: 'close'
     };
-    postmanSelectRequests: WebviewCommandPayloadPostmanSelectRequests;
+    postmanSelectRequests: Omit<WebviewCommandPayloadPostmanSelectRequests, "selectedItemForTestConnection">;
+    postmanDoneConvertDocument: WebviewCommandPayloadPostmanSelectRequests;
     postmanSelectReady: any;
     rabAddReady: any;
-    
+
     rabAddSave: WebviewCommandPayloadRabAddSave;
   }
 
@@ -60,7 +65,9 @@ export namespace SharedNs {
   export type VscodeCommandPayload = {
     openCopilotPostmanConvert: any;
     openCopilotAssistant: any;
-    updatePostmanRawData: any;
+    updatePostmanRawData: PostmanNs.Root;
+    updateEntryType: 'convertDocument' | 'addRequest';
+    openPostmanConvertConverDocument: any;
     loadRabAddData: any;
     routerNavigateTo: {
       href: WebviewRouteEnum;
@@ -118,7 +125,7 @@ export namespace RabAddNs {
     contactUS: string
     supportURL: string
     documentationURL: string
-    
+
   }
 
   export interface PublisherInfo {
@@ -127,7 +134,7 @@ export namespace RabAddNs {
     contactUS: string
     supportURL: string
     documentationURL: string
-    
+
   }
 
   export interface Settings {
@@ -177,7 +184,7 @@ export namespace RabAddNs {
     [key: string]: StaticInputField
   }
 
-  export interface StaticInputField  {
+  export interface StaticInputField {
     type?: string
     format?: string
     allOf?: any[]
@@ -1513,6 +1520,7 @@ export namespace PostmanNs {
   export interface Item extends Partial<Item2> {
     item?: Item[];
     isSelected?: boolean;
+    isSelectedForTestConnection?: boolean;
   }
 
   export interface Request {

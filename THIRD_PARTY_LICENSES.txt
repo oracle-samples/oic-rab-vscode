@@ -39,6 +39,12 @@ json-to-ast-ext
 * Source Code : https://github.com/vtrushin/json-to-ast
 * Project home: https://github.com/vtrushin/json-to-ast#readme
 
+jszip
+* Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+* License : MIT License
+* Source Code : https://github.com/Stuk/jszip
+* Project home: https://stuk.github.io/jszip/
+
 js-yaml
 * Copyright (C) 2011-2015 by Vitaly Puzrin
 * License : MIT License

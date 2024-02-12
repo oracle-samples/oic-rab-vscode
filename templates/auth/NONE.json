@@ -20,8 +20,8 @@
       {
         "type": "managed",
         "policy": "NONE",
-        "displayName": "No Auth",
-        "description": "No Auth",
+        "displayName": "No Authentication",
+        "description": "No Authentication",
         "scope": "ACTION",
         "securityProperties": []
       }

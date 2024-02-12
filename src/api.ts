@@ -1,5 +1,5 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2023, 2024 Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -15,7 +15,7 @@ import { log } from './logger';
 import { get as getProfileManager } from './profile-manager-provider';
 import * as utils from './utils';
 import { AddCreateUpdateResponseNs, AddListReponseNs, AddValidateReponseNs } from './utils';
-import { PostmanNs, RabAddNs } from './webview-shared-lib';
+import { PostmanNs, RabAddNs, SharedNs } from './webview-shared-lib';
 
 
 let client: AxiosInstance;
@@ -150,10 +150,10 @@ export namespace registration {
     const form = new FormData();
     form.append('document', fs.readFileSync(file.fsPath, 'utf8'));
 
-    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources')).find(e => e.endsWith('.svg'));
+    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "")).find(e => e.endsWith('.svg'));
     if (name) {
-      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources', name);
-      log.info(`Included icon 'resources/${name}'`);
+      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", name);
+      log.info(`Included icon '${name}'`);
       form.append('icon', fs.createReadStream(logoFile));
     }
 
@@ -167,10 +167,10 @@ export namespace registration {
     const form = new FormData();
     form.append('document', fs.readFileSync(file.fsPath, 'utf8'));
 
-    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources')).find(e => e.endsWith('.svg'));
+    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "")).find(e => e.endsWith('.svg'));
     if (name) {
-      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", 'resources', name);
-      log.info(`Included icon 'resources/${name}'`);
+      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", name);
+      log.info(`Included icon '${name}'`);
       form.append('icon', fs.createReadStream(logoFile));
     }
     return callAPI(() => client.put(url, form) as Promise<AxiosResponse<AddCreateUpdateResponseNs.Root>>);
@@ -210,7 +210,7 @@ export namespace registration {
 
 export namespace conversion {
 
-  export async function postman(postmanCollection: vscode.Uri | string, add?: vscode.Uri | string, requests?: string[]) {
+  export async function postman(postmanCollection: vscode.Uri | string, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, add?: vscode.Uri | string) {
     let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=postman`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
@@ -223,23 +223,55 @@ export namespace conversion {
       form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
       log.debug("Set 'targetADD'");
     }
+
+    const postmanConfigEntries: [string, any][] = [];
+
     // part 3
-    if (requests) {
-      form.append('postmanConfigRequest', JSON.stringify({
-        "postman_requests": requests.map(name => {
-          return {
-            "name": name,
-            "actionImport": true,
-            "flowImport": true,
-            "schemaImport": true
-          };
-        })
-      }));
+    if (postmanConfig?.items) {
+      postmanConfigEntries.push(
+        [
+          'postman_requests',
+          postmanConfig.items.map(name => {
+            return {
+              "name": name,
+              "actionImport": true,
+              "flowImport": true,
+              "schemaImport": true
+            };
+          })
+        ]
+      );
+    }
+
+    if (postmanConfig?.selectedItemForTestConnection) {
+      postmanConfigEntries.push(
+        [
+          'postman_request_as_test_connection',
+          {
+            name: postmanConfig.selectedItemForTestConnection
+          }
+        ]
+      );
+    }
+
+    if (postmanConfigEntries.length) {
       log.debug("Set 'postmanConfigRequest'");
+      form.append('postmanConfigRequest', JSON.stringify(Object.fromEntries(postmanConfigEntries)));
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<PostmanNs.Root>>, (err) => {
       utils.message.showErrorWithLog(`❌ Convert failed: Failed to call API at ${endpoint}`);
     });
+  }
+
+  export async function openapi(document: vscode.Uri | string) {
+    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=openapi`;
+    log.debug(`Calling '${endpoint}'`);
+    let client = await getClient();
+    const form = new FormData();
+    // part 1
+    form.append('sourceFile', document instanceof vscode.Uri ? fs.readFileSync(document.fsPath, 'utf8') : document);
+
+    return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<any>>);
   }
 }
