@@ -4,7 +4,7 @@ Rapid Adapter Builder is a set of tools with rich support for Oracle Integration
 
 ## Quick start
 
-To start from scratch, open any empty folder as your workspace then execute `RAB: Initialize Workspace` from the Command Palette. This will generate the necessary structure to help you begin the journey of writing your first RAB adapter. For more details, check out the `QUICKSTART.md` in the workspace.
+To start from scratch, open any empty folder as your workspace then execute `RAB: Initialize Workspace` from the Command Palette. This will generate the necessary structure to help you begin the journey of writing your first RAB adapter. For more details, check out the `QUICKSTART.md` in the workspace or online quick-start guide [here](https://www.oracle.com/pls/topic/lookup?ctx=appint&id=ICRAB).
 
 ## Key Features
 
@@ -22,7 +22,7 @@ To start from scratch, open any empty folder as your workspace then execute `RAB
 
 ## Documentation
 
-Full documentation, including prerequisites, supported vscode versions and configuration instructions, is available [here](https://docs.oracle.com/en/cloud/paas/application-integration/index.html).
+Full documentation, including prerequisites, supported vscode versions and configuration instructions, is available [here](https://www.oracle.com/pls/topic/lookup?ctx=appint&id=ICNAB).
 
 ## Contributing
 
