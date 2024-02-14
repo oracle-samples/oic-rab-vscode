@@ -17,6 +17,8 @@ To generate RAB bundle, use `RAB: Create RAB Bundle` command.
 └── logo.svg                           <-- The logo file for the adapter. Must be SVG format. (Optional)
 ```
 
-For more information, please check the documentations.
+For more information, please check out the quick-start guide [here](https://www.oracle.com/pls/topic/lookup?ctx=appint&id=ICRAB).
+
+Full documentation is available [here](https://www.oracle.com/pls/topic/lookup?ctx=appint&id=ICNAB).
 
 *You can safely delete this file.*
