@@ -31,15 +31,6 @@
 				"${workspaceFolder}/out/test/**/*.js"
 			],
 			"preLaunchTask": "npm: test-compile"
-		},
-		
-		{
-
-			"command": "npm run test-run",
-			"name": "Extension Tests by RedHat VSCode extension tester",
-			"request": "launch",
-			"type": "node-terminal"
-
 		}
 	]
 }

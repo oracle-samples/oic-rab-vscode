@@ -5,49 +5,30 @@
 
 import * as vscode from 'vscode';
 
-import { of, switchMap } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import path from 'path';
 
 import * as api from '../api';
 import { log } from '../logger';
-import * as utils from '../utils';
+import { RABError, showErrorMessage, showInfoMessage } from '../utils/ui-utils';
 
-function callback(file: vscode.Uri, context: vscode.ExtensionContext): any {
+async function callback(file: vscode.Uri, context: vscode.ExtensionContext) {
 
-  utils.fs.confirmSaveFile(file)
-    .pipe(
+  log.info(`Validating adapter definition ${path.basename(file.fsPath)}...`);
 
-      tap(() => log.showOutputChannel()),
-      tap(() => log.info(`Validating ${utils.fs.parseFilename(file)}...`)),
-
-      switchMap(
-        () => api.registration
-          .validateAdd(file)
-      ),
-
-      tap(res => {
-        if (res.data.valid) {
-          log.info("Result: " + log.formatJSON(res.data));
-          utils.message.showInfoWithLog("👍 Good job. Your adapter definition document is valid.");
-        } else {
-          log.error("Result: " + log.formatJSON(res.data));
-          utils.message.showErrorWithLog("❌ Your adapter definition document is invalid. See OUTPUT for more.");
-        }
-      }),
-
-      catchError(err => {
-        utils.message.showErrorWithLog(`API call failed (code=${err?.response?.status}). See OUTPUT for more.`);
-        log.error(err.response.data);
-        return of(err);
-      })
-    )
-    .subscribe();
-
+  try {
+    let report = await api.registration.validateAdd(file);
+    if (report.valid) {
+      showInfoMessage("👍 Good job. Your adapter definition document is valid.");
+    } else {
+      showErrorMessage("❌ Your adapter definition document is invalid. See OUTPUT for more.");
+    }
+  } catch (err) {
+    showErrorMessage(new RABError('Cannot validate adapter definition.', err));
+  }
 }
 
 export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand("orab.add.validate", (file: vscode.Uri) => {
-    callback(file, context);
-  });
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("orab.add.validate", callback)
+  );
 }

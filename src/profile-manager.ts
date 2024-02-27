@@ -92,7 +92,7 @@ export class Profile {
   /**
    * Tests if the profile is ready to use.
    */
-  isReady(): boolean {
+  isComplete(): boolean {
     return !!this.host && !!this.integrationInstance && this.isValidAuthentication();
   }
 

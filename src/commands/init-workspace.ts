@@ -4,17 +4,17 @@
  */
 
 import * as vscode from 'vscode';
-import * as utils from '../utils';
+import { RABError, showErrorMessage } from '../utils/ui-utils';
+import { initWorkspace } from '../workspace-manager';
 
-export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand("orab.initWorkspace", () => {
-    try {
-      utils.fs.initWorkspace();
-    } catch (err) {
-      if (err instanceof Error) {
-        vscode.window.showErrorMessage("Cannot initialize workspace: " + err.message);
+export async function register(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand("orab.initWorkspace", async () => {
+      try {
+        await initWorkspace();
+      } catch (err) {
+        showErrorMessage(new RABError("Cannot initialize workspace.", err));
       }
-    }
-  });
-  context.subscriptions.push(disposable);
+    })
+  );
 }
