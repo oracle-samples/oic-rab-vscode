@@ -13,14 +13,14 @@ import { getAddFile } from './workspace-manager';
 import { RabAddNs } from './webview-shared-lib';
 
 const invalidAddHandler = (
-  getFile = () => workspace.getAddFile()!
+  getFile = () => getAddFile()!
 ) => {
   showErrorMessage(`❌ The operation is aborted because the adapter definition '${fs.parseFilename(getFile())}' is invalid. You need to correct it before continue.`);
   return workspace.showADDDocument();
 };
 
 export const detectIsADDLocal = (
-  getFile = () => workspace.getAddFile()!,
+  getFile = () => getAddFile()!,
   errorError: (getFile: () => vscode.Uri) => Observable<any> = (getFile: () => vscode.Uri) =>
     from(showErrorMessage(`The offered file is not a valid adapter definition document. File:  ['${fs.parseFilename(getFile())}']`))
 
