@@ -10,9 +10,11 @@ import path = require("path");
 
 import { filter, firstValueFrom, from, iif, of, switchMap, tap } from "rxjs";
 import { callConversionApiAndShowDocument, convertCallback } from "../commands/convert-postman-collection";
-import { defaultApiCallTimeoutInSeconds, fs, message, workspace } from '../utils';
+import { fs, message, workspace } from '../utils';
 import { detectIsADDValidRemote } from "../utils-api";
 import { SharedNs } from "../webview-shared-lib";
+import { timeout as apiTimeout } from "../api";
+import { showErrorMessage } from "../utils/ui-utils";
 
 export namespace UtilsNs {
 
@@ -60,7 +62,7 @@ export namespace UtilsNs {
     let server = fs.serveStaticServer();
     server.on('listening', () => {
       if (!panel) {
-        message.showErrorWithLog("❌ The webview panel is gone");
+        showErrorMessage("❌ The webview panel is gone");
         return;
       }
       panel.webview.html = getWebviewContentV2ForStaticIframe(context, panel.webview);
@@ -258,7 +260,7 @@ const openWebview = (file: vscode.Uri, context: vscode.ExtensionContext, entryTy
 
     message.loading(
       {
-        message: `Updating in progress. This may take 5-${defaultApiCallTimeoutInSeconds} seconds. Don't edit the document before it's done.`,
+        message: `Updating in progress. This may take 5-${apiTimeout} seconds. Don't edit the document before it's done.`,
         hidePromise: requestPromise,
         context,
         isBlocking: false

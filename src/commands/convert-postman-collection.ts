@@ -14,6 +14,7 @@ import * as api from '../api';
 import { log } from '../logger';
 import { fs, workspace } from '../utils';
 import { PostmanNs, SharedNs } from '../webview-shared-lib';
+import { withProgress } from '../utils/ui-utils';
 
 const revealADDDocument = () => switchMap(
   (documentAndResponse: {
@@ -50,7 +51,12 @@ export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, postma
     ),
   
     switchMap(
-      (postmanCollectionName) => from(api.conversion.postman(postmanFile, postmanConfig, !!addFile ? addFile : undefined,)).pipe(
+      (postmanCollectionName) => from(
+        withProgress(
+          'Converting Postman collection...',
+          () => api.conversion.postman(postmanFile, postmanConfig, !!addFile ? addFile : undefined)
+        )
+      ).pipe(
         map(response => ({
           postmanCollectionName,
           response,

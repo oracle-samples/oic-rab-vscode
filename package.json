@@ -73,16 +73,16 @@
         "icon": "$(add)"
       },
       {
-        "command": "orab.add.publish",
-        "title": "RAB: Publish"
+        "command": "orab.bundle.register",
+        "title": "RAB: Register RAB Bundle"
       },
       {
-        "command": "orab.add.delete",
-        "title": "Delete ADD"
+        "command": "orab.bundle.delete",
+        "title": "Delete"
       },
       {
-        "command": "orab.add.get",
-        "title": "Get ADD"
+        "command": "orab.bundle.get",
+        "title": "Download"
       },
       {
         "command": "orab.add.validate",
@@ -105,7 +105,7 @@
         "title": "RAB: Add Requests from Postman Collection..."
       },
       {
-        "command": "orab.explorer.add.refresh",
+        "command": "orab.explorer.bundle.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
       },
@@ -144,15 +144,11 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "orab.add.publish",
+          "command": "orab.bundle.get",
           "when": "false"
         },
         {
-          "command": "orab.add.delete",
-          "when": "false"
-        },
-        {
-          "command": "orab.add.get",
+          "command": "orab.bundle.delete",
           "when": "false"
         },
         {
@@ -176,7 +172,7 @@
           "when": "false"
         },
         {
-          "command": "orab.explorer.add.refresh",
+          "command": "orab.explorer.bundle.refresh",
           "when": "false"
         },
         {
@@ -209,11 +205,6 @@
         {
           "when": "resourceFilename =~ /\\.add\\.json$/",
           "command": "orab.add.version-check",
-          "group": "orab"
-        },
-        {
-          "when": "resourceFilename =~ /\\.add\\.json$/",
-          "command": "orab.add.publish",
           "group": "orab"
         },
         {
@@ -268,12 +259,14 @@
       ],
       "view/item/context": [
         {
-          "when": "view == adaptersTreeView && viewItem == addRecord",
-          "command": "orab.add.get"
+          "when": "view == adaptersTreeView && viewItem == bundle",
+          "command": "orab.bundle.get",
+          "group": "navigation@1"
         },
         {
-          "when": "view == adaptersTreeView && viewItem == addRecord",
-          "command": "orab.add.delete"
+          "when": "view == adaptersTreeView && viewItem == bundle",
+          "command": "orab.bundle.delete",
+          "group": "navigation@2"
         },
         {
           "when": "view == outlineTreeView && viewItem == triggers",
@@ -289,7 +282,7 @@
       "view/title": [
         {
           "when": "view == adaptersTreeView",
-          "command": "orab.explorer.add.refresh",
+          "command": "orab.explorer.bundle.refresh",
           "group": "navigation"
         },
         {

@@ -5,20 +5,23 @@
 
 import * as vscode from 'vscode';
 
-import { createRabBundle } from '../workspace-manager';
+import { exportRABBundle } from '../workspace-manager';
+import { log } from '../logger';
+import { showErrorMessage } from '../utils/ui-utils';
+
 
 async function callback(file: vscode.Uri): Promise<any> {
+  log.info("Creating RAB bundling from current workspace");
   try {
-    await createRabBundle();
+    await exportRABBundle();
     vscode.window.showInformationMessage("RAB bundle created.");
   } catch (err) {
-    if (err instanceof Error) {
-      vscode.window.showErrorMessage("Cannot create RAB bundle: " + err.message);
-    }
+    showErrorMessage(err);
   }
 }
 
 export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand("orab.createRabBundle", callback);
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("orab.createRabBundle", callback)
+  );
 }

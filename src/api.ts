@@ -14,19 +14,54 @@ import FormData = require('form-data');
 import { log } from './logger';
 import { get as getProfileManager } from './profile-manager-provider';
 import * as utils from './utils';
-import { AddCreateUpdateResponseNs, AddListReponseNs, AddValidateReponseNs } from './utils';
 import { PostmanNs, RabAddNs, SharedNs } from './webview-shared-lib';
+import { Profile } from './profile-manager';
+import { RABError, showErrorMessage } from './utils/ui-utils';
 
+export const timeout = 120;
 
 let client: AxiosInstance;
 
 type Token = { value: string, expiry: number };
 let tokens: Map<string, Token> = new Map();
 
+/**
+ * Acquires access token from a service instance.
+ */
+async function acquireAccessToken(profile: Profile): Promise<{ access_token: string, expires_in: number }> {
+  log.debug("Acquiring new access token");
+  let { tokenUrl, clientId, clientSecret, scope } = profile.auth;
+  try {
+    let res = await axios.request({
+      url: tokenUrl,
+      method: "post",
+      auth: {
+        username: clientId,
+        password: clientSecret
+      },
+      data: {
+        "grant_type": "client_credentials",
+        "scope": scope
+      },
+      headers: {
+        "Content-Type": 'application/x-www-form-urlencoded'
+      },
+      proxy: false,
+      timeout: timeout * 1000,
+    });
+
+    log.debug("Authentication complete.");
+    return res.data;
+  } catch (err) {
+    log.error("Authentication failed.", err);
+    throw new Error("Authentication failed.");
+  }
+}
+
 function createClientConfig(host: string, instance: string, token?: string): CreateAxiosDefaults {
   const config: CreateAxiosDefaults = {
     baseURL: host,
-    timeout: utils.defaultApiCallTimeoutInSeconds * 1000,
+    timeout: timeout * 1000,
     params: {
       integrationInstance: instance
     },
@@ -41,76 +76,48 @@ function createClientConfig(host: string, instance: string, token?: string): Cre
 async function getClient(): Promise<AxiosInstance> {
 
   let profile = await getProfileManager().active();
-  let promise: Promise<string>;
-  if (!profile.isReady()) {
-    return Promise.reject(new Error('Profile not ready'));
+
+  if (!profile.isComplete()) {
+    throw new Error('Profile is not complete');
   }
+  let accessToken: string;
+
   if (!profile.auth) {
     log.debug("no auth scheme defined, no access token will be used.");
-    promise = Promise.resolve("");
+    accessToken = "";
   } else {
-    let key = profile.host + "/" + profile.integrationInstance;
+    let key = `${profile.host}/${profile.integrationInstance}`;
     let token = tokens.get(key);
     if (token && token.expiry - Date.now() > 120 * 1000) {
       log.debug("Using current access token...");
-      promise = Promise.resolve(token.value);
+      accessToken = token.value;
     } else {
-      log.debug("Getting new access token...");
-      let { tokenUrl, clientId, clientSecret, scope } = profile.auth;
-      promise = axios.request({
-        url: tokenUrl,
-        method: "post",
-        auth: {
-          username: clientId,
-          password: clientSecret
-        },
-        data: {
-          "grant_type": "client_credentials",
-          "scope": scope
-        },
-        headers: {
-          "Content-Type": 'application/x-www-form-urlencoded'
-        },
-        proxy: false,
-        timeout: utils.defaultApiCallTimeoutInSeconds * 1000,
-      }).then(res => {
-        log.debug("Authentication complete.");
-        tokens.set(key, { value: res.data.access_token, expiry: Date.now() + (res.data.expires_in * 1000) });
-        return res.data.access_token;
-      }).catch(err => {
-        utils.message.showErrorWithLog("❌ Authentication failed.");
-        throw err;
-      });
+      let data = await acquireAccessToken(profile);
+      tokens.set(key, { value: data.access_token, expiry: Date.now() + (data.expires_in * 1000) });
+      accessToken = data.access_token;
     }
   }
-  return promise
-    .then(token => {
-      let config = createClientConfig(profile.host, profile.integrationInstance, token);
-      client = axios.create(config);
-      return client;
-    });
+
+  return axios.create(createClientConfig(profile.host, profile.integrationInstance, accessToken));
 }
 
-async function callAPI<T>(task: () => Promise<AxiosResponse<T, any>>, errorCallback = (err: any) => { }):
-  Promise<AxiosResponse<T, any>> {
+async function callAPI<T>(task: () => Promise<AxiosResponse<T, any>>, errorCallback = (err: any) => { }): Promise<AxiosResponse<T, any>> {
   try {
     let res = await task();
     try {
       log.debug(`Received response (status=${res.status})`);
-      log.debug(`Received body: '${log.formatJSON(res.data)}'`);
+      log.debug(`Received body: '${log.format(res.data)}'`);
     } catch (error) {
-
     }
     return res;
   } catch (err) {
-    log.error(`API call failed. ${err}`);
-    console.error(err);
+    if (err instanceof Error) {
+      log.debug(`API call failed. cause: ${err.message}`);
+    }
     if (err instanceof AxiosError) {
       try {
-        log.error(`response body: '${log.formatJSON(err.response?.data)}'`);
-      } catch (error) {
-
-      }
+        log.debug(`response body: '${log.format(err.response?.data)}'`);
+      } catch (error) { }
     }
     errorCallback(err);
     throw err;
@@ -124,91 +131,216 @@ export function deleteTokens() {
 
 let apiRootPath = '/ic/api/adapters/v1';
 
+export interface PagedResult<T> {
+  items: T[]
+  limit: number
+  offset: number
+  hasMore: boolean
+  count: number
+}
+
+export interface AdapterRegistryEntity {
+  adapterId: string
+  adapterVersion: string
+  createdBy: string
+  updatedBy?: string
+  createdTime: number
+  updatedTime?: number
+  kind: string
+  state: string
+}
+
+export interface AdapterRegistrationResponse {
+  success: boolean
+  id: string
+  version: string
+  validation: {
+    warnings: any[]
+    errors: any[]
+    valid: boolean
+  }
+}
+
+export interface DefinitionValidationResponse {
+  errors: ValidationMessage[]
+  warnings: ValidationMessage[]
+  valid: boolean
+}
+
+export interface ValidationMessage {
+  ruleId: string
+  message: string
+  severity: string
+  location: string
+  suggestions: string[]
+}
+
 /**
- * Handles the callout to OIC registration API
+ * Bundle API
+ */
+export namespace bundle {
+
+  let resource = 'adapterBundles';
+
+  export async function list(): Promise<PagedResult<AdapterRegistryEntity>> {
+
+    let url = `${apiRootPath}/${resource}`;
+    log.debug(`Calling '${url}'`);
+    try {
+      let res = await callAPI(async () => (await getClient()).get(url) as Promise<AxiosResponse<PagedResult<AdapterRegistryEntity>>>);
+      return res.data;
+    } catch (err) {
+      throw new RABError(`Failed to call 'GET ${url}'`, err);
+    }
+  }
+
+  export async function get(id: string): Promise<Buffer> {
+
+    let url = `${apiRootPath}/${resource}/${id}`;
+    log.debug(`Calling '${url}'`);
+
+    try {
+      let res = await callAPI(async () => (await getClient()).get(url, { responseType: 'arraybuffer' }) as Promise<AxiosResponse<Buffer>>);
+      return res.data;
+    } catch (err) {
+      throw new RABError(`Failed to call 'GET ${url}'`, err);
+    }
+  }
+
+  export async function exist(id: string): Promise<AdapterRegistryEntity | undefined> {
+
+    let url = `${apiRootPath}/${resource}/${id}/exist`;
+    log.debug(`Calling '${url}'`);
+
+    try {
+      let res = await callAPI(async () => (await getClient()).get(url) as Promise<AxiosResponse<AdapterRegistryEntity>>);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err?.response?.status === 404) {
+        return undefined;
+      } else {
+        throw new RABError(`Failed to call 'GET ${url}'`, err);
+      }
+    }
+  }
+
+  export async function create(bundle: Buffer): Promise<AdapterRegistrationResponse> {
+
+    let url = `${apiRootPath}/${resource}`;
+    log.debug(`Calling '${url}'`);
+
+    try {
+      let res = await callAPI(async () => (await getClient()).post(url, bundle, {
+        headers: {
+          'Content-Type': 'application/zip',
+        },
+      }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
+      log.info(`Server response: ${log.format(res.data)}`);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        log.info(`Server response: ${err.response?.data}`);
+      }
+      throw new RABError(`Failed to call 'POST ${url}'`, err);
+    }
+  }
+
+  export async function update(id: string, bundle: Buffer): Promise<AdapterRegistrationResponse> {
+
+    let url = `${apiRootPath}/${resource}/${id}`;
+    log.debug(`Calling '${url}'`);
+
+    try {
+      let res = await callAPI(async () => (await getClient()).put(url, bundle, {
+        headers: {
+          'Content-Type': 'application/zip',
+        },
+      }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
+      log.info(`Server response: ${log.format(res.data)}`);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        log.info(`Server response: ${log.format(err.response?.data)}`);
+      }
+      throw new RABError(`Failed to call 'PUT ${url}'`, err);
+    }
+  }
+
+  /**
+   * Remove adapter from SI. 
+   * @param id The adapter ID to remove.
+   * @returns True if successfully removed, false is the adapter is nonexistent.
+   */
+  export async function remove(id: string): Promise<boolean> {
+
+    let url = `${apiRootPath}/${resource}/${id}`;
+    log.debug(`Calling '${url}'`);
+    try {
+      await callAPI(async () => (await getClient()).delete(url));
+      return true;
+    } catch (err) {
+      if (err instanceof AxiosError && err.status) {
+        return false;
+      }
+      throw new RABError(`Failed to call 'DELETE ${url}'`, err);
+    }
+  }
+
+}
+
+/**
+ * Definition API
  */
 export namespace registration {
 
-  export async function listAdd() {
-    let url = `${apiRootPath}/adapterDefinitions`;
-    log.debug(`Calling '${url}'`);
-    let client = await getClient();
-    return callAPI(() => client.get(url) as Promise<AxiosResponse<AddListReponseNs.Root>>);
-  }
-
-  export async function getAdd(id: string) {
-    let url = `${apiRootPath}/adapterDefinitions/${id}`;
-    log.debug(`Calling '${url}'`);
-    let client = await getClient();
-    return callAPI(() => client.get(url) as Promise<AxiosResponse<RabAddNs.Root>>);
-  }
-
-  export async function createAdd(file: vscode.Uri) {
-    let url = `${apiRootPath}/adapterDefinitions`;
-    log.debug(`Calling '${url}'`);
-    let client = await getClient();
-    const form = new FormData();
-    form.append('document', fs.readFileSync(file.fsPath, 'utf8'));
-
-    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "")).find(e => e.endsWith('.svg'));
-    if (name) {
-      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", name);
-      log.info(`Included icon '${name}'`);
-      form.append('icon', fs.createReadStream(logoFile));
-    }
-
-    return callAPI(() => client.post(`${apiRootPath}/adapterDefinitions`, form) as Promise<AxiosResponse<AddCreateUpdateResponseNs.Root>>);
-  }
-
-  export async function updateAdd(id: string, file: vscode.Uri) {
-    let url = `${apiRootPath}/adapterDefinitions/${id}`;
-    log.debug(`Calling '${url}'`);
-    let client = await getClient();
-    const form = new FormData();
-    form.append('document', fs.readFileSync(file.fsPath, 'utf8'));
-
-    let name = fs.readdirSync(path.resolve(utils.fs.getWorkspaceRoot() || "")).find(e => e.endsWith('.svg'));
-    if (name) {
-      let logoFile = path.resolve(utils.fs.getWorkspaceRoot() || "", name);
-      log.info(`Included icon '${name}'`);
-      form.append('icon', fs.createReadStream(logoFile));
-    }
-    return callAPI(() => client.put(url, form) as Promise<AxiosResponse<AddCreateUpdateResponseNs.Root>>);
-  }
-
-  export async function deleteAdd(id: string) {
-    let url = `${apiRootPath}/adapterDefinitions/${id}`;
-    log.debug(`Calling '${url}'`);
-    let client = await getClient();
-    return callAPI(() => client.delete(url));
-  }
+  const resource = 'adapterDefinitions';
 
   export async function validateAdd(file: vscode.Uri) {
-    let url = `${apiRootPath}/adapterDefinitions/validate`;
+    let url = `${apiRootPath}/${resource}/validate`;
     log.debug(`Calling '${url}'`);
     let client = await getClient();
     let config = {
       headers: { 'Content-Type': 'application/json' }
     };
 
-    return callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<AddValidateReponseNs.Root>>);
+    try {
+      let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<DefinitionValidationResponse>>);
+      log.info(`Server response: ${log.format(res.data)}`);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        log.info(`Server response: ${log.format(err.response?.data)}`);
+      }
+      throw new RABError(`Failed to call 'POST ${url}'`, err);
+    }
   }
 
   export async function verionCheck(file: vscode.Uri) {
     let add = JSON.parse(fs.readFileSync(file.fsPath, 'utf8'));
     let id = add.info.id;
-    let url = `${apiRootPath}/adapterDefinitions/${id}/versionCheck`;
+    let url = `${apiRootPath}/${resource}/${id}/versionCheck`;
     log.debug(`Calling '${url}'`);
     let client = await getClient();
     let config = {
       headers: { 'Content-Type': 'application/json' }
     };
 
-    return callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config));
+    try {
+      let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<any>>);
+      log.info(`Server response: ${log.format(res.data)}`);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        log.info(`Server response: ${log.format(err.response?.data)}`);
+      }
+      throw new RABError(`Failed to call 'POST ${url}'`, err);
+    }
   }
 }
 
 export namespace conversion {
+
+  const resource = 'adapterDefinitions';
 
   export async function postman(postmanCollection: vscode.Uri | string, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, add?: vscode.Uri | string) {
     let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=postman`;
@@ -260,18 +392,26 @@ export namespace conversion {
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<PostmanNs.Root>>, (err) => {
-      utils.message.showErrorWithLog(`❌ Convert failed: Failed to call API at ${endpoint}`);
+      showErrorMessage("❌ Conversion failed");
     });
   }
 
-  export async function openapi(document: vscode.Uri | string) {
-    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=openapi`;
+  export async function openapi(document: vscode.Uri | string): Promise<any> {
+    let endpoint = `${apiRootPath}/${resource}/convert?type=openapi`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
     const form = new FormData();
     // part 1
     form.append('sourceFile', document instanceof vscode.Uri ? fs.readFileSync(document.fsPath, 'utf8') : document);
 
-    return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<any>>);
+    try {
+      let res = await callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<any>>);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        log.info(`Server response: ${log.format(err.response?.data)}`);
+      }
+      throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
+    }
   }
 }

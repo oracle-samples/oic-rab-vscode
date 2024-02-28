@@ -76,13 +76,10 @@ export function register(context: vscode.ExtensionContext) {
 
   const provider = new PublisherProfileListProvider(utils.workspace.getWorkspaceRoot());
 
-  vscode.window.registerTreeDataProvider('profilesTreeView', provider);
-
-  vscode.commands.registerCommand('orab.explorer.profile.refresh', () => provider.refresh());
-
-  vscode.commands.registerCommand('orab.explorer.profile.edit', () => {
-    return getProfileManager().edit();
-  });
-
-  getProfileManager().onUpdate(x => { provider.refresh(); });
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider('profilesTreeView', provider),
+    vscode.commands.registerCommand('orab.explorer.profile.refresh', () => provider.refresh()),
+    vscode.commands.registerCommand('orab.explorer.profile.edit', () => getProfileManager().edit())
+  );
+  getProfileManager().onUpdate(_ => { provider.refresh(); });
 }

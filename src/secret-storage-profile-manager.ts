@@ -11,6 +11,7 @@ import * as path from 'path';
 import { log } from './logger';
 import * as utils from './utils';
 import { Callback, Profile, ProfileYaml, ProfileManager, ProfilesYaml, loadProfileYaml } from './profile-manager';
+import { RABError, showInfoMessage } from './utils/ui-utils';
 
 export class SecretStorageProfileManager implements ProfileManager {
 
@@ -45,8 +46,8 @@ export class SecretStorageProfileManager implements ProfileManager {
       if (document.uri.fsPath === this.tmpFileUri.fsPath) {
         log.debug(`detected file save '${document.fileName}'`);
         await this.secrets.store(this.secretKey, document.getText());
-        vscode.window.showInformationMessage("Profiles updated.");
-        log.debug('Profiles updated.');
+        showInfoMessage("Profiles updated.");
+        await vscode.commands.executeCommand('orab.explorer.profile.refresh');
         this.onUpdateCallbacks.forEach(cb => { cb(document.getText()); });
       }
     }));
@@ -105,13 +106,13 @@ export class SecretStorageProfileManager implements ProfileManager {
     let obj = await this._getYaml();
     const name = obj?.active;
     if (!name) {
-      throw new Error(`No active profile`);
+      throw new RABError(`No active profile`);
     }
     const profile = obj?.profiles.find((e: ProfileYaml) => e.name === name);
     if (!profile) {
-      throw new Error(`profile '${name}' not found`);
+      throw new RABError(`profile '${name}' not found`);
     }
-    log.info(`Using profile '${name}'`);
+    log.debug(`Active profile is '${name}'`);
     log.debug(`Host: ${profile.host}`);
     log.debug(`SI  : ${profile.integrationInstance}`);
     return new Profile(profile.name, profile.publisherId, profile.host, profile.integrationInstance, profile.auth, true);
