@@ -87,7 +87,7 @@ export async function createRABBundle(): Promise<AdapterBundle> {
 }
 
 export function getBundleFilename(id: string, version: string) {
-  return `${id.replace(":", "_")}_${version}.rab`;
+  return `${id.replace(":", "_")}-${version}.rab`;
 }
 
 export const isWorkSpaceInitialized = async () => {
