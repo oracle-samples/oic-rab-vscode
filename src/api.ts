@@ -231,6 +231,10 @@ export namespace bundle {
 
     try {
       let res = await callAPI(async () => (await getClient()).post(url, bundle, {
+        params: {
+          source: "private",
+          isLogoEnabled: true
+        },
         headers: {
           'Content-Type': 'application/zip',
         },
