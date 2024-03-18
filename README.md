@@ -2,6 +2,8 @@
 
 Rapid Adapter Builder is a set of tools with rich support for Oracle Integration Cloud's next gen adapter development including features such as linting, code navigation, code formatting, refactoring, lifecycle management and more!
 
+[![Watch the video](https://img.youtube.com/vi/CpYIruWdRlI/0.jpg)](https://www.youtube.com/watch?v=CpYIruWdRlI)
+
 ## Quick start
 
 To start from scratch, open any empty folder as your workspace then execute `RAB: Initialize Workspace` from the Command Palette. This will generate the necessary structure to help you begin the journey of writing your first RAB adapter. For more details, check out the `QUICKSTART.md` in the workspace or online quick-start guide [here](https://www.oracle.com/pls/topic/lookup?ctx=appint&id=ICRAB).
