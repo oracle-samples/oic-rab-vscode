@@ -2,15 +2,15 @@
  * Copyright © 2023, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
-import * as vscode from 'vscode';
 import { Observable, from, of } from 'rxjs';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import * as vscode from 'vscode';
 import { registration } from './api';
 import { log } from './logger';
-import { fs, message, workspace } from './utils';
-import { RABError, showErrorMessage } from './utils/ui-utils';
-import { getAddFile } from './workspace-manager';
+import { fs, workspace } from './utils';
+import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
 import { RabAddNs } from './webview-shared-lib';
+import { getAddFile } from './workspace-manager';
 
 const invalidAddHandler = (
   getFile = () => getAddFile()!
@@ -49,7 +49,7 @@ export const detectIsADDValidRemote = (getFile = () => getAddFile()!) => fs.chec
     )
   ),
   tap(
-    () => showErrorMessage(`🛜 Verifying the adapter definition [${workspace.presetFileMapAbs.definitionsMainAddJson}]`)
+    () => showInfoMessage(`🛜 Verifying the adapter definition [${workspace.presetFileMapAbs.definitionsMainAddJson}]`)
   ),
   switchMap(
     () => registration.validateAdd(getFile()
