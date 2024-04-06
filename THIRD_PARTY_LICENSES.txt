@@ -9,6 +9,12 @@
 
 ======================== Third Party Components ========================
 
+ajv, ajv-draft-04, ajv-formats
+* Copyright (c) 2015-2021 Evgeny Poberezkin
+* License : MIT License
+* Source Code : https://github.com/ajv-validator/ajv
+* Project home: https://ajv.js.org/
+
 axios 
 * Copyright (c) 2014-present Matt Zabriskie & Collaborators
 * License : MIT License
