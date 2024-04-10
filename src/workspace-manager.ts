@@ -13,7 +13,7 @@ import _, { extend } from 'lodash';
 
 import Ajv from "ajv-draft-04";
 import addFormats from "ajv-formats";
-import * as openapiSchema from "../schemas/openapi_v3.0.json";
+import * as openapiSchema from "./openapi/openapi_v3.0.json";
 
 import { log } from './logger';
 import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
