@@ -11,6 +11,9 @@ import * as path from 'path';
 import JSZip, { file } from 'jszip';
 import _, { extend } from 'lodash';
 
+import Ajv from "ajv-draft-04";
+import addFormats from "ajv-formats";
+import * as openapiSchema from "./openapi/openapi_v3.0.json";
 
 import { log } from './logger';
 import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
@@ -161,6 +164,10 @@ export class AdapterBundle {
 /* ========================================================================= *
  *  Internal methods                                                         *
  * ========================================================================= */
+
+let ajv = new Ajv();
+addFormats(ajv);
+let validateOpenAPI = ajv.compile(openapiSchema);
 
 class AdapterBundleBuilder {
 
@@ -344,12 +351,23 @@ class OpenApiFile extends AdapterBundleFile {
       if (doc.isDirty) {
         throw new Error('OpenAPI document has unsaved change.');
       } else {
-        return true;
+        return this.validateSchema();
       }
     } else {
-      //TODO validate content
-      return true;
+      return this.validateSchema();
     }
+  }
+
+  /**
+   * Validates the OpenAPI against its JSON schema.
+   */
+  private validateSchema(): boolean {
+    let valid = validateOpenAPI(JSON.parse(fs.readFileSync(this.absoluteFilePath, 'utf8')));
+    if (!valid) {
+      log.error(`The OpenAPI document is invalid: ${log.format(validateOpenAPI.errors)}`);
+      throw new Error(`The OpenAPI document is invalid. Please check logs for details.`);
+    }
+    return valid;
   }
 
 }
