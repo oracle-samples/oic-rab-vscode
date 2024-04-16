@@ -63,6 +63,10 @@
         "title": "RAB: Create RAB Bundle"
       },
       {
+        "command": "orab.importRabBundle",
+        "title": "RAB: Import RAB Bundle"
+      },
+      {
         "command": "orab.insertAuthenticationScheme",
         "title": "RAB: Insert Authentication Scheme...",
         "icon": "$(add)"
