@@ -190,6 +190,11 @@
           "description": "This setting enables the adapter with the connectivity agent if set to true, allowing the adapter to function in an on-premise deployed environment through the agent.",
           "type": "boolean"
         },
+        "endpointLocation": {
+          "title": "Endpoint Location",
+          "description": "The property models the location of endpoint.",
+          "$ref": "#/definitions/EndpointLocation"
+        },
         "supportsRegeneration": {
           "title": "Support Regeneration",
           "description": "This setting enables the adapter to support regeneration of configured endpoint if set to true. Regeneration of endpoint enables the schemas for the configured action to be refreshed with new schema information for the request and response based on changes to the backend metadata object model of the third party.",
@@ -251,6 +256,41 @@
           "title": "Follow Authorization Header",
           "description": "The setting enables the forwarding of authorization header during redirect.",
           "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EndpointLocation": {
+      "title": "Endpoint Location",
+      "description": "The property models the location of endpoint.",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "array",
+          "description": "Action Endpoint Location",
+          "maxItems": 2,
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "CLOUD",
+              "ON_PREMISE"
+            ]
+          }
+        },
+        "trigger": {
+          "type": "array",
+          "description": "Trigger Endpoint Location",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "CLOUD",
+              "ON_PREMISE"
+            ]
+          }
         }
       },
       "additionalProperties": false

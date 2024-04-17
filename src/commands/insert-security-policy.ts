@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 import { log } from '../logger';
 import * as utils from '../utils';
+import { showConfirmMessage } from '../utils/ui-utils';
 
 /**
  * All policy enums come from
@@ -76,7 +77,7 @@ async function applyToEditor(editor: vscode.TextEditor, policyId: string, scope:
   let addDoc = JSON.parse(editor.document.getText());
   let policyObj = Array.isArray(addDoc?.connection?.securityPolicies) ? addDoc.connection.securityPolicies.find((e: { policy: string; }) => e.policy === policyId) : undefined;
   if (policyObj) {
-    let confirm = await utils.message.confirm(`${policyId} already exists. Do you want to override?`);
+    let confirm = await showConfirmMessage(`${policyId} already exists. Do you want to override?`);
     if (confirm) {
       if (scope === 'ACTION') {
         setBaseURL(addDoc, template);

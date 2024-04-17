@@ -4,34 +4,31 @@
  */
 
 import * as vscode from 'vscode';
+import path from 'path';
 
 import { log } from '../logger';
 import * as api from '../api';
-import * as utils from '../utils';
+import { RABError, showErrorMessage } from '../utils/ui-utils';
 
-function callback(file: vscode.Uri): any {
+async function callback(file: vscode.Uri) {
 
-  log.showOutputChannel();
-  log.info(`Checking semver on ${utils.fs.parseFilename(file)}...`);
-  api.registration
-    .verionCheck(file)
-    .then(res => {
-      if (res.data) {
-        let same = res.data.advices.length === 0;
-        if (same) {
-          log.info(`Version check complete. Documents are identical.`);
-        } else {
-          log.info(`Version check complete. Recommended version change: ${res.data.minLevelUpdate}`);
-        }
-        log.debug(`Result: ${log.formatJSON(res.data)}`);
-      }
-    }).catch(err => {
-      log.debug(`API call failed (code=${err?.response?.status})`);
-      log.debug(err);
-    });
+  log.info(`Version check on ${path.basename(file.fsPath)}...`);
+
+  try {
+    let report = await api.registration.verionCheck(file);
+    let same = report.advices.length === 0;
+    if (same) {
+      log.info(`Version check complete. Documents are identical.`);
+    } else {
+      log.info(`Version check complete. Recommended version change: ${report.minLevelUpdate}`);
+    }
+  } catch (err) {
+    showErrorMessage(new RABError('Cannot conduct version check.', err));
+  }
 }
 
 export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand("orab.add.version-check", callback);
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("orab.add.version-check", callback)
+  );
 }

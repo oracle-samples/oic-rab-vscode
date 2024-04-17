@@ -5,7 +5,7 @@
   "description": "Oracle Integration Cloud Rapid Adapter Builder is a set of tools that makes it easier for you to validate, develop and deploy the next-gen RAB adapters for Oracle Integration Cloud (OIC) straight from VS Code.",
   "publisher": "Oracle",
   "license": "UPL",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "icon": "media/images/logo.png",
   "engines": {
     "vscode": "^1.73.0"
@@ -63,6 +63,10 @@
         "title": "RAB: Create RAB Bundle"
       },
       {
+        "command": "orab.importRabBundle",
+        "title": "RAB: Import RAB Bundle"
+      },
+      {
         "command": "orab.insertAuthenticationScheme",
         "title": "RAB: Insert Authentication Scheme...",
         "icon": "$(add)"
@@ -73,16 +77,16 @@
         "icon": "$(add)"
       },
       {
-        "command": "orab.add.publish",
-        "title": "RAB: Publish"
+        "command": "orab.bundle.register",
+        "title": "RAB: Register RAB Bundle"
       },
       {
-        "command": "orab.add.delete",
-        "title": "Delete ADD"
+        "command": "orab.bundle.delete",
+        "title": "Delete"
       },
       {
-        "command": "orab.add.get",
-        "title": "Get ADD"
+        "command": "orab.bundle.get",
+        "title": "Download"
       },
       {
         "command": "orab.add.validate",
@@ -105,7 +109,7 @@
         "title": "RAB: Add Requests from Postman Collection..."
       },
       {
-        "command": "orab.explorer.add.refresh",
+        "command": "orab.explorer.bundle.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
       },
@@ -144,15 +148,11 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "orab.add.publish",
+          "command": "orab.bundle.get",
           "when": "false"
         },
         {
-          "command": "orab.add.delete",
-          "when": "false"
-        },
-        {
-          "command": "orab.add.get",
+          "command": "orab.bundle.delete",
           "when": "false"
         },
         {
@@ -176,7 +176,7 @@
           "when": "false"
         },
         {
-          "command": "orab.explorer.add.refresh",
+          "command": "orab.explorer.bundle.refresh",
           "when": "false"
         },
         {
@@ -212,11 +212,6 @@
           "group": "orab"
         },
         {
-          "when": "resourceFilename =~ /\\.add\\.json$/",
-          "command": "orab.add.publish",
-          "group": "orab"
-        },
-        {
           "when": "resourceDirname =~ /(\\/|\\\\)misc$/ && resourceFilename =~ /(?<!\\.add)\\.json$/",
           "command": "orab.convert.postman.document",
           "group": "orab@1"
@@ -225,6 +220,11 @@
           "when": "resourceDirname =~ /(\\/|\\\\)misc$/ && resourceFilename =~ /(?<!\\.add).json$/",
           "command": "orab.webview.copilot.open.postman.convert",
           "group": "orab@2"
+        },
+        {
+          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceExtname == .json",
+          "command": "orab.add.convert",
+          "group": "orab@3"
         }
       ],
       "editor/context": [
@@ -263,12 +263,14 @@
       ],
       "view/item/context": [
         {
-          "when": "view == adaptersTreeView && viewItem == addRecord",
-          "command": "orab.add.get"
+          "when": "view == adaptersTreeView && viewItem == bundle",
+          "command": "orab.bundle.get",
+          "group": "navigation@1"
         },
         {
-          "when": "view == adaptersTreeView && viewItem == addRecord",
-          "command": "orab.add.delete"
+          "when": "view == adaptersTreeView && viewItem == bundle",
+          "command": "orab.bundle.delete",
+          "group": "navigation@2"
         },
         {
           "when": "view == outlineTreeView && viewItem == triggers",
@@ -284,7 +286,7 @@
       "view/title": [
         {
           "when": "view == adaptersTreeView",
-          "command": "orab.explorer.add.refresh",
+          "command": "orab.explorer.bundle.refresh",
           "group": "navigation"
         },
         {
@@ -395,6 +397,9 @@
     "vscode-extension-tester": "^5.9.1"
   },
   "dependencies": {
+    "ajv": "8.12.0",
+    "ajv-draft-04": "1.0.0",
+    "ajv-formats": "3.0.1",
     "axios": "1.6.0",
     "fs-extra": "11.1.1",
     "handlebars": "4.7.7",

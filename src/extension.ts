@@ -9,17 +9,20 @@ import { log } from './logger';
 
 import * as addLocate from './commands/add-locate';
 // import * as convertPostmanCollection from './commands/convert-postman-collection';
-import * as deleteAdd from './commands/delete-add';
+import * as downloadRABBundle from './commands/download-rab-bundle';
+import * as removeRABBundle from './commands/remove-rab-bundle';
+import * as registerRABBundle from './commands/register-rab-bundle';
+
+import * as createRabBundle from './commands/create-rab-bundle';
+import * as importRABBundle from './commands/import-rab-bundle';
+
 import * as explorerOutlineActionsNew from './commands/explorer-outline-actions-new';
 import * as explorerOutlineTriggersNew from './commands/explorer-outline-triggers-new';
-import * as getAdd from './commands/get-add';
 import * as initWorkspace from './commands/init-workspace';
 import * as insertSecurityPolicy from './commands/insert-security-policy';
 import * as insertTestConnection from './commands/insert-test-connection';
-import * as publishAdd from './commands/publish-add';
 import * as validateAdd from './commands/validate-add';
 import * as versionCheck from './commands/version-check';
-import * as createRabBundle from './commands/create-rab-bundle';
 import * as convertADD from './commands/convert-add';
 
 import * as addListProvider from './providers/add-list-provider';
@@ -32,17 +35,18 @@ import { init as initProfileManager, get as getProfileManager } from './profile-
 async function registerCommands(context: vscode.ExtensionContext) {
   addLocate.register(context);
   convertADD.register(context);
-  deleteAdd.register(context);
+  removeRABBundle.register(context);
   explorerOutlineActionsNew.register(context);
   explorerOutlineTriggersNew.register(context);
-  getAdd.register(context);
+  downloadRABBundle.register(context);
   initWorkspace.register(context);
   insertSecurityPolicy.register(context);
   insertTestConnection.register(context);
-  publishAdd.register(context);
+  registerRABBundle.register(context);
   validateAdd.register(context);
   versionCheck.register(context);
   createRabBundle.register(context);
+  importRABBundle.register(context);
 }
 
 async function registerProviders(context: vscode.ExtensionContext) {

@@ -6,83 +6,87 @@
 import * as vscode from 'vscode';
 
 import * as api from '../api';
-import * as utils from '../utils';
 import { get as getProfileManager } from '../profile-manager-provider';
+import { RABError, showErrorMessage } from '../utils/ui-utils';
 
-class AddListProvider implements vscode.TreeDataProvider<AddRecord> {
+/**
+ * TreeDataProvider for RAB adapters explorer.
+ * It reads data from the configured service instance.
+ */
+class RABAdapterListProvider implements vscode.TreeDataProvider<RABTreeItem> {
 
-  private _onDidChangeTreeData: vscode.EventEmitter<AddRecord | undefined | void> = new vscode.EventEmitter<AddRecord | undefined | void>();
-  readonly onDidChangeTreeData: vscode.Event<AddRecord | undefined | void> = this._onDidChangeTreeData.event;
+  private _onDidChangeTreeData: vscode.EventEmitter<RABTreeItem | undefined | void> = new vscode.EventEmitter<RABTreeItem | undefined | void>();
+  readonly onDidChangeTreeData: vscode.Event<RABTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  constructor(private workspaceRoot: string | undefined) {
+  constructor() {
   }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
   }
 
-  getTreeItem(element: AddRecord): vscode.TreeItem {
+  getTreeItem(element: RABTreeItem): vscode.TreeItem {
     return element;
   }
 
-  getChildren(element?: AddRecord): Thenable<AddRecord[]> {
+  async getChildren(element?: RABTreeItem): Promise<RABTreeItem[]> {
 
     if (element) {
-      return Promise.resolve([]);
+      return [];
+    }
+
+    if (await getProfileManager().isPresent()) {
+      return this.getData();
     } else {
-      return getProfileManager()
-        .isPresent()
-        .then(present => {
-          if (present) {
-            return this.getData();
-          } else {
-            return Promise.resolve([]);
-          }
-        });
+      return [];
     }
   }
 
   /**
    * Given the path to package.json, read all its dependencies and devDependencies.
    */
-  private getData(): Promise<AddRecord[]> {
-    return api.registration
-      .listAdd()
-      .then(res => {
-        return res.data.items
-          .sort((a: { adapterId: string; }, b: { adapterId: string; }) => a.adapterId > b.adapterId ? 1 : -1)
-          .map((e: { adapterId: string, adapterVersion: string }) => {
-            return new AddRecord(e.adapterId, e, vscode.TreeItemCollapsibleState.None);
-          });
+  private async getData(): Promise<RABTreeItem[]> {
+    let data;
+    try {
+      data = await api.bundle.list();
+    } catch (err) {
+      showErrorMessage(new RABError("Cannot list registered adapters.", err));
+      return [];
+    }
+    return data.items
+      .sort((a: { adapterId: string; }, b: { adapterId: string; }) => a.adapterId > b.adapterId ? 1 : -1)
+      .map((e: { adapterId: string, adapterVersion: string }) => {
+        return new RABTreeItem(e.adapterId, e, vscode.TreeItemCollapsibleState.None);
       });
   }
 }
 
-export class AddRecord extends vscode.TreeItem {
+export class RABTreeItem extends vscode.TreeItem {
 
   constructor(
     public readonly label: string,
-    private readonly record: any,
+    private readonly data: { adapterId: string, adapterVersion: string },
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
-
-    this.tooltip = JSON.stringify(this.record, null, 2);
-    this.description = this.record.adapterVersion;
+    this.description = this.data.adapterVersion;
+    this.tooltip = JSON.stringify(this.data, null, 2);
   }
 
-  getAddRecord() {
-    return this.record;
+  getData() {
+    return this.data;
   }
 
-  contextValue = 'addRecord';
+  // this is identifier for contribution point.
+  contextValue = 'bundle';
 }
 
 export function register(context: vscode.ExtensionContext) {
 
-  const provider = new AddListProvider(utils.workspace.getWorkspaceRoot());
-  vscode.window.registerTreeDataProvider('adaptersTreeView', provider);
-  let disposable = vscode.commands.registerCommand('orab.explorer.add.refresh', () => provider.refresh());
-  context.subscriptions.push(disposable);
+  const provider = new RABAdapterListProvider();
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider('adaptersTreeView', provider),
+    vscode.commands.registerCommand('orab.explorer.bundle.refresh', () => provider.refresh())
+  );
 }

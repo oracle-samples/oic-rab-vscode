@@ -4,8 +4,8 @@
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
+import { isBuffer } from 'lodash';
 import * as vscode from 'vscode';
-import { SharedNs } from './webview-shared-lib';
 
 vscode.workspace.onDidChangeConfiguration(event => {
   let affected = event.affectsConfiguration("RAB.logLevel");
@@ -48,7 +48,10 @@ class Logger {
     return this.log('error', msg);
   }
 
-  warn(msg: string): Logger {
+  warn(msg: string, err?: Error | unknown): Logger {
+    if (err instanceof Error) {
+      msg = `${msg} cause: ${err.stack}`;
+    }
     return this.log('warn', msg);
   }
 
@@ -65,14 +68,17 @@ class Logger {
     return this;
   }
 
-  formatJSON(val: any): string {
-    return SharedNs.ADDJsonStringify(val);
+  format(val: any): string {
+    if (isBuffer(val)) {
+      return `Buffer[${(val as Buffer).byteLength}]`;
+    }
+    return JSON.stringify(val, null, 2);
   }
 
   private log(level: string, ...msg: string[]): Logger {
     console.log(level, msg);
 
-    if (level === 'debug' && this.level === 'info') {return this;}
+    if (level === 'debug' && this.level === 'info') { return this; }
     let ts = `${new Date().toISOString()}`;
     let lvl: string;
     switch (level) {

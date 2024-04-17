@@ -12,13 +12,14 @@ import { Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } fr
 import { catchError, defaultIfEmpty, delay, filter, map, skipWhile, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
 import { log } from './logger';
-import { ensureOpenWorkspace } from './workspace-manager';
+import { ensureOpenWorkspace, initWorkspace } from './workspace-manager';
 
 import { PostmanNs, RabAddNs } from './webview-shared-lib';
 
 import { isWorkSpaceInitialized } from './workspace-manager';
+import { ConfirmOptions, showConfirmMessage, showErrorMessage, showInfoMessage, showModal } from './utils/ui-utils';
 
-export const defaultApiCallTimeoutInSeconds = 120;
+const defaultApiCallTimeoutInSeconds = 120;
 
 export namespace helpers {
   export const delayInSeconds = (timeInSeconds: number) => firstValueFrom(of(null).pipe(delay(timeInSeconds * 1000)));
@@ -31,6 +32,9 @@ export namespace constants {
 
 }
 
+/**
+ * @deprecated use workspace-manager instead
+ */
 export namespace workspace {
 
   export const MAX_ADD_COUNT_ALLOWED = 1000;
@@ -95,7 +99,7 @@ export namespace workspace {
       const postmanCollection = JSON.parse(doc.getText()) as PostmanNs.Root;
       return !!postmanCollection && !!postmanCollection.info?._postman_id && !!postmanCollection.item?.length;
     },
-    (file) => from(message.showErrorWithLog(`The offered file is not a valid postman collection. File: ['${fs.parseFilename(file)}']`))
+    (file) => from(showErrorMessage(`The offered file is not a valid postman collection. File: ['${fs.parseFilename(file)}']`))
   )
     .pipe(
       switchMap(
@@ -104,58 +108,35 @@ export namespace workspace {
     );
 
 
-  export const detectIsADDWithUILoading = <T extends Observable<any>>(context: vscode.ExtensionContext, file: vscode.Uri, successCallback: () => T) => {
+  // export const detectIsADDWithUILoading = <T extends Observable<any>>(context: vscode.ExtensionContext, file: vscode.Uri, successCallback: () => T) => {
 
-    let externalResolve = (val: any) => { };
-    const hidePromise = new Promise((resolve) => {
-      externalResolve = resolve;
-    });
+  //   let externalResolve = (val: any) => { };
+  //   const hidePromise = new Promise((resolve) => {
+  //     externalResolve = resolve;
+  //   });
 
-    return detectIsADDLocal(() => file)
-      .pipe(
-        tap(() => message.loading(
-          {
-            message: `⏱ Working on the adapter definition '${fs.parseFilename(file!)}'.... This may take 5-${defaultApiCallTimeoutInSeconds} seconds.`,
-            hidePromise,
-            context,
-            isBlocking: false
-          }
-        )
-        ),
-        switchMap(
-          successCallback
-        ),
-        tap(() => externalResolve(true)),
-        catchError((err) => {
-          externalResolve(true);
-          throw err;
-        })
+  //   return detectIsADDLocal(() => file)
+  //     .pipe(
+  //       tap(() => message.loading(
+  //         {
+  //           message: `⏱ Working on the adapter definition '${fs.parseFilename(file!)}'.... This may take 5-${defaultApiCallTimeoutInSeconds} seconds.`,
+  //           hidePromise,
+  //           context,
+  //           isBlocking: false
+  //         }
+  //       )
+  //       ),
+  //       switchMap(
+  //         successCallback
+  //       ),
+  //       tap(() => externalResolve(true)),
+  //       catchError((err) => {
+  //         externalResolve(true);
+  //         throw err;
+  //       })
 
-      );
-  };
-
-
-  export const detectIsADDLocal = (
-    getFile = () => workspace.getAddFile()!,
-    errorError: (getFile: () => vscode.Uri) => Observable<any> = (getFile: () => vscode.Uri) =>
-      from(message.showErrorWithLog(`The offered file is not a valid adapter definition document. File:  ['${fs.parseFilename(getFile())}']`))
-
-  ) => fs.isFileMatching(
-    getFile(),
-    (doc) => {
-      try {
-        const add = JSON.parse(doc.getText()) as RabAddNs.Root;
-        return !!add && !!add.info?.id;
-      } catch (error) {
-
-        return false;
-      }
-
-    },
-
-    () => errorError(getFile)
-
-  );
+  //     );
+  // };
 
   export function getApiFile(type: string): vscode.Uri | undefined {
     let root = fs.getWorkspaceRoot();
@@ -169,11 +150,10 @@ export namespace workspace {
     return undefined;
   }
 
-  export const detectOverrideAndOpenADDDocumentDialogOptions: message.ConfirmProp = {
+  export const detectOverrideAndOpenADDDocumentDialogOptions: ConfirmOptions = {
     yesText: `Update main`,
     noText: `Save new`,
     useNotification: true
-
   };
 
   /**
@@ -187,8 +167,12 @@ export namespace workspace {
     switchMap(
       (addFile) => iif(
         () => !!addFile,
-        message
-          .confirmV2(() => `Update main doucment '${fs.parseFilename(addFile!)}' or save as a new file? `, detectOverrideAndOpenADDDocumentDialogOptions)
+        of(null)
+          .pipe(
+            switchMap(
+              () => showConfirmMessage(() => `Update main doucment '${fs.parseFilename(addFile!)}' or save as a new file? `, detectOverrideAndOpenADDDocumentDialogOptions)
+            )
+          )
           .pipe(
             map(
               (confirm) => ({
@@ -314,29 +298,9 @@ export namespace workspace {
 
     );
 
-  // export const showPublisherYaml = () => of(getPublisherYaml())
-  //   .pipe(
-  //     filter(publisherYamlPath => !!publisherYamlPath),
-  //     switchMap((publisherYamlPath) => vscode.workspace.openTextDocument(publisherYamlPath!)),
-  //     switchMap((doc) => vscode.window.showTextDocument(doc!, vscode.ViewColumn.One)),
-  //   );
-
-  export function getPublisherYaml() {
-    let root = fs.getWorkspaceRoot();
-    if (!root) {
-      return;
-    }
-
-    const filePath = path.resolve(root, workspace.presetFileMap.publisherYaml);
-
-    if (!_fs.existsSync(filePath)) {
-      return;
-    }
-
-    return vscode.Uri.file(filePath);
-
-  }
-
+  /**
+   * @deprecated
+   */
   export function getAddFile(fileName: string = workspace.mainAddFileName, allowFallBack?: boolean): vscode.Uri | undefined {
 
     let root = fs.getWorkspaceRoot();
@@ -364,6 +328,10 @@ export namespace workspace {
 
   }
 
+  /**
+   * 
+   * @deprecated
+   */
   export const listAddFiles = () => fs.checkWorkspaceInitialized().pipe(
     map(() => fs.getWorkspaceRoot()),
     map(root => ({ root: root!, files: _fs.readdirSync(path.resolve(root!, "definitions")).filter(e => e.endsWith(`.add.json`)) }))
@@ -372,6 +340,7 @@ export namespace workspace {
   /**
    * Get ADD content in current RAB workspace.
    * @returns ADD or undefined if not found.
+   * @deprecated
    */
   export function getAddContent(fileName: string = workspace.mainAddFileName): string | undefined {
     let root = fs.getWorkspaceRoot();
@@ -455,10 +424,9 @@ export namespace fs {
       filter(initialized => !initialized),
 
       switchMap(
-        (addFile) => message
-          .confirm(`Your workspace is not intialized or was impaired. You must initialize/repair it before continue`, {
-            yesText: `Intialize/Repair`
-          })
+        (addFile) => showConfirmMessage(`Your workspace is not intialized or was impaired. You must initialize/repair it before continue`, {
+          yesText: `Intialize/Repair`
+        })
       ),
 
       switchMap(
@@ -516,49 +484,9 @@ export namespace fs {
 
   };
 
-  function copyRecursiveNoOverride(src: string, dest: string) {
-    try {
-      fsExtra
-        .readdirSync(src)
-        .filter(e => fsExtra.statSync(path.resolve(src, e)).isDirectory())
-        .forEach(e => {
-          log.debug(`Ensures dir: ${e}`);
-          fsExtra.ensureDirSync(path.resolve(dest, e));
-        });
-      fsExtra.copySync(src, dest, {
-        overwrite: false,
-        filter: e => !path.basename(e).startsWith('.')
-      });
-    } catch (error) {
-      log.warn(`${error}`);
-    }
-  }
-
-  export const initWorkspace = async () => {
-
-    ensureOpenWorkspace();
-
-    log.showOutputChannel();
-
-    let ws = getWorkspaceRoot() || '';
-
-    if (await isWorkSpaceInitialized()) {
-      log.warn(`[initWorkspace] The workspace is already intialized at [${ws}]`);
-      return;
-    }
 
 
-    let p = pathExists(path.resolve(__dirname, '../scaffold')) ? path.resolve(__dirname, '../scaffold') : path.resolve(__dirname, '../../scaffold');
 
-    copyRecursiveNoOverride(p, path.resolve(ws));
-
-    log.debug("Workspace initialized.");
-    vscode.commands.executeCommand('orab.explorer.profile.refresh');
-
-    log.info("📝 Please review the publisher settings.");
-
-    vscode.commands.executeCommand('orab.explorer.profile.edit');
-  };
 
   /**
  * Get the filename from a path.
@@ -570,7 +498,7 @@ export namespace fs {
     return arr[arr.length - 1];
   }
 
-  const defaultErrMsg = (file: vscode.Uri,) => from(message.showErrorWithLog(`The file format of '${parseFilename(file)}' is invalid.`))
+  const defaultErrMsg = (file: vscode.Uri,) => from(showErrorMessage(`The file format of '${parseFilename(file)}' is invalid.`))
     .pipe(
       map(() => file)
     );
@@ -621,6 +549,9 @@ export namespace fs {
     return vscode.workspace.openTextDocument(file).then(doc => doc.save());
   }
 
+  /**
+   * @deprecated
+   **/
   export const confirmOperationOnNonMainFile = (file: vscode.Uri, operation: string) => {
     return of(file)
       .pipe(
@@ -632,13 +563,13 @@ export namespace fs {
             of(false),
             of(fileName)
               .pipe(
-                switchMap((fileName) => message.confirm(`'${fileName}' is not the main document '${workspace.presetFileMap.definitionsMainAddJson}'. Are you sure`, {
+                switchMap((fileName) => showConfirmMessage(`'${fileName}' is not the main document '${workspace.presetFileMap.definitionsMainAddJson}'. Are you sure`, {
                   yesText: operation,
                   useNotification: true
                 })
                 ),
                 filter(confirmed => !!confirmed),
-                tap(() => message.showInfoWithLog(`Perform operation '${operation}' over file [${fileName}]`)),
+                tap(() => showInfoMessage(`Perform operation '${operation}' over file [${fileName}]`)),
                 map(() => true)
               )
 
@@ -657,13 +588,13 @@ export namespace fs {
             of(file)
               .pipe(
                 map((file) => file.path.split('/').pop()!),
-                switchMap((fileName) => message.confirm(`${fileName} should be saved before continue.`, {
+                switchMap((fileName) => showConfirmMessage(`${fileName} should be saved before continue.`, {
                   yesText: "Save and proceed",
                   useNotification: true
                 })
                 ),
                 filter(isToSave => !!isToSave),
-                tap(() => message.showInfoWithLog(`File saved`)),
+                tap(() => showInfoMessage(`File saved`)),
                 switchMap(() => saveFile(file))
               )
 
@@ -739,60 +670,10 @@ export namespace ext {
   }
 }
 
+/**
+ * @deprecated Use ui-utils instead.
+ */
 export namespace message {
-
-  export type ConfirmProp = {
-    yesText?: string;
-    noText?: string;
-    useNotification?: boolean;
-  };
-
-  export const confirmV2 = (getMsg: () => string, opts: ConfirmProp = {
-
-  }) => of(null)
-    .pipe(
-      switchMap(
-        () => confirm(getMsg(), opts)
-      )
-    );
-
-  export async function confirm(msg: string, {
-    yesText = "Yes",
-    noText,
-    useNotification
-  }: ConfirmProp = {
-
-    }): Promise<boolean> {
-    log.showOutputChannel();
-    log.info(`${msg}`);
-    return (noText ? vscode.window
-      .showInformationMessage(msg, { modal: !useNotification }, yesText, noText)
-      : vscode.window
-        .showInformationMessage(msg, { modal: !useNotification }, yesText)
-    )
-      .then(
-        str => { return str === yesText; },
-        () => { return false; }
-      );
-  }
-
-  export async function showInfo<T extends string>(msg: string, options: vscode.MessageOptions = {}, ...items: T[]) {
-    return vscode.window
-      .showInformationMessage(msg, { ...options }, ...items);
-  }
-  export async function showInfoWithLog<T extends string>(msg: string, options: vscode.MessageOptions = {}, ...items: T[]) {
-    log.showOutputChannel();
-    log.info(msg);
-    return vscode.window
-      .showInformationMessage(msg, { ...options }, ...items);
-  }
-
-  export function showErrorWithLog<T extends string>(msg: string, options: vscode.MessageOptions = {}, ...items: T[]) {
-    log.showOutputChannel();
-    log.error(msg);
-    return vscode.window
-      .showErrorMessage(msg, { ...options }, ...items);
-  }
 
   export function pop(msg: string, duration: number = 2) {
     let disposable = vscode.window.setStatusBarMessage(msg);
@@ -811,7 +692,7 @@ export namespace message {
     if (isBlocking) {
 
       const showMask = () => {
-        return showInfoWithLog(message, { modal: true });
+        return showModal(message);
       };
       showMask();
     };
@@ -819,7 +700,7 @@ export namespace message {
     const promise = vscode.window.setStatusBarMessage(message, hidePromise);
 
     const hideStatusItem = () => {
-      showInfoWithLog(`Done`);
+      // showInfoMessage(`Done`);
       // myStatusBarItem.hide();
       // myStatusBarItem.dispose();
     };
@@ -833,59 +714,4 @@ export namespace message {
 
     return promise;
   }
-}
-
-export namespace AddValidateReponseNs {
-  export interface Root {
-    errors: Warning[]
-    warnings: Warning[]
-    valid: boolean
-  }
-
-  export interface Warning {
-    ruleId: string
-    message: string
-    severity: string
-    location: string
-    suggestions: string[]
-  }
-
-}
-
-export namespace AddListReponseNs {
-  export interface Root {
-    items: Item[]
-    limit: number
-    offset: number
-    hasMore: boolean
-    count: number
-  }
-
-  export interface Item {
-    adapterId: string
-    adapterVersion: string
-    createdBy: string
-    updatedBy?: string
-    createdTime: number
-    updatedTime: number
-    kind: string
-    state: string
-  }
-
-}
-
-export namespace AddCreateUpdateResponseNs {
-  export interface Root {
-    success: boolean
-    id: string
-    version: string
-    validation: Validation
-  }
-
-  export interface Validation {
-    warnings: any[]
-    errors: any[]
-    valid: boolean
-  }
-
 }
