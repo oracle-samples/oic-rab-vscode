@@ -11,7 +11,7 @@
   },
   "additionalProperties": false,
   "minProperties": 0,
-  "maxProperties": 500,
+  "maxProperties": 600,
   "definitions": {
     "Schema": {
       "type": "object",
@@ -38,6 +38,9 @@
           "enum": [
             "binary"
           ]
+        },
+        "xml": {
+          "$ref": "#/definitions/XMLObject"
         },
         "required": {
           "type": "array",
@@ -138,9 +141,23 @@
         "propertyName": {
           "description": "The name of the property in the payload that will hold the discriminator value.",
           "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "XMLObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Declares XML Object type, using for overriding parent object type.",
+          "type": "string"
         },
-        "additionalProperties": false
-      }
+        "attribute": {
+          "description": "Declares whether the property definition translates to an attribute instead of an element. Default value is false.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

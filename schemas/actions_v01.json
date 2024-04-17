@@ -11,7 +11,7 @@
   },
   "additionalProperties": false,
   "minProperties": 0,
-  "maxProperties": 100,
+  "maxProperties": 200,
   "definitions": {
     "Action": {
       "type": "object",
@@ -38,7 +38,7 @@
             "$ref": "#/definitions/ConfigurationField"
           },
           "minItems": 0,
-          "maxItems": 20,
+          "maxItems": 40,
           "uniqueItems": true
         },
         "group": {
