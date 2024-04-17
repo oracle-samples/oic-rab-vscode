@@ -33,5 +33,57 @@
     }
   },
   "additionalProperties": false,
+  "allOf": [
+    {
+      "$comment": "must have at least one trigger in absence of actions.",
+      "if": {
+        "not": {
+          "required": [
+            "actions"
+          ],
+          "properties": {
+            "actions": {
+              "minProperties": 1
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "triggers"
+        ],
+        "properties": {
+          "triggers": {
+            "minProperties": 1
+          }
+        }
+      }
+    },
+    {
+      "$comment": "must have at least one action in absence of triggers.",
+      "if": {
+        "not": {
+          "required": [
+            "triggers"
+          ],
+          "properties": {
+            "triggers": {
+              "minProperties": 1
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "actions"
+        ],
+        "properties": {
+          "actions": {
+            "minProperties": 1
+          }
+        }
+      }
+    }
+  ],
   "definitions": {}
 }

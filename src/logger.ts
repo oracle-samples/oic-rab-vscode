@@ -48,7 +48,10 @@ class Logger {
     return this.log('error', msg);
   }
 
-  warn(msg: string): Logger {
+  warn(msg: string, err?: Error | unknown): Logger {
+    if (err instanceof Error) {
+      msg = `${msg} cause: ${err.stack}`;
+    }
     return this.log('warn', msg);
   }
 

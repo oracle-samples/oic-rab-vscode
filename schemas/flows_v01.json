@@ -10,8 +10,8 @@
     }
   },
   "additionalProperties": false,
-  "minItems": 1,
-  "maxItems": 100,
+  "minProperties": 1,
+  "maxProperties": 200,
   "definitions": {
     "nonEmptyString": {
       "type": "string",
@@ -216,10 +216,11 @@
                   "connectivity::jsonPayloadToXMLPayload",
                   "connectivity::xmlPayloadToJsonPayload",
                   "connectivity::xmlPayloadToJsonSchema",
+                  "connectivity::sampleXmlToJson",
                   "connectivity::updateSecurityProperty",
                   "connectivity::getSecurityProperty"
                 ],
-                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. `connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property."
+                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. 'connectivity::sampleXmlToJson' -> Makes xml payload to json payload conversion at designtime.`connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property."
               }
             }
           }
@@ -615,6 +616,10 @@
             "jsonPayload": {
               "$ref": "#/definitions/stringOrArgumentJQPattern",
               "description": "JSON payload converted to XML payload"
+            },
+            "targetNamespace": {
+              "$ref": "#/definitions/stringOrArgumentJQPattern",
+              "description": "Target Namespace for XML Payload"
             }
           },
           "additionalProperties": false
