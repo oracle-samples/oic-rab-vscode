@@ -5,7 +5,7 @@
   "description": "Oracle Integration Cloud Rapid Adapter Builder is a set of tools that makes it easier for you to validate, develop and deploy the next-gen RAB adapters for Oracle Integration Cloud (OIC) straight from VS Code.",
   "publisher": "Oracle",
   "license": "UPL",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "icon": "media/images/logo.png",
   "engines": {
     "vscode": "^1.73.0"
