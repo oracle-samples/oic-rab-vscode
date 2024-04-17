@@ -59,6 +59,10 @@ class Logger {
     return this.log('info', msg);
   }
 
+  infoServer(data: any): Logger {
+    return log.info(`Server response: ${log.formatV2(data)}`);
+  }
+
   debug(...msg: string[]): Logger {
     return this.log('debug', ...msg);
   }
@@ -73,6 +77,14 @@ class Logger {
       return `Buffer[${(val as Buffer).byteLength}]`;
     }
     return JSON.stringify(val, null, 2);
+  }
+
+  formatV2(val: any): string {
+    try {
+      return this.format(val);
+    } catch (error) {
+      return val;
+    }
   }
 
   private log(level: string, ...msg: string[]): Logger {

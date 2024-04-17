@@ -4,7 +4,6 @@
  */
 
 import * as fs from 'fs';
-import * as path from 'path';
 import * as vscode from 'vscode';
 
 import axios, { AxiosError, AxiosInstance, AxiosResponse, CreateAxiosDefaults } from 'axios';
@@ -12,11 +11,10 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse, CreateAxiosDefaults } 
 import FormData = require('form-data');
 
 import { log } from './logger';
-import { get as getProfileManager } from './profile-manager-provider';
-import * as utils from './utils';
-import { PostmanNs, RabAddNs, SharedNs } from './webview-shared-lib';
 import { Profile } from './profile-manager';
+import { get as getProfileManager } from './profile-manager-provider';
 import { RABError, showErrorMessage } from './utils/ui-utils';
+import { PostmanNs, SharedNs } from './webview-shared-lib';
 
 export const timeout = 120;
 
@@ -239,11 +237,11 @@ export namespace bundle {
           'Content-Type': 'application/zip',
         },
       }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
-      log.info(`Server response: ${log.format(res.data)}`);
+      log.infoServer(res?.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.info(`Server response: ${err.response?.data}`);
+        log.infoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -260,11 +258,11 @@ export namespace bundle {
           'Content-Type': 'application/zip',
         },
       }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
-      log.info(`Server response: ${log.format(res.data)}`);
+      log.infoServer(res?.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.info(`Server response: ${log.format(err.response?.data)}`);
+        log.infoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'PUT ${url}'`, err);
     }
@@ -309,11 +307,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<DefinitionValidationResponse>>);
-      log.info(`Server response: ${log.format(res.data)}`);
+      log.infoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.info(`Server response: ${log.format(err.response?.data)}`);
+        log.infoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -331,11 +329,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<any>>);
-      log.info(`Server response: ${log.format(res.data)}`);
+      log.infoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.info(`Server response: ${log.format(err.response?.data)}`);
+        log.infoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -413,7 +411,7 @@ export namespace conversion {
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.info(`Server response: ${log.format(err.response?.data)}`);
+        log.infoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
     }
