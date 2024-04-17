@@ -14,6 +14,7 @@ import * as removeRABBundle from './commands/remove-rab-bundle';
 import * as registerRABBundle from './commands/register-rab-bundle';
 
 import * as createRabBundle from './commands/create-rab-bundle';
+import * as importRABBundle from './commands/import-rab-bundle';
 
 import * as explorerOutlineActionsNew from './commands/explorer-outline-actions-new';
 import * as explorerOutlineTriggersNew from './commands/explorer-outline-triggers-new';
@@ -45,6 +46,7 @@ async function registerCommands(context: vscode.ExtensionContext) {
   validateAdd.register(context);
   versionCheck.register(context);
   createRabBundle.register(context);
+  importRABBundle.register(context);
 }
 
 async function registerProviders(context: vscode.ExtensionContext) {

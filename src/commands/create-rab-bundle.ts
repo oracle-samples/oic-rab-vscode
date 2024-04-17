@@ -11,7 +11,7 @@ import { showErrorMessage } from '../utils/ui-utils';
 
 
 async function callback(file: vscode.Uri): Promise<any> {
-  log.info("Creating RAB bundling from current workspace");
+  log.info("Creating RAB bundle in current workspace");
   try {
     await exportRABBundle();
     vscode.window.showInformationMessage("RAB bundle created.");

@@ -20,7 +20,9 @@ import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
 import { fs as fsUtils } from './utils';
 
 /**
- * This function ensures one open workspace otherwise throw error with specify message intended to be shown in UI.
+ * This function ensures one open workspace.
+ * @returns The workspace folder if the check passes.
+ * @throws if the check fails. The error message is intended for display in UI.
  */
 export function ensureOpenWorkspace(): vscode.WorkspaceFolder {
   if (!vscode.workspace.workspaceFolders) {
@@ -34,12 +36,35 @@ export function ensureOpenWorkspace(): vscode.WorkspaceFolder {
 
 /**
  * Ensure a workspace is open and has RAB layout.
+ * 
+ * @param {boolean} opts.createFolders if true, creates folders in RAB workspace structure.
+ * @returns The workspace folder if the check passes.
+ * @throws if the check fails. The error message is intended for display in UI.
  */
-export async function ensureValidRABWorkspace(): Promise<vscode.WorkspaceFolder> {
-  let ws = ensureOpenWorkspace();
+export async function ensureValidRABWorkspace(opts?: { createFolders?: boolean; }): Promise<vscode.WorkspaceFolder> {
+  const ws = ensureOpenWorkspace();
+  if (opts?.createFolders === true) {
+    fs.ensureDirSync(path.resolve(ws.uri.fsPath, 'api'));
+    fs.ensureDirSync(path.resolve(ws.uri.fsPath, 'misc'));
+  }
   await new AdapterDefinitionFile(ws).validate();
   await new LogoFile(ws).validate();
   await new OpenApiFile(ws).validate();
+  return ws;
+}
+
+/**
+ * Ensures a workspace is open and empty.
+ * 
+ * @returns The workspace folder if the check passes.
+ * @throws if the check fails. The error message is intended for display in UI.
+ */
+export async function ensureEmptyWorkspace(): Promise<vscode.WorkspaceFolder> {
+  const ws = ensureOpenWorkspace();
+  const files = fs.readdirSync(ws.uri.fsPath);
+  if (files.length > 0) {
+    throw new RABError('Workspace is not clean. Make sure it is empty before importing.');
+  }
   return ws;
 }
 
@@ -58,8 +83,38 @@ export const initWorkspace = async () => {
 };
 
 /**
+ * Import an RAB bundle file and unzip it into current workspace.
+ * 
+ * @param rab The URI of the RAB bundle file.
+ */
+export async function importRABBundle(rab: vscode.Uri): Promise<boolean> {
+  const ws = await ensureEmptyWorkspace();
+  const zip = await JSZip.loadAsync(fs.readFileSync(rab.fsPath));
+
+  for (const filename in zip.files) {
+    const content = zip.files[filename];
+    const dest = path.resolve(ws.uri.fsPath, filename);
+    if (content.dir) {
+      fs.ensureDirSync(dest);
+    } else {
+      fs.outputFileSync(dest, await content.async("nodebuffer"));
+    }
+  }
+
+  try {
+    await ensureValidRABWorkspace({ createFolders: true });
+  } catch (err) {
+    log.warn(`The imported RAB bundle is invalid`, err);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Creates RAB bundle file at the root of the workspace. Must have an open RAB workspace.
- * @returns URI of the bundle file.
+ * 
+ * @returns The URI of the RAB bundle file.
  */
 export async function exportRABBundle(): Promise<vscode.Uri> {
 

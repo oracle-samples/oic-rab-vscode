@@ -3,6 +3,10 @@ import * as _ from 'lodash';
 
 import { log } from '../logger';
 
+/**
+ * An error which can chain to its cause.
+ * The full chain will be pretty printed when the error is logged in the extension's interal log channel.
+ */
 export class RABError extends Error {
 
   private _cause: unknown | undefined;
@@ -65,6 +69,15 @@ export function showInfoMessage(msg: string) {
 }
 
 /**
+ * Show an info notification.
+ */
+export function showWarningMessage(msg: string) {
+  log.showOutputChannel();
+  log.warn(msg);
+  return vscode.window.showWarningMessage(msg);
+}
+
+/**
  * Show an error notification.
  */
 export function showErrorMessage(err: RABError | Error | string | unknown) {
@@ -87,6 +100,13 @@ export function showErrorMessage(err: RABError | Error | string | unknown) {
   // }
 }
 
+/**
+ * Executes a task with UI progress bar indicator.
+ * 
+ * @param title The title of the progress bar.
+ * @param task The task to be executed.
+ * @returns the result of the task.
+ */
 export function withProgress<T>(title: string, task: () => Promise<T>) {
 
   return vscode.window.withProgress({
@@ -97,6 +117,10 @@ export function withProgress<T>(title: string, task: () => Promise<T>) {
     return await task();
   });
 }
+
+/* ========================================================================= *
+ *  Internal methods                                                         *
+ * ========================================================================= */
 
 function printCause(err: RABError | Error | string | undefined | unknown): string {
   let msg: string = "";
