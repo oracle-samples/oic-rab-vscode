@@ -9,12 +9,13 @@ import * as vscode from 'vscode';
 import path = require("path");
 
 import { filter, firstValueFrom, from, iif, of, switchMap, tap } from "rxjs";
-import { callConversionApiAndShowDocument, convertCallback } from "../commands/convert-postman-collection";
+import { timeout as apiTimeout } from "../api";
+import { callOpenAPIConversionApiAndShowDocument, openAPIConvertCallback } from "../commands/convert-openapi-document";
+import { callPostmanConversionApiAndShowDocument, postmanConvertCallback } from "../commands/convert-postman-collection";
 import { fs, message, workspace } from '../utils';
 import { detectIsADDValidRemote } from "../utils-api";
-import { SharedNs } from "../webview-shared-lib";
-import { timeout as apiTimeout } from "../api";
 import { showErrorMessage } from "../utils/ui-utils";
+import { SharedNs } from "../webview-shared-lib";
 
 export namespace UtilsNs {
 
@@ -239,39 +240,98 @@ const notifyPostmanWebview = (file: vscode.Uri, entryType: SharedNs.VscodeComman
   UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updateEntryType, entryType);
 };
 
-const openWebview = (file: vscode.Uri, context: vscode.ExtensionContext, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => from([
-  handleWebviewRouting(SharedNs.WebviewRouteEnum.PostmanAdd),
-  handleWebviewLifecycle(),
-  notifyPostmanWebview(file, entryType),
-  UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectReady, () => notifyPostmanWebview(file, entryType)),
-  UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectRequests, (data) => {
+const notifyOpenAPIWebview = (file: vscode.Uri, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => {
+  UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updateOpenAPIRawData, JSON.parse(readFileSync(file.fsPath, 'utf8')));
+  UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updateEntryType, entryType);
+};
 
-    const observable = fs.checkWorkspaceInitialized().pipe(
-      switchMap(
-        () => workspace.detectIsPostmanFileWithUILoading(context, file, () => of(file)
-          .pipe(
-            switchMap(() => callConversionApiAndShowDocument(file, data, workspace.getAddFile(),))
+const openWebview = (
+  file: vscode.Uri,
+  context: vscode.ExtensionContext,
+  entryType: SharedNs.VscodeCommandPayload["updateEntryType"]
+) => {
+
+  const isPostmanEvents = [
+      SharedNs.VscodeCommandPayloadEntryType.PostmanAddRequest,
+      SharedNs.VscodeCommandPayloadEntryType.PostmanConvertDocument,
+    ].some(type => type === entryType);
+
+
+  const postmanEvents = () => [
+
+    notifyPostmanWebview(file, entryType),
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectReady, () => notifyPostmanWebview(file, entryType)),
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectRequests, (data) => {
+
+      const observable = fs.checkWorkspaceInitialized().pipe(
+        switchMap(
+          () => workspace.detectIsPostmanFileWithUILoading(context, file, () => of(file)
+            .pipe(
+              switchMap(() => callPostmanConversionApiAndShowDocument(file, data, workspace.getAddFile(),))
+            )
           )
         )
-      )
-    );
+      );
 
-    const requestPromise = firstValueFrom(observable);
+      const requestPromise = firstValueFrom(observable);
 
-    message.loading(
-      {
-        message: `Updating in progress. This may take 5-${apiTimeout} seconds. Don't edit the document before it's done.`,
-        hidePromise: requestPromise,
-        context,
-        isBlocking: false
-      }
-    );
-  }),
+      message.loading(
+        {
+          message: `Updating in progress. This may take 5-${apiTimeout} seconds. Don't edit the document before it's done.`,
+          hidePromise: requestPromise,
+          context,
+          isBlocking: false
+        }
+      );
+    }),
 
-  UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanDoneConvertDocument, (data) => {
-    convertCallback(file, context, data);
-  }),
-]);
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanDoneConvertDocument, (data) => {
+      postmanConvertCallback(file, context, data);
+    })
+  ];
+
+  const openAPIEvents = () => [
+
+    notifyOpenAPIWebview(file, entryType),
+
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.openAPISelectReady, () => notifyOpenAPIWebview(file, entryType)),
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.openAPISelectRequests, (data) => {
+
+      const observable = fs.checkWorkspaceInitialized().pipe(
+        switchMap(
+          () => workspace.detectIsOpenAPIFileWithUILoading(context, file, () => of(file)
+            .pipe(
+              switchMap(() => callOpenAPIConversionApiAndShowDocument(file, data, workspace.getAddFile(),))
+            )
+          )
+        )
+      );
+
+      const requestPromise = firstValueFrom(observable);
+
+      message.loading(
+        {
+          message: `Updating in progress. This may take 5-${apiTimeout} seconds. Don't edit the document before it's done.`,
+          hidePromise: requestPromise,
+          context,
+          isBlocking: false
+        }
+      );
+    }),
+
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.openAPIDoneConvertDocument, (data) => {
+      openAPIConvertCallback(file, context, data);
+    })
+  ];
+
+  const entryEvents = isPostmanEvents ? postmanEvents() : openAPIEvents();
+
+  return from([
+    handleWebviewRouting(SharedNs.WebviewRouteEnum.PostmanAdd),
+    handleWebviewLifecycle(),
+    ...entryEvents,
+  ]);
+};
 
 const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => (file: vscode.Uri) => {
 
@@ -281,7 +341,7 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
   const observable = of(entryType).pipe(
     switchMap(
       () => iif(
-        () => entryType === `addRequest`,
+        () => entryType === SharedNs.VscodeCommandPayloadEntryType.PostmanAddRequest,
         detectIsADDValidRemote(),
         fs.checkWorkspaceInitialized()
       )
@@ -307,12 +367,47 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
   return disposableList;
 };
 
+
+const registerOpenAPIConvertCallback = (context: vscode.ExtensionContext, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => (file: vscode.Uri) => {
+
+  const disposableList: vscode.Disposable[] = [];
+
+
+  const observable = of(entryType).pipe(
+    switchMap(
+      () => iif(
+        () => entryType === SharedNs.VscodeCommandPayloadEntryType.OpenAPIAddRequest,
+        detectIsADDValidRemote(),
+        fs.checkWorkspaceInitialized()
+      )
+    ),
+    switchMap(
+      () => workspace.detectIsOpenAPIFile(file, () => of(file)
+        .pipe(
+          tap(() => UtilsNs.showWebview(context)),
+          switchMap(
+            () => openWebview(file, context, entryType)
+              .pipe(
+                filter(disposible => !!disposible),
+                tap(disposable => disposableList.push(disposable!))
+              )
+          )
+        )
+      )
+    )
+  );
+
+  observable.subscribe();
+
+  return disposableList;
+};
+
 function registerPostmanConvertAddRequests(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     UtilsNs.registerCommandV2({
       context,
       command: SharedNs.ExtensionCommandEnum.openCopilotPostmanConvert,
-      callback: registerPostmanConvertCallback(context, "addRequest")
+      callback: registerPostmanConvertCallback(context, SharedNs.VscodeCommandPayloadEntryType.PostmanAddRequest)
     })
   );
 }
@@ -322,7 +417,28 @@ function registerPostmanConvertConvertDocument(context: vscode.ExtensionContext)
     UtilsNs.registerCommandV2({
       context,
       command: SharedNs.ExtensionCommandEnum.openPostmanConvertConverDocument,
-      callback: registerPostmanConvertCallback(context, "convertDocument")
+      callback: registerPostmanConvertCallback(context, SharedNs.VscodeCommandPayloadEntryType.PostmanConvertDocument)
+    })
+  );
+}
+
+function registerOpenAPIConvertAppendDocument(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
+    UtilsNs.registerCommandV2({
+      context,
+
+      command: SharedNs.ExtensionCommandEnum.openOpenAPIConvertAppendDocument,
+      callback: registerOpenAPIConvertCallback(context, SharedNs.VscodeCommandPayloadEntryType.OpenAPIAddRequest)
+    })
+  );
+}
+function registerOpenAPIConvertNewDocument(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
+    UtilsNs.registerCommandV2({
+      context,
+
+      command: SharedNs.ExtensionCommandEnum.openOpenAPIConvertNewDocument,
+      callback: registerOpenAPIConvertCallback(context, SharedNs.VscodeCommandPayloadEntryType.OpenAPIConvertDocument)
     })
   );
 }
@@ -464,5 +580,7 @@ const initCopilotEvents = (context: vscode.ExtensionContext) => from([
 export function register(context: vscode.ExtensionContext) {
   registerPostmanConvertAddRequests(context);
   registerPostmanConvertConvertDocument(context);
+  registerOpenAPIConvertAppendDocument(context);
+  registerOpenAPIConvertNewDocument(context);
   // registerCopilotAssistant(context);
 }

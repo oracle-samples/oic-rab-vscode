@@ -7,28 +7,14 @@ import * as vscode from 'vscode';
 
 import * as _fs from 'fs';
 
-import { AxiosResponse } from 'axios';
 import { bindNodeCallback, catchError, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
 import * as api from '../api';
 
 import { log } from '../logger';
 import { fs, workspace } from '../utils';
-import { PostmanNs, SharedNs } from '../webview-shared-lib';
 import { withProgress } from '../utils/ui-utils';
+import { PostmanNs, SharedNs } from '../webview-shared-lib';
 
-const revealADDDocument = () => switchMap(
-  (documentAndResponse: {
-    response: AxiosResponse<any, any>,
-    document: vscode.TextDocument
-  }) => from(workspace.showADDDocument(documentAndResponse.document))
-    .pipe(
-      map(editor => ({
-        editor,
-        ...documentAndResponse
-      })
-      )
-    )
-);
 
 const getPostmanCollection = (postmanFile: vscode.Uri) => bindNodeCallback(_fs.readFile)(postmanFile.fsPath).pipe(
   map(buffer => JSON.parse(buffer.toString()) as PostmanNs.Root)
@@ -41,7 +27,7 @@ const getPostmanCollectionNameAsFileName = (postmanFile: vscode.Uri) => getPostm
   map(postmanCollectionName => fs.getFileNameFromPostmanCollectionName(postmanCollectionName))
 );
 
-export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, addFile?: vscode.Uri,) => 
+export const callPostmanConversionApiAndShowDocument = (postmanFile: vscode.Uri, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, addFile?: vscode.Uri,) => 
   fs.checkWorkspaceInitialized()
   
   .pipe(
@@ -76,7 +62,7 @@ export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, postma
       )
     ),
 
-    revealADDDocument(),
+    workspace.revealADDDocument(),
     
     tap(({ editor, response }) => {
       let source = editor.document.getText();
@@ -98,14 +84,14 @@ export const callConversionApiAndShowDocument = (postmanFile: vscode.Uri, postma
     })
   );
 
-export function convertCallback(file: vscode.Uri, context: vscode.ExtensionContext, postmanConfig: SharedNs.WebviewCommandPayloadPostmanSelectRequests) {
+export function postmanConvertCallback(file: vscode.Uri, context: vscode.ExtensionContext, postmanConfig: SharedNs.WebviewCommandPayloadPostmanSelectRequests) {
 
   const observable = fs.checkWorkspaceInitialized().pipe(
     switchMap(
       () => workspace.detectIsPostmanFileWithUILoading(
         context,
         file, 
-        () => callConversionApiAndShowDocument(file, postmanConfig)
+        () => callPostmanConversionApiAndShowDocument(file, postmanConfig)
       )
     )
   ) ;

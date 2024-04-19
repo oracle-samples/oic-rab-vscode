@@ -14,7 +14,7 @@ import { log } from './logger';
 import { Profile } from './profile-manager';
 import { get as getProfileManager } from './profile-manager-provider';
 import { RABError, showErrorMessage } from './utils/ui-utils';
-import { PostmanNs, SharedNs } from './webview-shared-lib';
+import { OpenAPINS, PostmanNs, SharedNs } from './webview-shared-lib';
 
 export const timeout = 120;
 
@@ -398,22 +398,59 @@ export namespace conversion {
     });
   }
 
-  export async function openapi(document: vscode.Uri | string): Promise<any> {
-    let endpoint = `${apiRootPath}/${resource}/convert?type=openapi`;
+  export async function openapi(openAPIDocument: vscode.Uri | string, openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, add?: vscode.Uri | string): Promise<any> {
+   
+    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=openapi`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
     const form = new FormData();
     // part 1
-    form.append('sourceFile', document instanceof vscode.Uri ? fs.readFileSync(document.fsPath, 'utf8') : document);
-
-    try {
-      let res = await callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<any>>);
-      return res.data;
-    } catch (err) {
-      if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
-      }
-      throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
+    form.append('sourceFile', openAPIDocument instanceof vscode.Uri ? fs.readFileSync(openAPIDocument.fsPath, 'utf8') : postmanCollection);
+    log.debug("Set 'sourceFile'");
+    // part 2
+    if (add) {
+      form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
+      log.debug("Set 'targetADD'");
     }
+
+    const openAPIConfigEntries: [string, any][] = [];
+
+    // part 3
+    if (openAPIConfig?.items) {
+      openAPIConfigEntries.push(
+        [
+          'openapi_requests',
+          openAPIConfig.items.map(name => {
+            return {
+              "name": name,
+              "actionImport": true,
+              "flowImport": true,
+              "schemaImport": true
+            };
+          })
+        ]
+      );
+    }
+
+    if (openAPIConfig?.selectedItemForTestConnection) {
+      openAPIConfigEntries.push(
+        [
+          'openapi_request_as_test_connection',
+          {
+            name: openAPIConfig.selectedItemForTestConnection
+          }
+        ]
+      );
+    }
+
+    if (openAPIConfigEntries.length) {
+      log.debug("Set 'openAPIConfigRequest'");
+      form.append('openAPIConfigRequest', JSON.stringify(Object.fromEntries(openAPIConfigEntries)));
+    }
+
+    return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<OpenAPINS.Root>>, (err) => {
+      showErrorMessage("❌ Conversion failed");
+    });
+
   }
 }

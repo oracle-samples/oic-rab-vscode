@@ -5,18 +5,15 @@
 
 import * as vscode from 'vscode';
 
-import * as _fs from 'fs';
 
 
 import { firstValueFrom } from 'rxjs';
-import * as _ from 'lodash';
 
 import * as api from '../api';
-import { log } from '../logger';
 import { workspace } from '../utils';
-import { ensureOpenWorkspace } from '../workspace-manager';
 import { ensureOpenApiDocument } from '../utils/file-utils';
 import { RABError, showErrorMessage, withProgress } from '../utils/ui-utils';
+import { ensureOpenWorkspace } from '../workspace-manager';
 
 async function callback(file: vscode.Uri): Promise<any> {
 
@@ -46,8 +43,10 @@ async function callback(file: vscode.Uri): Promise<any> {
   }
 }
 
-export function register(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand("orab.add.convert", callback);
-  context.subscriptions.push(disposable);
-  return disposable;
-}
+// migrate to registerOpenAPIConvertNewDocument
+
+// export function register(context: vscode.ExtensionContext) {
+//   let disposable = vscode.commands.registerCommand("orab.add.convert", callback);
+//   context.subscriptions.push(disposable);
+//   return disposable;
+// }

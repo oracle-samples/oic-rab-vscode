@@ -13,6 +13,10 @@ export namespace SharedNs {
     postmanDoneConvertDocument: 'postmanDoneConvertDocument' as 'postmanDoneConvertDocument',
     postmanSelectReady: 'postmanSelectReady' as 'postmanSelectReady',
 
+    openAPISelectRequests: 'openAPISelectRequests' as 'openAPISelectRequests',
+    openAPISelectReady: 'openAPISelectReady' as 'openAPISelectReady',
+    openAPIDoneConvertDocument: 'openAPIDoneConvertDocument' as 'openAPIDoneConvertDocument',
+
     rabAddReady: 'rabAddReady' as 'rabAddReady',
 
     rabAddSave: 'rabAddSave' as 'rabAddSave',
@@ -21,8 +25,11 @@ export namespace SharedNs {
   export const ExtensionCommandEnum = {
     openCopilotPostmanConvert: 'orab.webview.copilot.open.postman.convert' as 'openCopilotPostmanConvert',
     openPostmanConvertConverDocument: 'orab.convert.postman.document' as 'openPostmanConvertConverDocument',
+    openOpenAPIConvertNewDocument: 'orab.add.convert' as 'openOpenAPIConvertNewDocument',
+    openOpenAPIConvertAppendDocument: 'orab.add.convert.append' as 'openOpenAPIConvertAppendDocument',
     openCopilotAssistant: 'orab.webview.copilot.open.assistant' as 'openCopilotAssistant',
     updatePostmanRawData: 'updatePostmanRawData' as 'updatePostmanRawData',
+    updateOpenAPIRawData: 'updateOpenAPIRawData' as 'updateOpenAPIRawData',
     updateEntryType: 'updateEntryType' as 'updateEntryType',
     loadRabAddData: 'loadRabAddData' as 'loadRabAddData',
     routerNavigateTo: 'routerNavigateTo' as 'routerNavigateTo',
@@ -43,6 +50,10 @@ export namespace SharedNs {
     items: string[];
     selectedItemForTestConnection?: string;
   }
+  export interface WebviewCommandPayloadOpenAPISelectRequests {
+    items: string[];
+    selectedItemForTestConnection?: string;
+  }
   export interface WebviewCommandPayloadRabAddSave {
     addToSave: RabAddNs.Root;
     vsCodeEditorConfig?: VsCoderEditorConfig;
@@ -53,21 +64,41 @@ export namespace SharedNs {
     webviewLifecycle: {
       type: 'close'
     };
+
     postmanSelectRequests: Omit<WebviewCommandPayloadPostmanSelectRequests, "selectedItemForTestConnection">;
     postmanDoneConvertDocument: WebviewCommandPayloadPostmanSelectRequests;
     postmanSelectReady: any;
+
+    openAPISelectRequests: Omit<WebviewCommandPayloadOpenAPISelectRequests, "selectedItemForTestConnection">;
+    openAPIDoneConvertDocument: WebviewCommandPayloadOpenAPISelectRequests;
+    openAPISelectReady: any;
+    
     rabAddReady: any;
 
     rabAddSave: WebviewCommandPayloadRabAddSave;
   }
 
+  export enum VscodeCommandPayloadEntryType {
+    PostmanConvertDocument = `PostmanConvertDocument`,
+    PostmanAddRequest = `PostmanAddRequest`,
+    OpenAPIConvertDocument = `OpenAPIConvertDocument`,
+    OpenAPIAddRequest = `OpenAPIAddRequest`,
+  }
 
   export type VscodeCommandPayload = {
     openCopilotPostmanConvert: any;
     openCopilotAssistant: any;
+
     updatePostmanRawData: PostmanNs.Root;
-    updateEntryType: 'convertDocument' | 'addRequest';
+    updateOpenAPIRawData: OpenAPINS.Root;
+
+    updateEntryType: VscodeCommandPayloadEntryType;
+
     openPostmanConvertConverDocument: any;
+
+    openOpenAPIConvertNewDocument: any;
+    openOpenAPIConvertAppendDocument: any;
+    
     loadRabAddData: any;
     routerNavigateTo: {
       href: WebviewRouteEnum;
@@ -1491,6 +1522,109 @@ export namespace RabAddNs {
 
 }
 
+export namespace OpenAPINS {
+  export type Root = {
+    openapi: string
+    info: {
+      version: string
+      title: string
+      license: {
+        name: string
+      }
+    }
+    servers: Array<{
+      url: string
+    }>
+    paths: {
+      [key: string]: {
+        get: {
+          summary: string
+          operationId: string
+          tags: Array<string>
+          parameters: Array<{
+            name: string
+            in: string
+            description: string
+            required: boolean
+            schema: {
+              type: string
+              maximum: number
+              format: string
+            }
+          }>
+          responses: {
+            "200": {
+              description: string
+              headers: {
+                "x-next": {
+                  description: string
+                  schema: {
+                    type: string
+                  }
+                }
+              }
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: string
+                  }
+                }
+              }
+            }
+            default: {
+              description: string
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: string
+                  }
+                }
+              }
+            }
+          }
+        }
+        post: {
+          summary: string
+          operationId: string
+          tags: Array<string>
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: string
+                }
+              }
+            }
+            required: boolean
+          }
+          responses: {
+            "201": {
+              description: string
+            }
+            default: {
+              description: string
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: string
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    components: {
+      schemas: {
+        Pets: {
+          [key: string]: any
+        }
+      }
+    }
+
+  }
+}
 
 
 export namespace PostmanNs {
