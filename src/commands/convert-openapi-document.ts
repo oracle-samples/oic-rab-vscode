@@ -40,7 +40,7 @@ export const callOpenAPIConversionApiAndShowDocument = (oppenAPIFile: vscode.Uri
       (openAPIName) => from(
         withProgress(
           'Converting OpenAPI document...',
-          () => api.conversion.openapi(oppenAPIFile, openAPIConfig, !!addFile ? addFile : undefined)
+          () => api.conversion.openapi(oppenAPIFile, openAPIConfig, addFile)
         )
       ).pipe(
         map(response => ({

@@ -50,10 +50,7 @@ export namespace SharedNs {
     items: string[];
     selectedItemForTestConnection?: string;
   }
-  export interface WebviewCommandPayloadOpenAPISelectRequests {
-    items: string[];
-    selectedItemForTestConnection?: string;
-  }
+  export type WebviewCommandPayloadOpenAPISelectRequests = OpenAPINS.UIStateForBackend
   export interface WebviewCommandPayloadRabAddSave {
     addToSave: RabAddNs.Root;
     vsCodeEditorConfig?: VsCoderEditorConfig;
@@ -69,7 +66,7 @@ export namespace SharedNs {
     postmanDoneConvertDocument: WebviewCommandPayloadPostmanSelectRequests;
     postmanSelectReady: any;
 
-    openAPISelectRequests: Omit<WebviewCommandPayloadOpenAPISelectRequests, "selectedItemForTestConnection">;
+    openAPISelectRequests: WebviewCommandPayloadOpenAPISelectRequests;
     openAPIDoneConvertDocument: WebviewCommandPayloadOpenAPISelectRequests;
     openAPISelectReady: any;
     
@@ -90,7 +87,10 @@ export namespace SharedNs {
     openCopilotAssistant: any;
 
     updatePostmanRawData: PostmanNs.Root;
-    updateOpenAPIRawData: OpenAPINS.Root;
+    updateOpenAPIRawData: {
+      openapi: OpenAPINS.Root,
+      add?: RabAddNs.Root
+    };
 
     updateEntryType: VscodeCommandPayloadEntryType;
 
@@ -406,6 +406,7 @@ export namespace RabAddNs {
     urn: string
     input?: Input
     output?: Input,
+    $refOpenapi?: string,
 
     configuration?: Configuration[]
   }
@@ -1523,6 +1524,56 @@ export namespace RabAddNs {
 }
 
 export namespace OpenAPINS {
+
+
+  export interface UIStateActionDeltaAdd {
+    actionRef: string
+  }
+
+
+  export interface UIStateActionDeltaItem {
+    actionRef: string,
+    actionDisplayName: string,
+  }
+
+  export interface UIStateActionDeltaRemove extends UIStateActionDeltaItem {
+    force?: boolean
+  }
+
+  export interface UIStateForBackend {
+    actionDelta: {
+      add: UIStateActionDeltaAdd[],
+      remove: UIStateActionDeltaRemove[]
+    }
+  }
+
+  export type MethodDefinition = {
+
+    isSelected?: boolean;
+    fullPathId: string;
+
+    summary: string
+    requestBody?: {
+      [key: string]: any
+    }
+    operationId: string
+    tags: Array<string>
+    parameters?: Array<{
+      name: string
+      in: string
+      description: string
+      required: boolean
+      schema: {
+        [key: string]: any
+      }
+    }>
+    responses?: {
+      [key: string]: any
+    }
+  };
+  export type PathDefinition = {
+    [key: string]: MethodDefinition
+  };
   export type Root = {
     openapi: string
     info: {
@@ -1536,88 +1587,11 @@ export namespace OpenAPINS {
       url: string
     }>
     paths: {
-      [key: string]: {
-        get: {
-          summary: string
-          operationId: string
-          tags: Array<string>
-          parameters: Array<{
-            name: string
-            in: string
-            description: string
-            required: boolean
-            schema: {
-              type: string
-              maximum: number
-              format: string
-            }
-          }>
-          responses: {
-            "200": {
-              description: string
-              headers: {
-                "x-next": {
-                  description: string
-                  schema: {
-                    type: string
-                  }
-                }
-              }
-              content: {
-                "application/json": {
-                  schema: {
-                    $ref: string
-                  }
-                }
-              }
-            }
-            default: {
-              description: string
-              content: {
-                "application/json": {
-                  schema: {
-                    $ref: string
-                  }
-                }
-              }
-            }
-          }
-        }
-        post: {
-          summary: string
-          operationId: string
-          tags: Array<string>
-          requestBody: {
-            content: {
-              "application/json": {
-                schema: {
-                  $ref: string
-                }
-              }
-            }
-            required: boolean
-          }
-          responses: {
-            "201": {
-              description: string
-            }
-            default: {
-              description: string
-              content: {
-                "application/json": {
-                  schema: {
-                    $ref: string
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      [key: string]: PathDefinition
     }
     components: {
       schemas: {
-        Pets: {
+        [key: string]: {
           [key: string]: any
         }
       }

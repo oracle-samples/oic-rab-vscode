@@ -405,47 +405,18 @@ export namespace conversion {
     let client = await getClient();
     const form = new FormData();
     // part 1
-    form.append('sourceFile', openAPIDocument instanceof vscode.Uri ? fs.readFileSync(openAPIDocument.fsPath, 'utf8') : postmanCollection);
+    form.append('sourceFile', openAPIDocument instanceof vscode.Uri ? fs.readFileSync(openAPIDocument.fsPath, 'utf8') : openAPIDocument);
     log.debug("Set 'sourceFile'");
+    
     // part 2
     if (add) {
-      form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
       log.debug("Set 'targetADD'");
+      form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
     }
 
-    const openAPIConfigEntries: [string, any][] = [];
-
-    // part 3
-    if (openAPIConfig?.items) {
-      openAPIConfigEntries.push(
-        [
-          'openapi_requests',
-          openAPIConfig.items.map(name => {
-            return {
-              "name": name,
-              "actionImport": true,
-              "flowImport": true,
-              "schemaImport": true
-            };
-          })
-        ]
-      );
-    }
-
-    if (openAPIConfig?.selectedItemForTestConnection) {
-      openAPIConfigEntries.push(
-        [
-          'openapi_request_as_test_connection',
-          {
-            name: openAPIConfig.selectedItemForTestConnection
-          }
-        ]
-      );
-    }
-
-    if (openAPIConfigEntries.length) {
-      log.debug("Set 'openAPIConfigRequest'");
-      form.append('openAPIConfigRequest', JSON.stringify(Object.fromEntries(openAPIConfigEntries)));
+    if (openAPIConfig) {
+      log.debug("Set 'openAPIConverterConfigRequest'");
+      form.append('openAPIConverterConfigRequest', JSON.stringify(openAPIConfig));
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<OpenAPINS.Root>>, (err) => {
