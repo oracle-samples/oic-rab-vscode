@@ -38,6 +38,7 @@ export namespace SharedNs {
   export enum WebviewRouteEnum {
     Root = `/`,
     PostmanAdd = `postman/add`,
+    OpenAPIAdd = `openapi/add`,
     Copilot = `copilot`,
 
   }
@@ -89,7 +90,7 @@ export namespace SharedNs {
     updatePostmanRawData: PostmanNs.Root;
     updateOpenAPIRawData: {
       openapi: OpenAPINS.Root,
-      add?: RabAddNs.Root
+      add?: RabAddNs.Root,
     };
 
     updateEntryType: VscodeCommandPayloadEntryType;
@@ -99,7 +100,7 @@ export namespace SharedNs {
     openOpenAPIConvertNewDocument: any;
     openOpenAPIConvertAppendDocument: any;
     
-    loadRabAddData: any;
+    loadRabAddData: RabAddNs.Root;
     routerNavigateTo: {
       href: WebviewRouteEnum;
     };
@@ -1543,14 +1544,15 @@ export namespace OpenAPINS {
   export interface UIStateForBackend {
     actionDelta: {
       add: UIStateActionDeltaAdd[],
-      remove: UIStateActionDeltaRemove[]
+      remove: UIStateActionDeltaRemove[],
+      selected: UIStateActionDeltaAdd[],
     }
   }
 
   export type MethodDefinition = {
 
     isSelected?: boolean;
-    fullPathId: string;
+    fullPathId?: string;
 
     summary: string
     requestBody?: {

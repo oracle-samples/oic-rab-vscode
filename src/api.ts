@@ -222,6 +222,10 @@ export namespace bundle {
     }
   }
 
+  export function logInfoServer(data: any) {
+    return log.info(`Server response: ${log.format(data)}`);
+  } 
+
   export async function create(bundle: Buffer): Promise<AdapterRegistrationResponse> {
 
     let url = `${apiRootPath}/${resource}`;
@@ -237,11 +241,11 @@ export namespace bundle {
           'Content-Type': 'application/zip',
         },
       }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
-      log.infoServer(res?.data);
+      logInfoServer(res?.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -258,11 +262,11 @@ export namespace bundle {
           'Content-Type': 'application/zip',
         },
       }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
-      log.infoServer(res?.data);
+      logInfoServer(res?.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'PUT ${url}'`, err);
     }
@@ -307,11 +311,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<DefinitionValidationResponse>>);
-      log.infoServer(res.data);
+      bundle.logInfoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        bundle.logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -329,11 +333,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<any>>);
-      log.infoServer(res.data);
+      bundle.logInfoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        bundle.logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -415,7 +419,7 @@ export namespace conversion {
     }
 
     if (openAPIConfig) {
-      log.debug("Set 'openAPIConverterConfigRequest'");
+      log.debug("Set 'openAPIConverterConfigRequest'", log.format(openAPIConfig));
       form.append('openAPIConverterConfigRequest', JSON.stringify(openAPIConfig));
     }
 

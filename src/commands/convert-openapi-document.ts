@@ -27,20 +27,32 @@ const getOpenAPIDocumenNameAsFileName = (file: vscode.Uri) => getOpenAPIDocument
   map(name => fs.getFileNameFromOpenAPIName(name))
 );
 
-export const callOpenAPIConversionApiAndShowDocument = (oppenAPIFile: vscode.Uri, openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, addFile?: vscode.Uri,) => 
+export const filterOpenAPIConfig = (openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests) => {
+  if (!openAPIConfig) {
+    return;
+  }
+
+  //@ts-ignore
+  delete openAPIConfig.actionDelta.remove;
+
+  return openAPIConfig;
+  
+}
+
+export const callOpenAPIConversionApiAndShowDocument = (openAPIFile: vscode.Uri, openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, addFile?: vscode.Uri,) => 
   fs.checkWorkspaceInitialized()
   
   .pipe(
 
     switchMap(
-      () => getOpenAPIDocumenNameAsFileName(oppenAPIFile)
+      () => getOpenAPIDocumenNameAsFileName(openAPIFile)
     ),
   
     switchMap(
       (openAPIName) => from(
         withProgress(
           'Converting OpenAPI document...',
-          () => api.conversion.openapi(oppenAPIFile, openAPIConfig, addFile)
+          () => api.conversion.openapi(openAPIFile, filterOpenAPIConfig(openAPIConfig), addFile)
         )
       ).pipe(
         map(response => ({

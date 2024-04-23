@@ -15,7 +15,7 @@ import { callPostmanConversionApiAndShowDocument, postmanConvertCallback } from 
 import { log } from "../logger";
 import { fs, message, workspace } from '../utils';
 import { detectIsADDValidRemote } from "../utils-api";
-import { showErrorMessage } from "../utils/ui-utils";
+import { showErrorMessage, showInfoMessage } from "../utils/ui-utils";
 import { OpenAPINS, PostmanNs, RabAddNs, SharedNs } from "../webview-shared-lib";
 import { getAddFile } from "../workspace-manager";
 
@@ -244,11 +244,11 @@ const notifyPostmanWebview = (file: vscode.Uri, entryType: SharedNs.VscodeComman
 
 const notifyOpenAPIWebview = ({
   openAPIFile,
-  ADDFile,
+  addFile,
   entryType
 }: {
   openAPIFile: vscode.Uri,
-  ADDFile?: vscode.Uri,
+  addFile?: vscode.Uri,
   entryType: SharedNs.VscodeCommandPayload["updateEntryType"]
 }) => {
 
@@ -263,14 +263,13 @@ const notifyOpenAPIWebview = ({
   let ADD: RabAddNs.Root | undefined = undefined;
 
   try {
-    if (ADDFile) {
-      ADD = JSON.parse(readFileSync(openAPIFile.fsPath, 'utf8'));
+    if (addFile) {
+      ADD = JSON.parse(readFileSync(addFile.fsPath, 'utf8'));
     }
   } catch (error) {
     log.error(`Unable to parse adapter definition document`, error);
     return;
   }
-
 
   UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updateOpenAPIRawData, {
     openapi: openAPIDoc,
@@ -284,13 +283,13 @@ const openWebview = ({
   file,
   context,
   entryType,
-  ADDFile
+  addFile
 }: {
 
   file: vscode.Uri,
   context: vscode.ExtensionContext,
   entryType: SharedNs.VscodeCommandPayload["updateEntryType"];
-  ADDFile?: vscode.Uri,
+  addFile?: vscode.Uri,
 
 }) => {
 
@@ -310,7 +309,7 @@ const openWebview = ({
         switchMap(
           () => workspace.detectIsPostmanFileWithUILoading(context, file, () => of(file)
             .pipe(
-              switchMap(() => callPostmanConversionApiAndShowDocument(file, data, workspace.getAddFile(),))
+              switchMap(() => callPostmanConversionApiAndShowDocument(file, data, addFile,))
             )
           )
         )
@@ -338,14 +337,14 @@ const openWebview = ({
     notifyOpenAPIWebview({
       openAPIFile: file,
       entryType,
-      ADDFile
+      addFile
 
     }),
 
     UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.openAPISelectReady, () => notifyOpenAPIWebview({
       openAPIFile: file,
       entryType,
-      ADDFile
+      addFile
 
     }
     )),
@@ -355,7 +354,7 @@ const openWebview = ({
         switchMap(
           () => workspace.detectIsOpenAPIFileWithUILoading(context, file, () => of(file)
             .pipe(
-              switchMap(() => callOpenAPIConversionApiAndShowDocument(file, data, workspace.getAddFile(),))
+              switchMap(() => callOpenAPIConversionApiAndShowDocument(file, data, addFile,))
             )
           )
         )
@@ -381,7 +380,7 @@ const openWebview = ({
   const entryEvents = isPostmanEvents ? postmanEvents() : openAPIEvents();
 
   return from([
-    handleWebviewRouting(SharedNs.WebviewRouteEnum.PostmanAdd),
+    handleWebviewRouting(SharedNs.WebviewRouteEnum.OpenAPIAdd),
     handleWebviewLifecycle(),
     ...entryEvents,
   ]);
@@ -404,6 +403,11 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
       () => workspace.detectIsPostmanFile(file, () => of(file)
         .pipe(
           tap(() => UtilsNs.showWebview(context)),
+          tap(() => showInfoMessage(
+            entryType === SharedNs.VscodeCommandPayloadEntryType.PostmanAddRequest ?
+              "Select the requests from the Postman collection to add"
+              : "Select the requests from the Postman collection to convert"
+          )),
           switchMap(
             () => openWebview(
               {
@@ -443,10 +447,15 @@ const registerOpenAPIConvertCallback = (context: vscode.ExtensionContext, entryT
       () => workspace.detectIsOpenAPIFile(file, () => of(file)
         .pipe(
           tap(() => UtilsNs.showWebview(context)),
+          tap(() => showInfoMessage(
+            entryType === SharedNs.VscodeCommandPayloadEntryType.OpenAPIAddRequest ? 
+            "Select the OpenAPI paths and methods to add" 
+              : "Select the OpenAPI paths and methods to convert" 
+          )),
           switchMap(
             () => openWebview({
               file, context, entryType,
-              ADDFile: getAddFile()
+              addFile: entryType === SharedNs.VscodeCommandPayloadEntryType.OpenAPIAddRequest ? getAddFile() : undefined
             })
               .pipe(
                 filter(disposible => !!disposible),
@@ -538,48 +547,48 @@ function moveCursor(props: {
 
 }
 
-const rabAddReady = () => {
-  workspace.openADDDocument().pipe(
-    tap((document) => {
-      const addDoc = JSON.parse(document.getText());
-      UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.loadRabAddData, addDoc);
-    })
-  );
+// const rabAddReady = () => {
+//   workspace.openADDDocument().pipe(
+//     tap((document) => {
+//       const addDoc = JSON.parse(document.getText());
+//       UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.loadRabAddData, addDoc);
+//     })
+//   );
 
-};
+// };
 
-const updatedAddDocFromWebviewV2 = (context: vscode.ExtensionContext, data: SharedNs.WebviewCommandPayloadRabAddSave) => workspace.showADDDocument().pipe(
-  tap(
-    (editor) => {
-      let source = editor.document.getText();
-      let range = new vscode.Range(editor.document.positionAt(0), editor.document.positionAt(source.length));
-      editor.edit(edit => {
-        const updatedAddDoc = SharedNs.ADDJsonStringify(data.addToSave);
-        edit.replace(range, updatedAddDoc);
+// const updatedAddDocFromWebviewV2 = (context: vscode.ExtensionContext, data: SharedNs.WebviewCommandPayloadRabAddSave) => workspace.showADDDocument().pipe(
+//   tap(
+//     (editor) => {
+//       let source = editor.document.getText();
+//       let range = new vscode.Range(editor.document.positionAt(0), editor.document.positionAt(source.length));
+//       editor.edit(edit => {
+//         const updatedAddDoc = SharedNs.ADDJsonStringify(data.addToSave);
+//         edit.replace(range, updatedAddDoc);
 
-        setTimeout(() => {
+//         setTimeout(() => {
 
-          if (data.vsCodeEditorConfig) {
-            moveCursor(
-              {
-                editor,
+//           if (data.vsCodeEditorConfig) {
+//             moveCursor(
+//               {
+//                 editor,
 
-                ...data.vsCodeEditorConfig
-              }
-            );
-          }
-        }, 500);
+//                 ...data.vsCodeEditorConfig
+//               }
+//             );
+//           }
+//         }, 500);
 
 
-      }).then(ret => {
+//       }).then(ret => {
 
-        setTimeout(() => {
-          vscode.commands.executeCommand('orab.explorer.outline.refresh');
-        }, 1000);
-      });
-    }
-  ),
-);
+//         setTimeout(() => {
+//           vscode.commands.executeCommand('orab.explorer.outline.refresh');
+//         }, 1000);
+//       });
+//     }
+//   ),
+// );
 
 // const initCopilotEvents = (context: vscode.ExtensionContext) => from([
 //   UtilsNs.showWebview(context),
