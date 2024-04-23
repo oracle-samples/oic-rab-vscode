@@ -390,7 +390,6 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
 
   const disposableList: vscode.Disposable[] = [];
 
-
   const observable = of(entryType).pipe(
     switchMap(
       () => iif(
@@ -433,7 +432,6 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
 const registerOpenAPIConvertCallback = (context: vscode.ExtensionContext, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => (file: vscode.Uri) => {
 
   const disposableList: vscode.Disposable[] = [];
-
 
   const observable = of(entryType).pipe(
     switchMap(

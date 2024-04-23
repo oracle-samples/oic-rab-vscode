@@ -161,8 +161,6 @@ export namespace workspace {
       )
   );
 
-
-
   // export const detectIsADDWithUILoading = <T extends Observable<any>>(context: vscode.ExtensionContext, file: vscode.Uri, successCallback: () => T) => {
 
   //   let externalResolve = (val: any) => { };

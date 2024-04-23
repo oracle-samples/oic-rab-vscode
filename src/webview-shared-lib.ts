@@ -1526,11 +1526,9 @@ export namespace RabAddNs {
 
 export namespace OpenAPINS {
 
-
   export interface UIStateActionDeltaAdd {
     actionRef: string
   }
-
 
   export interface UIStateActionDeltaItem {
     actionRef: string,
