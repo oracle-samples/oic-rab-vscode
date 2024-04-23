@@ -7,12 +7,12 @@ import * as vscode from 'vscode';
 
 import * as _fs from 'fs';
 
-import { bindNodeCallback, catchError, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
+import { bindNodeCallback, catchError, filter, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
 import * as api from '../api';
 
 import { log } from '../logger';
 import { fs, workspace } from '../utils';
-import { withProgress } from '../utils/ui-utils';
+import { showWarningMessage, withProgress } from '../utils/ui-utils';
 import { OpenAPINS, SharedNs } from '../webview-shared-lib';
 
 
@@ -33,16 +33,28 @@ export const filterOpenAPIConfig = (openAPIConfig?: SharedNs.WebviewCommandPaylo
   }
 
   //@ts-ignore
-  delete openAPIConfig.actionDelta.remove;
+  delete openAPIConfig.actionDelta.selected;
 
   return openAPIConfig;
   
 }
 
-export const callOpenAPIConversionApiAndShowDocument = (openAPIFile: vscode.Uri, openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, addFile?: vscode.Uri,) => 
+export const callOpenAPIConversionApiAndShowDocument = (openAPIFile: vscode.Uri, openAPIConfig: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, addFile?: vscode.Uri,) => 
   fs.checkWorkspaceInitialized()
   
   .pipe(
+
+    tap(
+      () =>  {
+        if (!openAPIConfig.actionDelta.add.length && !openAPIConfig.actionDelta.remove.length) {
+          showWarningMessage(`There is nothing to add or to remove`);
+        }
+      }
+    ),
+
+    filter(
+      () => !!openAPIConfig.actionDelta.add.length || !!openAPIConfig.actionDelta.remove.length
+    ),
 
     switchMap(
       () => getOpenAPIDocumenNameAsFileName(openAPIFile)
