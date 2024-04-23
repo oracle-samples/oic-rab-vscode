@@ -1536,7 +1536,7 @@ export namespace OpenAPINS {
   }
 
   export interface UIStateActionDeltaRemove extends UIStateActionDeltaItem {
-    force?: boolean
+    // force?: boolean
   }
 
   export interface UIStateForBackend {
