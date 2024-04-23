@@ -1557,7 +1557,7 @@ export namespace OpenAPINS {
       [key: string]: any
     }
     operationId: string
-    tags: Array<string>
+    tags?: Array<string>
     parameters?: Array<{
       name: string
       in: string
@@ -1586,6 +1586,14 @@ export namespace OpenAPINS {
     servers: Array<{
       url: string
     }>
+    tags?: Array<{
+      name: string
+      description?: string
+      externalDocs?: {
+        description: string
+        url: string
+      }
+    }>
     paths: {
       [key: string]: PathDefinition
     }
@@ -1596,6 +1604,8 @@ export namespace OpenAPINS {
         }
       }
     }
+
+
 
   }
 }
