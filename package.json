@@ -102,7 +102,7 @@
       },
       {
         "command": "orab.add.convert.append",
-        "title": "RAB: Add Requests from OpenAPI document..."
+        "title": "RAB: Update actions with OpenAPI document..."
       },
       {
         "command": "orab.convert.postman.document",

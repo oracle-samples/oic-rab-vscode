@@ -122,6 +122,10 @@ async function callAPI<T>(task: () => Promise<AxiosResponse<T, any>>, errorCallb
   }
 }
 
+export function logInfoServer(data: any) {
+  return log.info(`Server response: ${log.format(data)}`);
+} 
+
 export function deleteTokens() {
   log.debug('All tokens have been deleted.');
   tokens.clear();
@@ -222,9 +226,6 @@ export namespace bundle {
     }
   }
 
-  export function logInfoServer(data: any) {
-    return log.info(`Server response: ${log.format(data)}`);
-  } 
 
   export async function create(bundle: Buffer): Promise<AdapterRegistrationResponse> {
 
@@ -311,11 +312,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<DefinitionValidationResponse>>);
-      bundle.logInfoServer(res.data);
+      logInfoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        bundle.logInfoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -333,11 +334,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<any>>);
-      bundle.logInfoServer(res.data);
+      logInfoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        bundle.logInfoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -424,6 +425,9 @@ export namespace conversion {
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<OpenAPINS.Root>>, (err) => {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        logInfoServer(err.response?.data);
+      }
       showErrorMessage("❌ Conversion failed");
     });
 
