@@ -44,7 +44,7 @@
       "properties": {
         "RAB.logLevel": {
           "type": "string",
-          "default": "debug",
+          "default": "info",
           "description": "The log level for output channel.",
           "enum": [
             "debug",
