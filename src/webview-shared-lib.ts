@@ -1547,6 +1547,10 @@ export namespace OpenAPINS {
     }
   }
 
+  export type Ref = {
+    $ref?: string
+  }
+
   export type MethodDefinition = {
 
     isSelected?: boolean;
@@ -1572,7 +1576,8 @@ export namespace OpenAPINS {
     }
   };
   export type PathDefinition = {
-    [key: string]: MethodDefinition
+    [key: string]: MethodDefinition;
+    
   };
   export type Root = {
     openapi: string
