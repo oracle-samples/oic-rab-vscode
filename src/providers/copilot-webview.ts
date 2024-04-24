@@ -301,6 +301,9 @@ const openWebview = ({
 
   const postmanEvents = () => [
 
+
+    handleWebviewRouting(SharedNs.WebviewRouteEnum.PostmanAdd),
+    handleWebviewLifecycle(),
     notifyPostmanWebview(file, entryType),
     UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectReady, () => notifyPostmanWebview(file, entryType)),
     UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectRequests, (data) => {
@@ -333,7 +336,8 @@ const openWebview = ({
   ];
 
   const openAPIEvents = () => [
-
+    handleWebviewRouting(SharedNs.WebviewRouteEnum.OpenAPIAdd),
+    handleWebviewLifecycle(),
     notifyOpenAPIWebview({
       openAPIFile: file,
       entryType,
@@ -380,8 +384,6 @@ const openWebview = ({
   const entryEvents = isPostmanEvents ? postmanEvents() : openAPIEvents();
 
   return from([
-    handleWebviewRouting(SharedNs.WebviewRouteEnum.OpenAPIAdd),
-    handleWebviewLifecycle(),
     ...entryEvents,
   ]);
 };
