@@ -105,6 +105,23 @@
 
 /**
    * @license
+   * Copyright (c) 2014, 2023, Oracle and/or its affiliates.
+   * Licensed under The Universal Permissive License (UPL), Version 1.0
+   * as shown at https://oss.oracle.com/licenses/upl/
+   *
+   * @license
+   * Knockout Fast Foreach v0.6.0 (2016-07-28T11:02:54.197Z)
+   * By: Brian M Hunt (C) 2015 | License: MIT
+   *
+   * Adds `fastForEach` to `ko.bindingHandlers`.
+   *
+   * Modification notice: The code is obtained from https://github.com/brianmhunt/knockout-fast-foreach
+   * and modified by Oracle JET team to be included into Oracle JET project.
+   * @ignore
+   */
+
+/**
+   * @license
    * Copyright (c) 2019 2023, Oracle and/or its affiliates.
    * Licensed under The Universal Permissive License (UPL), Version 1.0
    * as shown at https://oss.oracle.com/licenses/upl/
@@ -153,8 +170,32 @@
 
 /**
  * @license
+ * Copyright (c) 2004 %CURRENT_YEAR%, Oracle and/or its affiliates.
+ * Licensed under The Universal Permissive License (UPL), Version 1.0
+ * as shown at https://oss.oracle.com/licenses/upl/
+ * @ignore
+ */
+
+/**
+ * @license
+ * Copyright (c) 2011 %CURRENT_YEAR%, Oracle and/or its affiliates.
+ * Licensed under The Universal Permissive License (UPL), Version 1.0
+ * as shown at https://oss.oracle.com/licenses/upl/
+ * @ignore
+ */
+
+/**
+ * @license
  * Copyright (c) 2014, 2023, Oracle and/or its affiliates.
  * Licensed under The Universal Permissive License (UPL), Version 1.0
+ * as shown at https://oss.oracle.com/licenses/upl/
+ * @ignore
+ */
+
+/**
+ * @license
+ * Copyright (c) 2019 %CURRENT_YEAR%, Oracle and/or its affiliates.
+ * The Universal Permissive License (UPL), Version 1.0
  * as shown at https://oss.oracle.com/licenses/upl/
  * @ignore
  */
