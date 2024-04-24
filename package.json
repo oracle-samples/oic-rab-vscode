@@ -237,7 +237,7 @@
         {
           "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceExtname == .json",
           "command": "orab.add.convert.append",
-          "group": "orab@3"
+          "group": "orab@4"
         }
       ],
       "editor/context": [
