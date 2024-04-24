@@ -12,7 +12,7 @@ import * as api from '../api';
 
 import { log } from '../logger';
 import { fs, workspace } from '../utils';
-import { showWarningMessage, withProgress } from '../utils/ui-utils';
+import { showErrorMessage, showWarningMessage, withProgress } from '../utils/ui-utils';
 import { OpenAPINS, SharedNs } from '../webview-shared-lib';
 
 
@@ -104,6 +104,7 @@ export const callOpenAPIConversionApiAndShowDocument = (openAPIFile: vscode.Uri,
 
     catchError(err => {
       log.error(`Unable to convert document. [${err}]`);
+      showErrorMessage("❌ Conversion failed");
       return throwError(() => err);
     })
   );

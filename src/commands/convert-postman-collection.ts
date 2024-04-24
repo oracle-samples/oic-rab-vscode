@@ -12,7 +12,7 @@ import * as api from '../api';
 
 import { log } from '../logger';
 import { fs, workspace } from '../utils';
-import { withProgress } from '../utils/ui-utils';
+import { showErrorMessage, withProgress } from '../utils/ui-utils';
 import { PostmanNs, SharedNs } from '../webview-shared-lib';
 
 
@@ -80,6 +80,7 @@ export const callPostmanConversionApiAndShowDocument = (postmanFile: vscode.Uri,
 
     catchError(err => {
       log.error(`Unable to convert document. [${err}]`);
+      showErrorMessage("❌ Conversion failed");
       return throwError(() => err);
     })
   );

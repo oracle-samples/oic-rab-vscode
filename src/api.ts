@@ -13,7 +13,7 @@ import FormData = require('form-data');
 import { log } from './logger';
 import { Profile } from './profile-manager';
 import { get as getProfileManager } from './profile-manager-provider';
-import { RABError, showErrorMessage } from './utils/ui-utils';
+import { RABError } from './utils/ui-utils';
 import { OpenAPINS, PostmanNs, SharedNs } from './webview-shared-lib';
 
 export const timeout = 120;
@@ -399,7 +399,10 @@ export namespace conversion {
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<PostmanNs.Root>>, (err) => {
-      showErrorMessage("❌ Conversion failed");
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        logInfoServer(err.response?.data);
+      }
+      throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
     });
   }
 
@@ -428,7 +431,7 @@ export namespace conversion {
       if (err instanceof AxiosError && err.response?.status !== 404) {
         logInfoServer(err.response?.data);
       }
-      showErrorMessage("❌ Conversion failed");
+      throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
     });
 
   }
