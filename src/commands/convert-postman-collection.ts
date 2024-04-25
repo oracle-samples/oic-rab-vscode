@@ -10,7 +10,6 @@ import * as _fs from 'fs';
 import { bindNodeCallback, catchError, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
 import * as api from '../api';
 
-import { log } from '../logger';
 import { fs, workspace } from '../utils';
 import { showErrorMessage, withProgress } from '../utils/ui-utils';
 import { PostmanNs, SharedNs } from '../webview-shared-lib';
@@ -79,7 +78,9 @@ export const callPostmanConversionApiAndShowDocument = (postmanFile: vscode.Uri,
 
 
     catchError(err => {
-      log.error(`Unable to convert document. [${err}]`);
+      api.logInfoServer(err?.message);
+      api.logInfoServer(err?.cause?.message);
+      api.logInfoServer(err?.cause?.response?.data);
       showErrorMessage("❌ Conversion failed");
       return throwError(() => err);
     })
