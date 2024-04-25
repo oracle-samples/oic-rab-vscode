@@ -230,14 +230,14 @@
           "group": "orab@2"
         },
         {
-          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceExtname == .json",
+          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceFilename =~ /^openapi\\.resource\\.json$/",
           "command": "orab.add.convert",
           "group": "orab@3"
         },
         {
-          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceExtname == .json",
+          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceFilename =~ /^openapi\\.resource\\.json$/",
           "command": "orab.add.convert.append",
-          "group": "orab@4"
+          "group": "orab@4" 
         }
       ],
       "editor/context": [
