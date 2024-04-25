@@ -123,6 +123,9 @@ async function callAPI<T>(task: () => Promise<AxiosResponse<T, any>>, errorCallb
 }
 
 export function logInfoServer(data: any) {
+  if (!data) {
+    return;
+  }
   return log.info(`Server response: ${log.format(data)}`);
 } 
 
