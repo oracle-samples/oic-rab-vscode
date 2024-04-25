@@ -126,7 +126,11 @@ export function logInfoServer(data: any) {
   if (!data) {
     return;
   }
-  return log.info(`Server response: ${log.format(data)}`);
+  try {
+    return log.info(`Server response: ${log.format(data).replace(/\\+n/g, `\n`).replace(/\\+t/g, `\t`)}`);
+  } catch (error) {
+    return log.info(`Server response: ${data}`);
+  }
 } 
 
 export function deleteTokens() {
