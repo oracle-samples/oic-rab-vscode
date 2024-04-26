@@ -13,8 +13,8 @@ import FormData = require('form-data');
 import { log } from './logger';
 import { Profile } from './profile-manager';
 import { get as getProfileManager } from './profile-manager-provider';
-import { RABError, showErrorMessage } from './utils/ui-utils';
-import { PostmanNs, SharedNs } from './webview-shared-lib';
+import { RABError } from './utils/ui-utils';
+import { OpenAPINS, PostmanNs, SharedNs } from './webview-shared-lib';
 
 export const timeout = 120;
 
@@ -122,6 +122,17 @@ async function callAPI<T>(task: () => Promise<AxiosResponse<T, any>>, errorCallb
   }
 }
 
+export function logInfoServer(data: any) {
+  if (!data) {
+    return;
+  }
+  try {
+    return log.info(`Server response: ${log.format(data).replace(/\\+n/g, `\n`).replace(/\\+t/g, `\t`)}`);
+  } catch (error) {
+    return log.info(`Server response: ${data}`);
+  }
+} 
+
 export function deleteTokens() {
   log.debug('All tokens have been deleted.');
   tokens.clear();
@@ -222,6 +233,7 @@ export namespace bundle {
     }
   }
 
+
   export async function create(bundle: Buffer): Promise<AdapterRegistrationResponse> {
 
     let url = `${apiRootPath}/${resource}`;
@@ -237,11 +249,11 @@ export namespace bundle {
           'Content-Type': 'application/zip',
         },
       }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
-      log.infoServer(res?.data);
+      logInfoServer(res?.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -258,11 +270,11 @@ export namespace bundle {
           'Content-Type': 'application/zip',
         },
       }) as Promise<AxiosResponse<AdapterRegistrationResponse>>);
-      log.infoServer(res?.data);
+      logInfoServer(res?.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'PUT ${url}'`, err);
     }
@@ -307,11 +319,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<DefinitionValidationResponse>>);
-      log.infoServer(res.data);
+      logInfoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -329,11 +341,11 @@ export namespace registration {
 
     try {
       let res = await callAPI(() => client.post(url, fs.readFileSync(file.fsPath), config) as Promise<AxiosResponse<any>>);
-      log.infoServer(res.data);
+      logInfoServer(res.data);
       return res.data;
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${url}'`, err);
     }
@@ -394,26 +406,40 @@ export namespace conversion {
     }
 
     return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<PostmanNs.Root>>, (err) => {
-      showErrorMessage("❌ Conversion failed");
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        logInfoServer(err.response?.data);
+      }
+      throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
     });
   }
 
-  export async function openapi(document: vscode.Uri | string): Promise<any> {
-    let endpoint = `${apiRootPath}/${resource}/convert?type=openapi`;
+  export async function openapi(openAPIDocument: vscode.Uri | string, openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, add?: vscode.Uri | string): Promise<any> {
+   
+    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=openapi`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
     const form = new FormData();
     // part 1
-    form.append('sourceFile', document instanceof vscode.Uri ? fs.readFileSync(document.fsPath, 'utf8') : document);
+    form.append('sourceFile', openAPIDocument instanceof vscode.Uri ? fs.readFileSync(openAPIDocument.fsPath, 'utf8') : openAPIDocument);
+    log.debug("Set 'sourceFile'");
+    
+    // part 2
+    if (add) {
+      log.debug("Set 'targetADD'");
+      form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
+    }
 
-    try {
-      let res = await callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<any>>);
-      return res.data;
-    } catch (err) {
+    if (openAPIConfig) {
+      log.debug("Set 'openAPIConverterConfigRequest'", log.format(openAPIConfig));
+      form.append('openAPIConverterConfigRequest', JSON.stringify(openAPIConfig));
+    }
+
+    return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<OpenAPINS.Root>>, (err) => {
       if (err instanceof AxiosError && err.response?.status !== 404) {
-        log.infoServer(err.response?.data);
+        logInfoServer(err.response?.data);
       }
       throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
-    }
+    });
+
   }
 }

@@ -57,6 +57,7 @@ export const detectIsADDValidRemote = (getFile = () => getAddFile()!) => fs.chec
   ),
   switchMap(report => {
     if (report.valid) {
+      showInfoMessage(`👍 The adapter definition is valid`);
       return of(report);
     } else {
       log.error("Result: " + log.format(report));
