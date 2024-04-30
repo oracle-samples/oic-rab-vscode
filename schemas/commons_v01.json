@@ -138,6 +138,7 @@
           "$ref": "#/definitions/flowPattern"
         }
       ]
+
     },
     "stringOrArgumentJQPattern": {
       "$ref": "#/definitions/nonEmptyString"
@@ -306,17 +307,17 @@
     "httpMethod": {
       "description": "A String representing an HTTP request method. Many of these are not frequently used in practice. In practice, Simple HTTP method contains the frequently used http methods.",
       "type": "string",
-      "enum": [
-        "GET",
-        "HEAD",
-        "PUT",
-        "POST",
-        "PATCH",
-        "DELETE",
-        "CONNECT",
-        "OPTIONS",
-        "TRACE"
-      ]
+        "enum": [
+          "GET",
+          "HEAD",
+          "PUT",
+          "POST",
+          "PATCH",
+          "DELETE",
+          "CONNECT",
+          "OPTIONS",
+          "TRACE"
+        ]
     },
     "simpleHttpMethod": {
       "description": "A String representing a simple HTTP request method..",

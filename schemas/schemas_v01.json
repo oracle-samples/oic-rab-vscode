@@ -5,7 +5,7 @@
   "description": "Schema of Schema",
   "type": "object",
   "patternProperties": {
-    "^[a-zA-Z0-9\\.\\-_]{0,100}$": {
+    "^[a-zA-Z][a-zA-Z0-9\\.\\-_]{0,100}$": {
       "$ref": "#/definitions/Schema"
     }
   },
@@ -139,7 +139,7 @@
       ],
       "properties": {
         "propertyName": {
-          "description": "The name of the property in the payload that will hold the discriminator value.",
+          "description":"The name of the property in the payload that will hold the discriminator value.",
           "type": "string"
         }
       },

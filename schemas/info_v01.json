@@ -38,6 +38,7 @@
       "title": "Display Name",
       "description": "The name of the adapter that would show up in the adapter registry landing page, in the connection creation selection, and various other places in the UI. This can change if the third party decides on an identity or name change.",
       "type": "string",
+      "minLength": 1,
       "maxLength": 100
     },
     "description": {
@@ -226,7 +227,7 @@
             "maxLength": 1000
           }
         },
-        "followRedirects": {
+        "followRedirects" : {
           "$ref": "#/definitions/Redirects"
         }
       },

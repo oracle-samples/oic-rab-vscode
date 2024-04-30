@@ -10,17 +10,17 @@
   "properties": {
     "displayName": {
       "type": "string",
-      "description": "The field name of the group that shows up in the user interface.",
+      "description":"The field name of the group that shows up in the user interface.",
       "maxLength": 100
     },
     "description": {
       "type": "string",
-      "description": "The description of the group that shows up in the user interface as a tooltip.",
+      "description":"The description of the group that shows up in the user interface as a tooltip.",
       "maxLength": 1000
     },
     "groups": {
       "type": "array",
-      "description": "The list of group definition.",
+      "description":"The list of group definition.",
       "minItems": 0,
       "maxItems": 20,
       "items": {
@@ -40,17 +40,17 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the group which is a selectable item value in the user interface.",
+          "description":"The name of the group which is a selectable item value in the user interface.",
           "maxLength": 100
         },
         "displayName": {
           "type": "string",
-          "description": "The name of the group that shows up as a selectable item in the user interface.",
+          "description":"The name of the group that shows up as a selectable item in the user interface.",
           "maxLength": 100
         },
         "description": {
           "type": "string",
-          "description": "The description of the group that shows up in the user interface as a tooltip.",
+          "description":"The description of the group that shows up in the user interface as a tooltip.",
           "maxLength": 1000
         }
       },
