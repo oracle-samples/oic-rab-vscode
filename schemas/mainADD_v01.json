@@ -1,5 +1,4 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$id": "#schema",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ADD Specification",
@@ -38,9 +37,7 @@
       "$comment": "must have at least one trigger in absence of actions.",
       "if": {
         "not": {
-          "required": [
-            "actions"
-          ],
+          "required": [ "actions" ],
           "properties": {
             "actions": {
               "minProperties": 1
@@ -49,9 +46,7 @@
         }
       },
       "then": {
-        "required": [
-          "triggers"
-        ],
+        "required": [ "triggers" ],
         "properties": {
           "triggers": {
             "minProperties": 1
@@ -63,9 +58,7 @@
       "$comment": "must have at least one action in absence of triggers.",
       "if": {
         "not": {
-          "required": [
-            "triggers"
-          ],
+          "required": [ "triggers" ],
           "properties": {
             "triggers": {
               "minProperties": 1
@@ -74,9 +67,7 @@
         }
       },
       "then": {
-        "required": [
-          "actions"
-        ],
+        "required": [ "actions" ],
         "properties": {
           "actions": {
             "minProperties": 1
@@ -85,5 +76,6 @@
       }
     }
   ],
-  "definitions": {}
+  "definitions": {
+  }
 }

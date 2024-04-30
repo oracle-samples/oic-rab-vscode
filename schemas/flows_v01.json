@@ -1,871 +1,871 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
-  "$id": "#flows",
-  "title": "Flows",
-  "description": "Flows",
-  "type": "object",
-  "patternProperties": {
-    "^[a-zA-Z0-9\\.\\-_]{0,100}$": {
-      "$ref": "#/definitions/Flow"
-    }
-  },
-  "additionalProperties": false,
-  "minProperties": 1,
-  "maxProperties": 200,
-  "definitions": {
-    "nonEmptyString": {
-      "type": "string",
-      "minLength": 1
-    },
-    "versionPattern": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/nonEmptyString"
-        },
-        {
-          "pattern": "^([0-9])+(\\.)([0-9])+(\\.)*([0-9])*?$"
+    "$id": "#flows",
+    "title": "Flows",
+    "description": "Flows",
+    "type": "object",
+    "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9\\.\\-_]{0,100}$": {
+            "$ref": "#/definitions/Flow"
         }
-      ]
     },
-    "argumentsJQPattern_archive": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/nonEmptyString"
+    "additionalProperties": false,
+    "minProperties": 1,
+    "maxProperties": 200,
+    "definitions": {
+        "nonEmptyString": {
+            "type": "string",
+            "minLength": 1
         },
-        {
-          "pattern": "^(\\$\\{)(.*)(})$"
-        }
-      ]
-    },
-    "argumentsJQPattern": {
-      "$ref": "#/definitions/nonEmptyString"
-    },
-    "stringOrArgumentJQPattern": {
-      "$ref": "#/definitions/nonEmptyString"
-    },
-    "stringOrArgumentJQArray": {
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/definitions/stringOrArgumentJQPattern"
-          },
-          {
-            "type": "boolean"
-          },
-          {
-            "type": "integer"
-          }
-        ]
-      }
-    },
-    "singleOrMultiValuedList": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/stringOrArgumentJQPattern"
+        "versionPattern": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                {
+                    "pattern": "^([0-9])+(\\.)([0-9])+(\\.)*([0-9])*?$"
+                }
+            ]
         },
-        {
-          "type": "boolean"
+        "argumentsJQPattern_archive": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                {
+                    "pattern": "^(\\$\\{)(.*)(})$"
+                }
+            ]
         },
-        {
-          "type": "integer"
+        "argumentsJQPattern": {
+            "$ref": "#/definitions/nonEmptyString"
         },
-        {
-          "$ref": "#/definitions/stringOrArgumentJQArray"
-        }
-      ]
-    },
-    "singleValueMap": {
-      "type": "object",
-      "patternProperties": {
-        "^[a-zA-Z0-9\\.\\-_]+$": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/stringOrArgumentJQPattern"
-            },
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "integer"
+        "stringOrArgumentJQPattern": {
+            "$ref": "#/definitions/nonEmptyString"
+        },
+        "stringOrArgumentJQArray": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/stringOrArgumentJQPattern"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "integer"
+                    }
+                ]
             }
-          ]
-        }
-      },
-      "minProperties": 0,
-      "maxProperties": 100
-    },
-    "singleOrMultiValuedMap": {
-      "type": "object",
-      "patternProperties": {
-        "^[a-zA-Z0-9\\.\\-_]+$": {
-          "$ref": "#/definitions/singleOrMultiValuedList"
-        }
-      },
-      "minProperties": 0,
-      "maxProperties": 100
-    },
-    "Flow": {
-      "type": "object",
-      "required": [
-        "id",
-        "specVersion",
-        "version",
-        "start",
-        "functions",
-        "states"
-      ],
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "Flow unique identifier. Used to refer flow across ADD"
         },
-        "description": {
-          "type": "string",
-          "description": "Description of flow"
+        "singleOrMultiValuedList": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/stringOrArgumentJQPattern"
+                },
+                {
+                    "type": "boolean"
+                },
+                {
+                    "type": "integer"
+                },
+                {
+                    "$ref": "#/definitions/stringOrArgumentJQArray"
+                }
+            ]
         },
-        "specVersion": {
-          "enum": [
-            "0.8"
-          ],
-          "$comment": " Future --> #/definitions/versionPattern",
-          "description": "Flow Specification version. Must be `0.8`"
+        "singleValueMap": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9\\.\\-_]+$": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern"
+                        },
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "integer"
+                        }
+                    ]
+                }
+            },
+            "minProperties": 0,
+            "maxProperties": 100
         },
-        "version": {
-          "$ref": "#/definitions/versionPattern",
-          "description": "Flow version"
+        "singleOrMultiValuedMap": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9\\.\\-_]+$": {
+                    "$ref": "#/definitions/singleOrMultiValuedList"
+                }
+            },
+            "minProperties": 0,
+            "maxProperties": 100
         },
-        "start": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "Name of Flow start state. Must be valid state name."
+        "Flow": {
+            "type": "object",
+            "required": [
+                "id",
+                "specVersion",
+                "version",
+                "start",
+                "functions",
+                "states"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "Flow unique identifier. Used to refer flow across ADD"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of flow"
+                },
+                "specVersion": {
+                    "enum": [
+                        "0.8"
+                    ],
+                    "$comment": " Future --> #/definitions/versionPattern",
+                    "description": "Flow Specification version. Must be `0.8`"
+                },
+                "version": {
+                    "$ref": "#/definitions/versionPattern",
+                    "description": "Flow version"
+                },
+                "start": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "Name of Flow start state. Must be valid state name."
+                },
+                "functions": {
+                    "type": "array",
+                    "description": "Array of Function Definitions, to be referred in states.",
+                    "items": {
+                        "$ref": "#/definitions/function"
+                    },
+                    "uniqueItems": true
+                },
+                "states": {
+                    "type": "array",
+                    "description": "State definitions",
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "items": {
+                        "anyOf": [
+                            {
+                                "title": "Operation State",
+                                "$ref": "#/definitions/OperationState"
+                            },
+                            {
+                                "title": "Switch State",
+                                "$ref": "#/definitions/SwitchState"
+                            }
+                        ]
+                    },
+                    "additionalItems": false
+                }
+            },
+            "additionalProperties": false
         },
-        "functions": {
-          "type": "array",
-          "description": "Array of Function Definitions, to be referred in states.",
-          "items": {
-            "$ref": "#/definitions/function"
-          },
-          "uniqueItems": true
-        },
-        "states": {
-          "type": "array",
-          "description": "State definitions",
-          "minItems": 1,
-          "maxItems": 10,
-          "items": {
+        "function": {
+            "description": "Function definition",
+            "type": "object",
+            "required": [
+                "name",
+                "type",
+                "operation"
+            ],
+            "properties": {
+                "name": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "Unique function name, referred in Actions defined in state."
+                },
+                "type": {
+                    "description": "Defines the function type. Is either `expression`, or `custom`.",
+                    "enum": [
+                        "expression",
+                        "custom"
+                    ]
+                },
+                "operation": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "If type is `expression`, defines the flow JQ expression, If type is `custom`, then one of supported functions"
+                }
+            },
             "anyOf": [
-              {
-                "title": "Operation State",
-                "$ref": "#/definitions/OperationState"
-              },
-              {
-                "title": "Switch State",
-                "$ref": "#/definitions/SwitchState"
-              }
-            ]
-          },
-          "additionalItems": false
-        }
-      },
-      "additionalProperties": false
-    },
-    "function": {
-      "description": "Function definition",
-      "type": "object",
-      "required": [
-        "name",
-        "type",
-        "operation"
-      ],
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "Unique function name, referred in Actions defined in state."
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "custom"
+                            }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "connectivity::rest",
+                                    "connectivity::log",
+                                    "connectivity::oauth",
+                                    "connectivity::avroSchemaToJsonSchema",
+                                    "connectivity::avroEncode",
+                                    "connectivity::avroDecode",
+									"connectivity::jsonPayloadToXMLPayload",
+									"connectivity::xmlPayloadToJsonPayload",
+									"connectivity::xmlPayloadToJsonSchema",
+                                    "connectivity::sampleXmlToJson",
+                                    "connectivity::updateSecurityProperty",
+                                    "connectivity::getSecurityProperty"
+                                ],
+                                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. 'connectivity::sampleXmlToJson' -> Makes xml payload to json payload conversion at designtime.`connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property."
+                            }
+                        }
+                    }
+                }
+            ],
+            "additionalProperties": false
         },
-        "type": {
-          "description": "Defines the function type. Is either `expression`, or `custom`.",
-          "enum": [
-            "expression",
-            "custom"
-          ]
-        },
-        "operation": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "If type is `expression`, defines the flow JQ expression, If type is `custom`, then one of supported functions"
-        }
-      },
-      "anyOf": [
-        {
-          "if": {
-            "properties": {
-              "type": {
-                "const": "custom"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "operation": {
-                "enum": [
-                  "connectivity::rest",
-                  "connectivity::log",
-                  "connectivity::oauth",
-                  "connectivity::avroSchemaToJsonSchema",
-                  "connectivity::avroEncode",
-                  "connectivity::avroDecode",
-                  "connectivity::jsonPayloadToXMLPayload",
-                  "connectivity::xmlPayloadToJsonPayload",
-                  "connectivity::xmlPayloadToJsonSchema",
-                  "connectivity::sampleXmlToJson",
-                  "connectivity::updateSecurityProperty",
-                  "connectivity::getSecurityProperty"
-                ],
-                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. 'connectivity::sampleXmlToJson' -> Makes xml payload to json payload conversion at designtime.`connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property."
-              }
-            }
-          }
-        }
-      ],
-      "additionalProperties": false
-    },
-    "OperationState": {
-      "type": "object",
-      "description": "Defines actions be performed. Does not wait for incoming events",
-      "oneOf": [
-        {
-          "required": [
-            "name",
-            "type",
-            "actions",
-            "end"
-          ]
-        },
-        {
-          "required": [
-            "name",
-            "type",
-            "actions",
-            "transition"
-          ]
-        }
-      ],
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "State name"
-        },
-        "type": {
-          "enum": [
-            "operation"
-          ],
-          "description": "State type. Must be `operation`"
-        },
-        "transition": {
-          "$ref": "#/definitions/transitionDef"
-        },
-        "end": {
-          "$ref": "#/definitions/endDef"
-        },
-        "actions": {
-          "type": "array",
-          "description": "Actions to be performed",
-          "minItems": 1,
-          "maxItems": 20,
-          "items": {
+        "OperationState": {
             "type": "object",
-            "$ref": "#/definitions/CNCFAction"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "SwitchState": {
-      "type": "object",
-      "description": "Defines actions be performed. Does not wait for incoming events",
-      "required": [
-        "name",
-        "type",
-        "dataConditions",
-        "defaultCondition"
-      ],
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "State name"
+            "description": "Defines actions be performed. Does not wait for incoming events",
+            "oneOf": [
+                {
+                    "required": [
+                        "name",
+                        "type",
+                        "actions",
+                        "end"
+                    ]
+                },
+                {
+                    "required": [
+                        "name",
+                        "type",
+                        "actions",
+                        "transition"
+                    ]
+                }
+            ],
+            "properties": {
+                "name": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "State name"
+                },
+                "type": {
+                    "enum": [
+                        "operation"
+                    ],
+                    "description": "State type. Must be `operation`"
+                },
+                "transition": {
+                    "$ref": "#/definitions/transitionDef"
+                },
+                "end": {
+                    "$ref": "#/definitions/endDef"
+                },
+                "actions": {
+                    "type": "array",
+                    "description": "Actions to be performed",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/CNCFAction"
+                    }
+                }
+            },
+            "additionalProperties": false
         },
-        "type": {
-          "enum": [
-            "switch"
-          ],
-          "description": "State type. Must be `switch`"
-        },
-        "dataConditions": {
-          "type": "array",
-          "description": "Defines conditions evaluated against state data",
-          "items": {
+        "SwitchState": {
             "type": "object",
-            "$ref": "#/definitions/CNCFDataConditionDef"
-          },
-          "additionalItems": false
-        },
-        "defaultCondition": {
-          "description": "Default transition of the workflow if there is no matching data conditions. Can include a transition or end definition",
-          "$ref": "#/definitions/CNCFDefaultConditionDef"
-        }
-      },
-      "additionalProperties": false
-    },
-    "CNCFDefaultConditionDef": {
-      "type": "object",
-      "description": "DefaultCondition definition. Can be either a transition or end definition",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "The optional name of the default condition, used solely for display purposes"
-        },
-        "transition": {
-          "$ref": "#/definitions/transitionDef"
-        },
-        "end": {
-          "$ref": "#/definitions/endDef"
-        }
-      },
-      "additionalProperties": false,
-      "oneOf": [
-        {
-          "required": [
-            "transition"
-          ]
-        },
-        {
-          "required": [
-            "end"
-          ]
-        }
-      ]
-    },
-    "CNCFDataConditionDef": {
-      "type": "object",
-      "description": "DefaultCondition definition. Can be either a transition or end definition",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/nonEmptyString",
-          "description": "The optional name of the default condition, used solely for display purposes"
-        },
-        "condition": {
-          "$ref": "#/definitions/conditionDef"
-        },
-        "transition": {
-          "$ref": "#/definitions/transitionDef"
-        },
-        "end": {
-          "$ref": "#/definitions/endDef"
-        }
-      },
-      "additionalProperties": false,
-      "oneOf": [
-        {
-          "required": [
-            "condition",
-            "transition"
-          ]
-        },
-        {
-          "required": [
-            "condition",
-            "end"
-          ]
-        }
-      ]
-    },
-    "CNCFAction": {
-      "type": "object",
-      "required": [
-        "functionRef"
-      ],
-      "properties": {
-        "functionRef": {
-          "description": "References a function to be invoked",
-          "oneOf": [
-            {
-              "description": "Function Reference",
-              "$ref": "#/definitions/FunctionRef"
+            "description": "Defines actions be performed. Does not wait for incoming events",
+            "required": [
+                "name",
+                "type",
+                "dataConditions",
+                "defaultCondition"
+            ],
+            "properties": {
+                "name": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "State name"
+                },
+                "type": {
+                    "enum": [
+                        "switch"
+                    ],
+                    "description": "State type. Must be `switch`"
+                },
+                "dataConditions": {
+                    "type": "array",
+                    "description": "Defines conditions evaluated against state data",
+                    "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/CNCFDataConditionDef"
+                    },
+                    "additionalItems": false
+                },
+                "defaultCondition": {
+                    "description": "Default transition of the workflow if there is no matching data conditions. Can include a transition or end definition",
+                    "$ref": "#/definitions/CNCFDefaultConditionDef"
+                }
             },
-            {
-              "$ref": "#/definitions/nonEmptyString",
-              "description": "Name of the referenced function, Shorthand for no arguments and expressions"
-            }
-          ]
+            "additionalProperties": false
         },
-        "name": {
-          "description": "Unique Action name",
-          "$ref": "#/definitions/nonEmptyString"
-        },
-        "actionDataFilter": {
-          "$ref": "#/definitions/ActionDataFilter"
-        },
-        "condition": {
-          "$ref": "#/definitions/conditionDef"
-        }
-      },
-      "additionalProperties": false
-    },
-    "FunctionRef": {
-      "type": "object",
-      "required": [
-        "refName"
-      ],
-      "properties": {
-        "refName": {
-          "type": "string",
-          "description": "Name of the referenced function. Must match valid function name"
-        },
-        "arguments": {
-          "description": "Function arguments/inputs",
-          "$ref": "#/definitions/Arguments"
-        }
-      },
-      "additionalProperties": false
-    },
-    "Arguments": {
-      "type": "object",
-      "description": "Each argument is valid JsonNode or JQ expression. JQ expression to be written as ${}",
-      "oneOf": [
-        {
-          "required": [
-            "uri",
-            "method"
-          ],
-          "properties": {
-            "uri": {
-              "description": "Target Endpoint. Absolute URL. A valid url string or expression",
-              "anyOf": [
+        "CNCFDefaultConditionDef": {
+            "type": "object",
+            "description": "DefaultCondition definition. Can be either a transition or end definition",
+            "properties": {
+                "name": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "The optional name of the default condition, used solely for display purposes"
+                },
+                "transition": {
+                    "$ref": "#/definitions/transitionDef"
+                },
+                "end": {
+                    "$ref": "#/definitions/endDef"
+                }
+            },
+            "additionalProperties": false,
+            "oneOf": [
                 {
-                  "$ref": "#/definitions/nonEmptyString",
-                  "format": "uri"
+                    "required": [
+                        "transition"
+                    ]
                 },
                 {
-                  "$ref": "#/definitions/argumentsJQPattern"
+                    "required": [
+                        "end"
+                    ]
                 }
-              ],
-              "examples": [
-                "http://dummyurl.com/dummyEndpoint",
-                "${.securityProperties.access_token_url}",
-                "${.connectionProperties.baseURL + \"/customers?id=123\"}",
-                "${.connectionProperties.baseURL + \"/customers/{id}?detail=true\"}"
-              ]
-            },
-            "method": {
-              "description": "HTTP method. A valid HTTP method or jq expression resolving to valid method",
-              "anyOf": [
-                {
-                  "enum": [
-                    "GET",
-                    "PUT",
-                    "POST",
-                    "DELETE",
-                    "PATCH"
-                  ]
-                },
-                {
-                  "$ref": "#/definitions/argumentsJQPattern"
-                }
-              ],
-              "examples": [
-                "GET",
-                "${.connectionProperties.method}"
-              ]
-            },
-            "headers": {
-              "$ref": "#/definitions/httpHeaders",
-              "description": "HTTP Headers. Object of key and value(s) or jq expression resolving to Object of key and value(s)"
-            },
-            "parameters": {
-              "$ref": "#/definitions/httpParams",
-              "description": "HTTP query and path Params. Object of key and value or jq expression resolving to Object of key and value(s)"
-            },
-            "body": {
-              "$ref": "#/definitions/httpBody",
-              "description": "HTTP Body to be sent. Object, array or string or JQ expression or mix of these."
-            },
-            "requestMediaType": {
-              "description": "Is content binary or multipart or structured xml/json/yaml",
-              "default": "structured",
-              "anyOf": [
-                {
-                  "enum": [
-                    "structured",
-                    "structured_xml",
-                    "structured_yaml",
-                    "multipart",
-                    "binary"
-                  ]
-                },
-                {
-                  "$ref": "#/definitions/argumentsJQPattern"
-                }
-              ],
-              "examples": [
-                "structured",
-                "${.connectionProperties.request}"
-              ]
-            },
-            "skipPolicy": {
-              "description": "Skip Oauth Policy Enforcement",
-              "default": false,
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "#/definitions/argumentsJQPattern"
-                }
-              ],
-              "examples": [
-                true,
-                "${.configuration.skipPolicy}"
-              ]
-            },
-            "responseMediaType": {
-              "description": "Optionally to override response media type",
-              "anyOf": [
-                {
-                  "enum": [
-                    "structured",
-                    "structured_xml",
-                    "structured_yaml",
-                    "multipart",
-                    "binary"
-                  ]
-                },
-                {
-                  "$ref": "#/definitions/argumentsJQPattern"
-                }
-              ],
-              "examples": [
-                true,
-                "${.configuration.responseMediaType}"
-              ]
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "message to be logged in activity stream"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "avroSchema"
-          ],
-          "properties": {
-            "avroSchema": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "AVRO Schema converted to JSON Schema"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "avroSchema",
-            "avroJsonData"
-          ],
-          "properties": {
-            "avroSchema": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "AVRO Schema converted to JSON Schema"
-            },
-            "avroJsonData": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "JSON Data valid against AVRO Schema"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "avroSchema",
-            "avroEncodedData"
-          ],
-          "properties": {
-            "avroSchema": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "AVRO Schema converted to JSON Schema"
-            },
-            "avroEncodedData": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "AVRO Encoded Data"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "jsonPayload"
-          ],
-          "properties": {
-            "jsonPayload": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "JSON payload converted to XML payload"
-            },
-            "targetNamespace": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "Target Namespace for XML Payload"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "XMLPayload"
-          ],
-          "properties": {
-            "XMLPayload": {
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "description": "XML Payload converted to JSON Payload"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "name",
-            "value"
-          ],
-          "properties": {
-            "name": {
-              "description": "Name of property to be updated.",
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "examples": [
-                "secret"
-              ]
-            },
-            "value": {
-              "description": "Value of the property",
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "examples": [
-                "secretValue"
-              ]
-            },
-            "scope": {
-              "description": "Scope of the property",
-              "enum": [
-                "inbound",
-                "outbound"
-              ],
-              "examples": [
-                "inbound"
-              ]
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "required": [
-            "name"
-          ],
-          "properties": {
-            "name": {
-              "description": "Name of property to read.",
-              "$ref": "#/definitions/stringOrArgumentJQPattern",
-              "examples": [
-                "secret"
-              ]
-            },
-            "scope": {
-              "description": "Scope of the property",
-              "enum": [
-                "inbound",
-                "outbound"
-              ],
-              "examples": [
-                "inbound"
-              ]
-            }
-          },
-          "additionalProperties": false
-        }
-      ]
-    },
-    "httpHeaders": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/singleOrMultiValuedMap",
-          "examples": [
-            {
-              "header1Key": "header1Value",
-              "header2Key": "${.input.header2Value}",
-              "header3Key": [
-                "header3Value1",
-                "${.input.header3Value2}"
-              ]
-            }
-          ]
-        },
-        {
-          "$ref": "#/definitions/argumentsJQPattern",
-          "examples": [
-            "${.configuration.headers}"
-          ]
-        }
-      ]
-    },
-    "httpParams": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/singleValueMap",
-          "description": "Map of template and query params",
-          "examples": [
-            {
-              "param1Key": "param1Value",
-              "param2Key": "${.input.param2Value}"
-            }
-          ]
-        },
-        {
-          "type": "object",
-          "description": "Map containing template and query as keys with corresponding expressions/maps",
-          "properties": {
-            "query": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/singleValueMap"
-                },
-                {
-                  "$ref": "#/definitions/argumentsJQPattern"
-                }
-              ],
-              "description": "Map of query params or JQ expression for map"
-            },
-            "template": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/singleValueMap"
-                },
-                {
-                  "$ref": "#/definitions/argumentsJQPattern"
-                }
-              ],
-              "description": "Map of template params or JQ expression for map"
-            }
-          },
-          "examples": [
-            {
-              "template": {
-                "param1Key": "${.input.param1Value}",
-                "param2Key": "param2Value"
-              },
-              "query": "${.input.queryMap}"
-            },
-            {
-              "template": "${.input.templateMap}",
-              "query": {
-                "param1Key": "${.input.param1Value}",
-                "param2Key": "param2Value"
-              }
-            }
-          ],
-          "additionalProperties": false
-        },
-        {
-          "$ref": "#/definitions/argumentsJQPattern",
-          "description": "An Expression resolving to one of teh above types",
-          "examples": "${.input.params}"
-        }
-      ]
-    },
-    "httpBody": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/stringOrArgumentJQPattern",
-          "examples": [
-            "dummyBody",
-            "${.input.body}"
-          ]
-        },
-        {
-          "$ref": "#/definitions/singleOrMultiValuedMap",
-          "examples": [
-            {
-              "key1": "dummyBody",
-              "key2": "${.input.bodyKey2}"
-            }
-          ]
-        },
-        {
-          "$ref": "#/definitions/stringOrArgumentJQArray",
-          "examples": [
-            [
-              "dummyBody",
-              "${.input.bodyPart}"
             ]
-          ]
         },
-        {
-          "type": "array",
-          "items": {
-            "type": "object"
-          },
-          "examples": [
-            [
-              {
-                "Content-Type": "application/json; charset=UTF-8; name=metadata.json",
-                "Content-Transfer-Encoding": "binary",
-                "Content-Disposition": "form-data; name=\"metadata.json\"; filename=\"metadata.json\"",
-                "content": {
-                  "name": "${ .input.fileName }",
-                  "parents": [
-                    "${ .configuration.folderId }"
-                  ]
+        "CNCFDataConditionDef": {
+            "type": "object",
+            "description": "DefaultCondition definition. Can be either a transition or end definition",
+            "properties": {
+                "name": {
+                    "$ref": "#/definitions/nonEmptyString",
+                    "description": "The optional name of the default condition, used solely for display purposes"
+                },
+                "condition": {
+                    "$ref": "#/definitions/conditionDef"
+                },
+                "transition": {
+                    "$ref": "#/definitions/transitionDef"
+                },
+                "end": {
+                    "$ref": "#/definitions/endDef"
                 }
-              }
+            },
+            "additionalProperties": false,
+            "oneOf": [
+                {
+                    "required": [
+                        "condition",
+                        "transition"
+                    ]
+                },
+                {
+                    "required": [
+                        "condition",
+                        "end"
+                    ]
+                }
             ]
-          ]
-        }
-      ]
-    },
-    "ActionDataFilter": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "$ref": "#/definitions/argumentsJQPattern",
-          "examples": "${ {age: .body.age} }",
-          "description": "Expression that filters the actions data results. If not specified entire result of action is used. "
         },
-        "toStateData": {
-          "$ref": "#/definitions/argumentsJQPattern",
-          "examples": "${ .output }",
-          "description": "Expression that selects a state data element to which the action results should be added/merged into. If not specified, denote, the top-level state data element"
+        "CNCFAction": {
+            "type": "object",
+            "required": [
+                "functionRef"
+            ],
+            "properties": {
+                "functionRef": {
+                    "description": "References a function to be invoked",
+                    "oneOf": [
+                        {
+                            "description": "Function Reference",
+                            "$ref": "#/definitions/FunctionRef"
+                        },
+                        {
+                            "$ref": "#/definitions/nonEmptyString",
+                            "description": "Name of the referenced function, Shorthand for no arguments and expressions"
+                        }
+                    ]
+                },
+                "name": {
+                    "description": "Unique Action name",
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "actionDataFilter": {
+                    "$ref": "#/definitions/ActionDataFilter"
+                },
+                "condition": {
+                    "$ref": "#/definitions/conditionDef"
+                }
+            },
+            "additionalProperties": false
+        },
+        "FunctionRef": {
+            "type": "object",
+            "required": [
+                "refName"
+            ],
+            "properties": {
+                "refName": {
+                    "type": "string",
+                    "description": "Name of the referenced function. Must match valid function name"
+                },
+                "arguments": {
+                    "description": "Function arguments/inputs",
+                    "$ref": "#/definitions/Arguments"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Arguments": {
+            "type": "object",
+            "description": "Each argument is valid JsonNode or JQ expression. JQ expression to be written as ${}",
+            "oneOf": [
+                {
+                    "required": [
+                        "uri",
+                        "method"
+                    ],
+                    "properties": {
+                        "uri": {
+                            "description": "Target Endpoint. Absolute URL. A valid url string or expression",
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/nonEmptyString",
+                                    "format": "uri"
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "examples": [
+                                "http://dummyurl.com/dummyEndpoint",
+                                "${.securityProperties.access_token_url}",
+                                "${.connectionProperties.baseURL + \"/customers?id=123\"}",
+                                "${.connectionProperties.baseURL + \"/customers/{id}?detail=true\"}"
+                            ]
+                        },
+                        "method": {
+                            "description": "HTTP method. A valid HTTP method or jq expression resolving to valid method",
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "GET",
+                                        "PUT",
+                                        "POST",
+                                        "DELETE",
+                                        "PATCH"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "examples": [
+                                "GET",
+                                "${.connectionProperties.method}"
+                            ]
+                        },
+                        "headers": {
+                            "$ref": "#/definitions/httpHeaders",
+                            "description": "HTTP Headers. Object of key and value(s) or jq expression resolving to Object of key and value(s)"
+                        },
+                        "parameters": {
+                            "$ref": "#/definitions/httpParams",
+                            "description": "HTTP query and path Params. Object of key and value or jq expression resolving to Object of key and value(s)"
+                        },
+                        "body": {
+                            "$ref": "#/definitions/httpBody",
+                            "description": "HTTP Body to be sent. Object, array or string or JQ expression or mix of these."
+                        },
+                        "requestMediaType": {
+                            "description": "Is content binary or multipart or structured xml/json/yaml",
+                            "default": "structured",
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "structured",
+                                        "structured_xml",
+                                        "structured_yaml",
+                                        "multipart",
+                                        "binary"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "examples": [
+                                "structured",
+                                "${.connectionProperties.request}"
+                            ]
+                        },
+                        "skipPolicy": {
+                            "description": "Skip Oauth Policy Enforcement",
+                            "default": false,
+                            "anyOf": [
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "examples": [
+                                true,
+                                "${.configuration.skipPolicy}"
+                            ]
+                        },
+                        "responseMediaType": {
+                            "description": "Optionally to override response media type",
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "structured",
+                                        "structured_xml",
+                                        "structured_yaml",
+                                        "multipart",
+                                        "binary"
+                                    ]
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "examples": [
+                                true,
+                                "${.configuration.responseMediaType}"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "message"
+                    ],
+                    "properties": {
+                        "message": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "message to be logged in activity stream"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "avroSchema"
+                    ],
+                    "properties": {
+                        "avroSchema": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "AVRO Schema converted to JSON Schema"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "avroSchema",
+                        "avroJsonData"
+                    ],
+                    "properties": {
+                        "avroSchema": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "AVRO Schema converted to JSON Schema"
+                        },
+                        "avroJsonData": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "JSON Data valid against AVRO Schema"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "avroSchema",
+                        "avroEncodedData"
+                    ],
+                    "properties": {
+                        "avroSchema": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "AVRO Schema converted to JSON Schema"
+                        },
+                        "avroEncodedData": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "AVRO Encoded Data"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+				{
+                    "required": [
+                        "jsonPayload"
+                    ],
+                    "properties": {
+                        "jsonPayload": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "JSON payload converted to XML payload"
+                        },
+                        "targetNamespace": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "Target Namespace for XML Payload"
+                        }
+                    },
+
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "XMLPayload"
+                    ],
+                    "properties": {
+                        "XMLPayload": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "XML Payload converted to JSON Payload"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "name",
+                        "value"
+                    ],
+                    "properties": {
+                        "name": {
+                            "description": "Name of property to be updated.",
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "examples": [
+                                "secret"
+                            ]
+                        },
+                        "value": {
+                            "description": "Value of the property",
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "examples": [
+                                "secretValue"
+                            ]
+                        },
+                        "scope": {
+                            "description": "Scope of the property",
+                            "enum": [
+                                "inbound",
+                                "outbound"
+                            ],
+                            "examples": [
+                                "inbound"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "description": "Name of property to read.",
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "examples": [
+                                "secret"
+                            ]
+                        },
+                        "scope": {
+                            "description": "Scope of the property",
+                            "enum": [
+                                "inbound",
+                                "outbound"
+                            ],
+                            "examples": [
+                                "inbound"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "httpHeaders": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/singleOrMultiValuedMap",
+                    "examples": [
+                        {
+                            "header1Key": "header1Value",
+                            "header2Key": "${.input.header2Value}",
+                            "header3Key": [
+                                "header3Value1",
+                                "${.input.header3Value2}"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/argumentsJQPattern",
+                    "examples": [
+                        "${.configuration.headers}"
+                    ]
+                }
+            ]
+        },
+        "httpParams": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/singleValueMap",
+                    "description": "Map of template and query params",
+                    "examples": [
+                        {
+                            "param1Key": "param1Value",
+                            "param2Key": "${.input.param2Value}"
+                        }
+                    ]
+                },
+                {
+                    "type": "object",
+                    "description": "Map containing template and query as keys with corresponding expressions/maps",
+                    "properties": {
+                        "query": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/definitions/singleValueMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "description": "Map of query params or JQ expression for map"
+                        },
+                        "template": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/definitions/singleValueMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/argumentsJQPattern"
+                                }
+                            ],
+                            "description": "Map of template params or JQ expression for map"
+                        }
+                    },
+                    "examples": [
+                        {
+                            "template": {
+                                "param1Key": "${.input.param1Value}",
+                                "param2Key": "param2Value"
+                            },
+                            "query": "${.input.queryMap}"
+                        },
+                        {
+                            "template": "${.input.templateMap}",
+                            "query": {
+                                "param1Key": "${.input.param1Value}",
+                                "param2Key": "param2Value"
+                            }
+                        }
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "$ref": "#/definitions/argumentsJQPattern",
+                    "description": "An Expression resolving to one of teh above types",
+                    "examples": "${.input.params}"
+                }
+            ]
+        },
+        "httpBody": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/stringOrArgumentJQPattern",
+                    "examples": [
+                        "dummyBody",
+                        "${.input.body}"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/singleOrMultiValuedMap",
+                    "examples": [
+                        {
+                            "key1": "dummyBody",
+                            "key2": "${.input.bodyKey2}"
+                        }
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/stringOrArgumentJQArray",
+                    "examples": [
+                        [
+                            "dummyBody",
+                            "${.input.bodyPart}"
+                        ]
+                    ]
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "examples": [
+                        [
+                            {
+                                "Content-Type": "application/json; charset=UTF-8; name=metadata.json",
+                                "Content-Transfer-Encoding": "binary",
+                                "Content-Disposition": "form-data; name=\"metadata.json\"; filename=\"metadata.json\"",
+                                "content": {
+                                    "name": "${ .input.fileName }",
+                                    "parents": [
+                                        "${ .configuration.folderId }"
+                                    ]
+                                }
+                            }
+                        ]
+                    ]
+                }
+            ]
+        },
+        "ActionDataFilter": {
+            "type": "object",
+            "properties": {
+                "results": {
+                    "$ref": "#/definitions/argumentsJQPattern",
+                    "examples": "${ {age: .body.age} }",
+                    "description": "Expression that filters the actions data results. If not specified entire result of action is used. "
+                },
+                "toStateData": {
+                    "$ref": "#/definitions/argumentsJQPattern",
+                    "examples": "${ .output }",
+                    "description": "Expression that selects a state data element to which the action results should be added/merged into. If not specified, denote, the top-level state data element"
+                }
+            },
+            "additionalProperties": false,
+            "required": []
+        },
+        "transitionDef": {
+            "$ref": "#/definitions/nonEmptyString",
+            "description": "Name of state to transition to. Must be valid state name."
+        },
+        "endDef": {
+            "type": "boolean",
+            "description": "End state, indicating flow termination",
+            "default": false
+        },
+        "conditionDef": {
+            "description": "Expression, if defined, must evaluate to true for this action to be performed. If false, action is disregarded. Can refer function using fn:",
+            "$ref": "#/definitions/nonEmptyString",
+            "examples": [
+                "${.input.applicant | .age >= 60}",
+                "${   fn:isAdult     }"
+            ]
         }
-      },
-      "additionalProperties": false,
-      "required": []
-    },
-    "transitionDef": {
-      "$ref": "#/definitions/nonEmptyString",
-      "description": "Name of state to transition to. Must be valid state name."
-    },
-    "endDef": {
-      "type": "boolean",
-      "description": "End state, indicating flow termination",
-      "default": false
-    },
-    "conditionDef": {
-      "description": "Expression, if defined, must evaluate to true for this action to be performed. If false, action is disregarded. Can refer function using fn:",
-      "$ref": "#/definitions/nonEmptyString",
-      "examples": [
-        "${.input.applicant | .age >= 60}",
-        "${   fn:isAdult     }"
-      ]
     }
-  }
 }

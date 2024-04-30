@@ -1,11 +1,10 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$id": "#triggers",
   "title": "Triggers",
   "description": "Triggers models the ability for the adapter to receive an event from an external source and can be implemented in different ways. The supported protocols for receiving events is HTTP. The definition of a trigger allows the modeling of the inbound message structure, the security scheme for message ingress and validation, and the mechanism for creating and deleting a subscription if the third party application.",
   "type": "object",
   "patternProperties": {
-    "^[a-zA-Z0-9\\.\\-_]{0,100}$": {
+    "^[a-zA-Z][a-zA-Z0-9\\.\\-_]{0,100}$": {
       "$ref": "#/definitions/Trigger"
     }
   },
@@ -42,11 +41,11 @@
         },
         "group": {
           "type": "string",
-          "description": "The name of the group which is defined in groups section. Association with a group allows sets of triggers to be grouped together so that they can be filtered in the user interface. A section of a group will filter the set displayed to the set associated with that group.",
+          "description":"The name of the group which is defined in groups section. Association with a group allows sets of triggers to be grouped together so that they can be filtered in the user interface. A section of a group will filter the set displayed to the set associated with that group.",
           "maxLength": 100
         },
         "execute": {
-          "description": "The field references a flow defined in the flow section that is the implementation for the trigger in runtime. When a message is received by this trigger, the flow processes the incoming message prior to sending it to the integration. This flow references the logic that processes that message.",
+          "description":"The field references a flow defined in the flow section that is the implementation for the trigger in runtime. When a message is received by this trigger, the flow processes the incoming message prior to sending it to the integration. This flow references the logic that processes that message.",
           "type": "string",
           "pattern": "^flow:[\\w|-]+$",
           "maxLength": 100
@@ -84,11 +83,12 @@
           "items": {
             "$ref": "#/definitions/PingRequestFilter"
           },
-          "description": "Contents of this section will be used to identify validation requests. It also allows to override response behavior for such requests. Integration flow will not be executed for validation requests."
+          "description":"Contents of this section will be used to identify validation requests. It also allows to override response behavior for such requests. Integration flow will not be executed for validation requests."
+
         },
-        "configuration": {
+        "configuration" : {
           "type": "array",
-          "description": "The configuration section models the configuration option for an option to fully configure the trigger. Certain triggers may need additional information that users need to provide to allow runtime to function. The configuration options are modeled as user interface widgets with data either statically defined for fed by flows.",
+          "description":"The configuration section models the configuration option for an option to fully configure the trigger. Certain triggers may need additional information that users need to provide to allow runtime to function. The configuration options are modeled as user interface widgets with data either statically defined for fed by flows.",
           "items": {
             "$ref": "actions_v01.json#/definitions/ConfigurationField"
           },
@@ -101,10 +101,10 @@
     },
     "TriggerWebhook": {
       "type": "object",
-      "description": "The section describes the raw incoming request structure received by the trigger. This represents the message that is sent by the third party endpoint as-is, prior to any processing by the trigger.",
+      "description" : "The section describes the raw incoming request structure received by the trigger. This represents the message that is sent by the third party endpoint as-is, prior to any processing by the trigger.",
       "properties": {
         "headers": {
-          "description": "",
+          "description":"",
           "type": "array",
           "items": {
             "$ref": "#/definitions/Parameter"
@@ -114,7 +114,7 @@
           "uniqueItems": true
         },
         "parameters": {
-          "description": "This models the parameters from the webhook request to trigger.",
+          "description":"This models the parameters from the webhook request to trigger.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/Parameter"
@@ -157,11 +157,11 @@
       "properties": {
         "server": {
           "type": "object",
-          "description": "Contents of this section will be made available to register/unregister subscription. It will allow reuse of the flows."
+          "description":"Contents of this section will be made available to register/unregister subscription. It will allow reuse of the flows."
         },
         "client": {
           "$ref": "#/definitions/ClientSideFilter",
-          "description": "Contents of this section will be used to filter events at OIC and allow only selected events. It also allows to override default status in case of ignored or accepted events."
+          "description":"Contents of this section will be used to filter events at OIC and allow only selected events. It also allows to override default status in case of ignored or accepted events."
         }
       },
       "additionalProperties": false
@@ -171,17 +171,17 @@
       "properties": {
         "condition": {
           "type": "string",
-          "description": "JQ expression on incoming request object. This expression must return true or false. If false, request will be ignored.",
-          "maxLength": 1000
+          "description":"JQ expression on incoming request object. This expression must return true or false. If false, request will be ignored.",
+          "maxLength" : 1000
         },
         "acceptStatus": {
           "type": "integer",
           "default": 202,
-          "description": "Override Status code in case request is allowed. This takes precedence over the override specified in ping filter and default value."
+          "description":"Override Status code in case request is allowed. This takes precedence over the override specified in ping filter and default value."
         },
         "ignoreStatus": {
           "default": 201,
-          "description": "Override Status code in case request is ignored."
+          "description":"Override Status code in case request is ignored."
         }
       },
       "additionalProperties": false
@@ -191,20 +191,20 @@
       "properties": {
         "condition": {
           "$ref": "commons_v01.json#/definitions/flowOrJQExpression",
-          "description": "JQ expression on incoming request object. Must return true or false. If true request will be ignored",
-          "maxLength": 1000
+          "description":"JQ expression on incoming request object. Must return true or false. If true request will be ignored",
+          "maxLength" : 1000
         },
         "skipAuthentication": {
           "default": false,
           "type": "boolean",
-          "description": "Disable Authentication for validation Request matching the condition."
+          "description":"Disable Authentication for validation Request matching the condition."
         },
         "response": {
           "description": "Set this to override default response in ping. Default is `201` empty response.",
-          "oneOf": [
+          "oneOf" : [
             {
               "$ref": "commons_v01.json#/definitions/flowOrJQExpression",
-              "description": "JQ expression or CNCF flow. Output must be JSON object representing response status, headers and body"
+              "description":"JQ expression or CNCF flow. Output must be JSON object representing response status, headers and body"
             },
             {
               "$ref": "commons_v01.json#/definitions/httpResponse"
@@ -222,12 +222,12 @@
       ],
       "properties": {
         "name": {
-          "description": "The name of the parameter",
+          "description":"The name of the parameter",
           "type": "string",
-          "maxLength": 100
+          "maxLength" : 100
         },
         "type": {
-          "description": "The type models the parameter.",
+          "description":"The type models the parameter.",
           "type": "string",
           "enum": [
             "boolean",
@@ -243,7 +243,7 @@
       "oneOf": [
         {
           "type": "object",
-          "description": "Schema defined in the schemas section.",
+          "description":"Schema defined in the schemas section.",
           "required": [
             "schemaType",
             "schema"
@@ -270,9 +270,9 @@
         },
         {
           "type": "string",
-          "description": "This field references a flow defined in the flow section that is the implementation for creation of the schema definition. For example, a third party may offer metadata APIs that can retrieve the schema of a given resource given the resource identifier. In this case, the schema does not need to be statically defined in the schema section of the document but instead can be dynamically create the JSON schema definition of that resource from calling the third party API. This field may also drive the schema from user defined schema derived from JSON sample.",
+          "description":"This field references a flow defined in the flow section that is the implementation for creation of the schema definition. For example, a third party may offer metadata APIs that can retrieve the schema of a given resource given the resource identifier. In this case, the schema does not need to be statically defined in the schema section of the document but instead can be dynamically create the JSON schema definition of that resource from calling the third party API. This field may also drive the schema from user defined schema derived from JSON sample.",
           "pattern": "^flow:[\\w|-]+$|[Uu][Ss][Ee][Rr][Dd][Ee][Ff][Ii][Nn][Ee][Dd]",
-          "maxLength": 100
+          "maxLength" : 100
         }
       ]
     }

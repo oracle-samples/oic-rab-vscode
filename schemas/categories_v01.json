@@ -1,5 +1,4 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$id": "#categories",
   "title": "Categories",
   "description": "Categories are the user-facing list of actions/triggers of the adapter. This section contains information that powers the UI for designtime configuration. ",
@@ -10,17 +9,17 @@
   "properties": {
     "displayName": {
       "type": "string",
-      "description": "The field name of the group that shows up in the user interface.",
+      "description":"The field name of the group that shows up in the user interface.",
       "maxLength": 100
     },
     "description": {
       "type": "string",
-      "description": "The description of the group that shows up in the user interface as a tooltip.",
+      "description":"The description of the group that shows up in the user interface as a tooltip.",
       "maxLength": 1000
     },
     "groups": {
       "type": "array",
-      "description": "The list of group definition.",
+      "description":"The list of group definition.",
       "minItems": 0,
       "maxItems": 20,
       "items": {
@@ -40,17 +39,17 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the group which is a selectable item value in the user interface.",
+          "description":"The name of the group which is a selectable item value in the user interface.",
           "maxLength": 100
         },
         "displayName": {
           "type": "string",
-          "description": "The name of the group that shows up as a selectable item in the user interface.",
+          "description":"The name of the group that shows up as a selectable item in the user interface.",
           "maxLength": 100
         },
         "description": {
           "type": "string",
-          "description": "The description of the group that shows up in the user interface as a tooltip.",
+          "description":"The description of the group that shows up in the user interface as a tooltip.",
           "maxLength": 1000
         }
       },
