@@ -378,7 +378,6 @@
     "vscode:prepublish": "npm run -S esbuild-base -- --minify",
     "esbuild-base": "rm -rf out && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "build": "npm run -S esbuild-base -- --sourcemap",
-    "sync-schema": "[[ ! -z \"${RAB_VSCODE_SCHEMA_DIR}\" ]] && (cp ${RAB_VSCODE_SCHEMA_DIR}/* schemas; echo Schema-Sync-Done-$(date)); echo ''",
     "watch": "npm run -S esbuild-base -- --sourcemap --watch",
     "fmt": "prettier --write \"src/**/*.ts\"&& npm run test -- --fix",
     "test": "npm run lint && cd src; tsc --noEmit",
