@@ -412,7 +412,8 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
           switchMap(
             () => openWebview(
               {
-                file, context, entryType
+                file, context, entryType, 
+                addFile: entryType === SharedNs.VscodeCommandPayloadEntryType.PostmanAddRequest ? getAddFile() : undefined
               }
             )
               .pipe(
