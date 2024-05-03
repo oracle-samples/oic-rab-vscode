@@ -4,20 +4,20 @@
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
-import * as vscode from 'vscode';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
-import JSZip, { file } from 'jszip';
-import _, { extend } from 'lodash';
+import JSZip from 'jszip';
+import _ from 'lodash';
 
 import Ajv from "ajv-draft-04";
 import addFormats from "ajv-formats";
 import * as openapiSchema from "./openapi/openapi_v3.0.json";
 
 import { log } from './logger';
-import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
 import { fs as fsUtils } from './utils';
+import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
 
 /**
  * This function ensures one open workspace.
@@ -173,30 +173,41 @@ export const isWorkSpaceInitialized = async () => {
     )
 };
 
-export function getAddFile(fileName: string = "main", allowFallBack?: boolean): vscode.Uri | undefined {
+export function getAddFile(fileName: string = "main", allowFallBack?: boolean, isShowErrorMessage?: boolean): vscode.Uri | undefined {
 
+  const fileFullName = `${fileName}.add.json`;
+  const errorMessage = `Unable to find the adapter definition document at ${presetFileMap.definitions}/${fileFullName}.`;
+
+  let ret: vscode.Uri | undefined;
   let root = ensureOpenWorkspace();
-  if (!root) {
-    return;
-  }
+  if (root) {
+    try {
+      let files = fs.readdirSync(path.resolve(root.uri.fsPath, presetFileMap.definitions));
+      let fileMain = files.find(e => e === presetFileMap.definitionsMainAddJson);
+      let file = files.find(e => e === fileFullName);
 
-  try {
-    let files = fs.readdirSync(path.resolve(root.uri.fsPath, "definitions"));
-    let fileMain = files.find(e => e === `main.add.json`);
-    let file = files.find(e => e === `${fileName}.add.json`);
-
-    if (!file) {
-      if (!allowFallBack || !fileMain) {
-        return;
+      if (!file && allowFallBack && fileMain) {
+        file = fileMain;
       }
-      file = fileMain;
+
+      if (file) {
+        ret = vscode.Uri.file(path.resolve(root.uri.fsPath, "definitions", file));
+      }
+
+
+    } catch (err) {
+      log.error(errorMessage, err);
     }
-
-    return vscode.Uri.file(path.resolve(root.uri.fsPath, "definitions", file));
-
-  } catch (err) {
-    log.error(`Unable to find the adapter definition document.`);
   }
+
+  if (!ret) {
+    log.error(errorMessage);
+    if (isShowErrorMessage) {
+      showErrorMessage(errorMessage);
+    }
+  }
+
+  return ret;
 
 }
 

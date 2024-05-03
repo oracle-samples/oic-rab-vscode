@@ -7,7 +7,7 @@ import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
 import { registration } from './api';
 import { log } from './logger';
-import { fs, workspace } from './utils';
+import { fs, workspace, } from './utils';
 import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
 import { RabAddNs } from './webview-shared-lib';
 import { getAddFile } from './workspace-manager';
@@ -24,24 +24,30 @@ export const detectIsADDLocal = (
   errorError: (getFile: () => vscode.Uri) => Observable<any> = (getFile: () => vscode.Uri) =>
     from(showErrorMessage(`The offered file is not a valid adapter definition document. File:  ['${fs.parseFilename(getFile())}']`))
 
-) => fs.isFileMatching(
-  getFile(),
-  (doc) => {
-    try {
-      const add = JSON.parse(doc.getText()) as RabAddNs.Root;
-      return !!add && !!add.info?.id;
-    } catch (error) {
+) => fs.confirmSaveFile(getFile())
+.pipe(
+  switchMap(
+    () => fs.isFileMatching(
+      getFile(),
+      (doc) => {
+        try {
+          const add = JSON.parse(doc.getText()) as RabAddNs.Root;
+          return !!add && !!add.info?.id;
+        } catch (error) {
 
-      return false;
-    }
+          return false;
+        }
 
-  },
+      },
 
-  () => errorError(getFile)
+      () => errorError(getFile)
 
-);
+    )
+  )
+)
+;
 
-export const detectIsADDValidRemote = (getFile = () => getAddFile()!) => fs.checkWorkspaceInitialized().pipe(
+export const detectIsADDValidRemote = (getFile = () => getAddFile()!) => fs.checkWorkspaceInitialized().pipe( 
   switchMap(
     () => detectIsADDLocal(
       getFile,

@@ -635,7 +635,7 @@ export namespace fs {
       );
   }
 
-  export function confirmSaveFile(file: vscode.Uri) {
+  export function confirmSaveFile(file: vscode.Uri, emitResult?: boolean) {
     return isFileSaved(file)
       .pipe(
         switchMap(
@@ -662,7 +662,7 @@ export namespace fs {
           log.debug(`[confirmSaveFile] isSaved [${isSaved}]`);
         }),
 
-        filter(isSaved => isSaved)
+        filter(isSaved => emitResult || isSaved)
       );
   }
 
