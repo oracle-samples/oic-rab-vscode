@@ -7,11 +7,18 @@ import * as vscode from 'vscode';
 
 import path from 'path';
 
+import { firstValueFrom } from 'rxjs';
 import * as api from '../api';
 import { log } from '../logger';
+import { fs } from '../utils';
 import { RABError, showErrorMessage, showInfoMessage } from '../utils/ui-utils';
 
 async function callback(file: vscode.Uri, context: vscode.ExtensionContext) {
+
+  const isSaved = await firstValueFrom(fs.confirmSaveFile(file, true));
+  if (!isSaved) {
+    return;
+  }
 
   log.info(`Validating adapter definition ${path.basename(file.fsPath)}...`);
 

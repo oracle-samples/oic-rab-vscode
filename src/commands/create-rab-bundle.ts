@@ -5,12 +5,19 @@
 
 import * as vscode from 'vscode';
 
-import { exportRABBundle } from '../workspace-manager';
+import { firstValueFrom } from 'rxjs';
 import { log } from '../logger';
+import { fs } from '../utils';
 import { showErrorMessage } from '../utils/ui-utils';
+import { exportRABBundle } from '../workspace-manager';
 
 
 async function callback(file: vscode.Uri): Promise<any> {
+  const isSaved = await firstValueFrom(fs.confirmSaveFile(file, true));
+  if (!isSaved) {
+    return;
+  }
+  
   log.info("Creating RAB bundle in current workspace");
   try {
     await exportRABBundle();
