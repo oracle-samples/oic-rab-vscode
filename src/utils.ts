@@ -7,7 +7,7 @@ import * as _fs from 'fs';
 
 import { createServer } from 'http';
 import * as path from 'path';
-import { Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } from 'rxjs';
+import { EMPTY, Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } from 'rxjs';
 import { catchError, defaultIfEmpty, delay, filter, map, skipWhile, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
 import { log } from './logger';
@@ -636,6 +636,11 @@ export namespace fs {
   }
 
   export function confirmSaveFile(file: vscode.Uri, emitResult?: boolean) {
+    if (!file) {
+      showErrorMessage(`Unable to save the file since the file doesn't exist`);
+      return emitResult ? of(false) : EMPTY;
+    }
+
     return isFileSaved(file)
       .pipe(
         switchMap(

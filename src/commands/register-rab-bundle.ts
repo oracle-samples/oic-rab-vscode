@@ -6,26 +6,15 @@
 import * as vscode from 'vscode';
 
 
-import { firstValueFrom } from 'rxjs';
 import * as api from '../api';
 import { log } from '../logger';
 import { get as getProfileManager } from '../profile-manager-provider';
-import { fs } from '../utils';
 import { RABError, showErrorMessage, showInfoMessage, withProgress } from '../utils/ui-utils';
-import { createRABBundle, getAddFile } from '../workspace-manager';
+import { createRABBundle } from '../workspace-manager';
 
 async function callback(file: vscode.Uri, context: vscode.ExtensionContext): Promise<any> {
   
   withProgress("Registering RAB bundle...", async () => {
-
-    const add = getAddFile(undefined, undefined, true);
-    if (!add) {
-      return;
-    }
-    const isSaved = await firstValueFrom(fs.confirmSaveFile(add, true));
-    if (!isSaved) {
-       return;
-    }
     log.info(`Registering RAB bundle...`);
     let bundle;
     try {
