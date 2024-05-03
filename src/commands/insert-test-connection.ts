@@ -1,15 +1,12 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 
 import * as _ from 'lodash';
 
-import { log } from '../logger';
 import * as utils from '../utils';
 
 function callback(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]): any {

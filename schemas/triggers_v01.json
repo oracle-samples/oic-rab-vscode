@@ -1,5 +1,5 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "_comment": "Copyright (c) 2022-2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$id": "#triggers",
   "title": "Triggers",
   "description": "Triggers models the ability for the adapter to receive an event from an external source and can be implemented in different ways. The supported protocols for receiving events is HTTP. The definition of a trigger allows the modeling of the inbound message structure, the security scheme for message ingress and validation, and the mechanism for creating and deleting a subscription if the third party application.",

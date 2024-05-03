@@ -1,13 +1,13 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
-import * as vscode from 'vscode';
 import path from 'path';
+import * as vscode from 'vscode';
 
-import { log } from '../logger';
 import * as api from '../api';
+import { log } from '../logger';
 import { RABError, showErrorMessage } from '../utils/ui-utils';
 
 async function callback(file: vscode.Uri) {
