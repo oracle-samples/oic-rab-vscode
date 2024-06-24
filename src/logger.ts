@@ -1,6 +1,6 @@
 
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -69,11 +69,18 @@ class Logger {
   }
 
   format(val: any): string {
-    if (isBuffer(val)) {
-      return `Buffer[${(val as Buffer).byteLength}]`;
+
+    try {
+      if (isBuffer(val)) {
+        return `Buffer[${(val as Buffer).byteLength}]`;
+      }
+      return JSON.stringify(val, null, 2);
+    } catch (error) {
+      return val;
     }
-    return JSON.stringify(val, null, 2);
+
   }
+
 
   private log(level: string, ...msg: string[]): Logger {
     console.log(level, msg);

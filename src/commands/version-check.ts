@@ -1,17 +1,24 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
-import * as vscode from 'vscode';
 import path from 'path';
+import * as vscode from 'vscode';
 
-import { log } from '../logger';
+import { firstValueFrom } from 'rxjs';
 import * as api from '../api';
+import { log } from '../logger';
+import { fs } from '../utils';
 import { RABError, showErrorMessage } from '../utils/ui-utils';
 
 async function callback(file: vscode.Uri) {
 
+  const isSaved = await firstValueFrom(fs.confirmSaveFile(file, true));
+  if (!isSaved) {
+    return;
+  }
+  
   log.info(`Version check on ${path.basename(file.fsPath)}...`);
 
   try {

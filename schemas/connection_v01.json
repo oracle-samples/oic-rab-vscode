@@ -1,5 +1,5 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "_comment": "Copyright (c) 2022-2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$schema": "https://json-schema.org/draft-07/schema#",
   "$id": "#connection",
   "title": "connectionDefinition",
@@ -234,7 +234,7 @@
           "scope"
         ],
         "allOf": [
-          {
+            {
             "if": {
               "properties": {
                 "type": {
@@ -250,31 +250,20 @@
                   "enum": [
                     "NONE",
                     "BASIC_AUTH",
-                    "OAUTH_INBOUND",
-                    "OAUTH2.0_TOKEN_VALIDATION",
-                    "MULTI_TOKEN_INBOUND",
-                    "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
-                    "DIGITAL_SIGNATURE",
-                    "HMAC_SIGNATURE_VALIDATION",
-                    "RSA_SIGNATURE_VALIDATION",
-                    "JWT_VALIDATION",
-                    "CUSTOM_SINGLE_TOKEN",
-                    "API_KEY_AUTHENTICATION",
+                    "OAUTH_INBOUND", "OAUTH2.0_TOKEN_VALIDATION",
+                    "MULTI_TOKEN_INBOUND", "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
+                    "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION",
+                    "CUSTOM_SINGLE_TOKEN", "API_KEY_AUTHENTICATION",
                     "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
                     "OAUTH_CLIENT_CREDENTIALS",
                     "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                     "OCI_SIGNATURE_VERSION1",
-                    "OAUTH_ONE_TOKEN_BASED",
-                    "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
-                    "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
-                    "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
-                    "ADD_OAUTH_CLIENT_CREDENTIALS",
-                    "OAUTH2.0_CLIENT_CREDENTIALS",
-                    "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                    "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                    "AWS_SIGNATURE_VERSION4",
-                    "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW",
-                    "CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW"
+                    "OAUTH_ONE_TOKEN_BASED", "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
+                    "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS", "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
+                    "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
+                    "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                    "AWS_SIGNATURE_VERSION4","CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
+                    "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH"
                   ]
                 }
               },
@@ -292,7 +281,7 @@
                   },
                   "then": {
                     "properties": {
-                      "scope": {
+                      "scope" : {
                         "const": "TRIGGER"
                       },
                       "securityProperties": {
@@ -311,7 +300,7 @@
                   },
                   "then": {
                     "properties": {
-                      "scope": {
+                      "scope" : {
                         "const": "TRIGGER"
                       },
                       "securityProperties": {
@@ -330,7 +319,7 @@
                   },
                   "then": {
                     "properties": {
-                      "scope": {
+                      "scope" : {
                         "const": "TRIGGER"
                       },
                       "securityProperties": {
@@ -349,7 +338,7 @@
                   },
                   "then": {
                     "properties": {
-                      "scope": {
+                      "scope" : {
                         "const": "TRIGGER"
                       },
                       "securityProperties": {
@@ -363,19 +352,15 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "MULTI_TOKEN_INBOUND"
-                          },
-                          {
-                            "const": "OAUTH2.0_OR_BASIC_AUTH_VALIDATION"
-                          }
+                          { "const": "MULTI_TOKEN_INBOUND" },
+                          { "const": "OAUTH2.0_OR_BASIC_AUTH_VALIDATION" }
                         ]
                       }
                     }
                   },
                   "then": {
                     "properties": {
-                      "scope": {
+                      "scope" : {
                         "const": "TRIGGER"
                       }
                     }
@@ -386,19 +371,15 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "OAUTH_INBOUND"
-                          },
-                          {
-                            "const": "OAUTH2.0_TOKEN_VALIDATION"
-                          }
+                          { "const": "OAUTH_INBOUND" },
+                          { "const": "OAUTH2.0_TOKEN_VALIDATION" }
                         ]
                       }
                     }
                   },
                   "then": {
                     "properties": {
-                      "scope": {
+                      "scope" : {
                         "const": "TRIGGER"
                       }
                     }
@@ -425,12 +406,8 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "CUSTOM_SINGLE_TOKEN"
-                          },
-                          {
-                            "const": "API_KEY_AUTHENTICATION"
-                          }
+                          { "const": "CUSTOM_SINGLE_TOKEN" },
+                          { "const": "API_KEY_AUTHENTICATION" }
                         ]
                       }
                     }
@@ -450,9 +427,7 @@
                         "const": "OAUTH_AUTHORIZATION_CODE_CREDENTIALS"
                       }
                     },
-                    "required": [
-                      "policy"
-                    ]
+                    "required": ["policy"]
                   },
                   "then": {
                     "properties": {
@@ -515,12 +490,8 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "OAUTH_ONE_TOKEN_BASED"
-                          },
-                          {
-                            "const": "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION"
-                          }
+                          { "const": "OAUTH_ONE_TOKEN_BASED" },
+                          { "const": "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION" }
                         ]
                       }
                     }
@@ -538,9 +509,7 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS"
-                          }
+                          { "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS" }
                         ]
                       }
                     }
@@ -558,9 +527,8 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "OAUTH2.0_CLIENT_CREDENTIALS"
-                          }
+
+                          { "const": "OAUTH2.0_CLIENT_CREDENTIALS" }
                         ]
                       }
                     }
@@ -578,9 +546,7 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          {
-                            "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
-                          }
+                          { "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS" }
                         ]
                       }
                     }
@@ -605,6 +571,38 @@
                     "properties": {
                       "securityProperties": {
                         "$ref": "#/definitions/awsSignatureVersion4SecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/jwtClientCredentialsAssertionForOAuthSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "JWT_USER_ASSERTION_FOR_OAUTH"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "securityProperties": {
+                        "$ref": "#/definitions/jwtUserAssertionForOAuthSecurityProperties_type"
                       }
                     }
                   }
@@ -653,11 +651,7 @@
                 "policyInbound",
                 "policyOutbound"
               ],
-              "not": {
-                "required": [
-                  "policy"
-                ]
-              }
+              "not": { "required": [ "policy" ] }
             }
           }
         ],
@@ -813,6 +807,7 @@
       },
       "additionalItems": false
     },
+
     "HmacValidationSecurityProperties_type": {
       "type": "array",
       "description": "HTTP HMAC Validation is a signature based authentication mechanism. The client sends HTTP requests that contain HMAC Signature constructed using parts of request",
@@ -1673,6 +1668,7 @@
       },
       "additionalItems": false
     },
+
     "policyInbound_type": {
       "type": "object",
       "properties": {
@@ -1693,7 +1689,7 @@
       "required": [
         "type"
       ],
-      "allOf": [
+      "allOf":[
         {
           "if": {
             "properties": {
@@ -1708,14 +1704,9 @@
                 "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
                 "type": "string",
                 "enum": [
-                  "DIGITAL_SIGNATURE",
-                  "HMAC_SIGNATURE_VALIDATION",
-                  "RSA_SIGNATURE_VALIDATION",
-                  "JWT_VALIDATION",
-                  "OAUTH_INBOUND",
-                  "OAUTH2.0_TOKEN_VALIDATION",
-                  "MULTI_TOKEN_INBOUND",
-                  "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
+                  "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION",
+                  "OAUTH_INBOUND", "OAUTH2.0_TOKEN_VALIDATION",
+                  "MULTI_TOKEN_INBOUND", "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
                   "BASIC_AUTH"
                 ]
               }
@@ -1734,7 +1725,7 @@
                 },
                 "then": {
                   "properties": {
-                    "scope": {
+                    "scope" : {
                       "const": "TRIGGER"
                     },
                     "securityProperties": {
@@ -1753,7 +1744,7 @@
                 },
                 "then": {
                   "properties": {
-                    "scope": {
+                    "scope" : {
                       "const": "TRIGGER"
                     },
                     "securityProperties": {
@@ -1772,7 +1763,7 @@
                 },
                 "then": {
                   "properties": {
-                    "scope": {
+                    "scope" : {
                       "const": "TRIGGER"
                     },
                     "securityProperties": {
@@ -1791,7 +1782,7 @@
                 },
                 "then": {
                   "properties": {
-                    "scope": {
+                    "scope" : {
                       "const": "TRIGGER"
                     },
                     "securityProperties": {
@@ -1805,19 +1796,15 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "MULTI_TOKEN_INBOUND"
-                        },
-                        {
-                          "const": "OAUTH2.0_OR_BASIC_AUTH_VALIDATION"
-                        }
+                        { "const": "MULTI_TOKEN_INBOUND" },
+                        { "const": "OAUTH2.0_OR_BASIC_AUTH_VALIDATION" }
                       ]
                     }
                   }
                 },
                 "then": {
                   "properties": {
-                    "scope": {
+                    "scope" : {
                       "const": "TRIGGER"
                     }
                   }
@@ -1828,19 +1815,15 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "OAUTH_INBOUND"
-                        },
-                        {
-                          "const": "OAUTH2.0_TOKEN_VALIDATION"
-                        }
+                        { "const": "OAUTH_INBOUND" },
+                        { "const": "OAUTH2.0_TOKEN_VALIDATION" }
                       ]
                     }
                   }
                 },
                 "then": {
                   "properties": {
-                    "scope": {
+                    "scope" : {
                       "const": "TRIGGER"
                     }
                   }
@@ -1871,7 +1854,7 @@
       "required": [
         "type"
       ],
-      "allOf": [
+      "allOf":[
         {
           "if": {
             "properties": {
@@ -1888,23 +1871,17 @@
                 "enum": [
                   "NONE",
                   "BASIC_AUTH",
-                  "CUSTOM_SINGLE_TOKEN",
-                  "API_KEY_AUTHENTICATION",
+                  "CUSTOM_SINGLE_TOKEN", "API_KEY_AUTHENTICATION",
                   "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
                   "OAUTH_CLIENT_CREDENTIALS",
                   "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                   "OCI_SIGNATURE_VERSION1",
-                  "OAUTH_ONE_TOKEN_BASED",
-                  "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
-                  "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
-                  "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
-                  "ADD_OAUTH_CLIENT_CREDENTIALS",
-                  "OAUTH2.0_CLIENT_CREDENTIALS",
-                  "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                  "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
-                  "AWS_SIGNATURE_VERSION4",
-                  "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW",
-                  "CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW"
+                  "OAUTH_ONE_TOKEN_BASED", "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
+                  "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS", "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
+                  "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
+                  "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
+                  "AWS_SIGNATURE_VERSION4", "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
+                  "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH"
                 ]
               }
             },
@@ -1933,12 +1910,8 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "CUSTOM_SINGLE_TOKEN"
-                        },
-                        {
-                          "const": "API_KEY_AUTHENTICATION"
-                        }
+                        { "const": "CUSTOM_SINGLE_TOKEN" },
+                        { "const": "API_KEY_AUTHENTICATION" }
                       ]
                     }
                   }
@@ -1958,9 +1931,7 @@
                       "const": "OAUTH_AUTHORIZATION_CODE_CREDENTIALS"
                     }
                   },
-                  "required": [
-                    "policy"
-                  ]
+                  "required": ["policy"]
                 },
                 "then": {
                   "properties": {
@@ -2023,12 +1994,8 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "OAUTH_ONE_TOKEN_BASED"
-                        },
-                        {
-                          "const": "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION"
-                        }
+                        { "const": "OAUTH_ONE_TOKEN_BASED" },
+                        { "const": "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION" }
                       ]
                     }
                   }
@@ -2046,9 +2013,7 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS"
-                        }
+                        { "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS" }
                       ]
                     }
                   }
@@ -2066,9 +2031,7 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS"
-                        }
+                        { "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS" }
                       ]
                     }
                   }
@@ -2086,9 +2049,7 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        {
-                          "const": "OAUTH2.0_CLIENT_CREDENTIALS"
-                        }
+                        { "const": "OAUTH2.0_CLIENT_CREDENTIALS" }
                       ]
                     }
                   }
@@ -2113,6 +2074,38 @@
                   "properties": {
                     "securityProperties": {
                       "$ref": "#/definitions/awsSignatureVersion4SecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/jwtClientCredentialsAssertionForOAuthSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "JWT_USER_ASSERTION_FOR_OAUTH"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "securityProperties": {
+                      "$ref": "#/definitions/jwtUserAssertionForOAuthSecurityProperties_type"
                     }
                   }
                 }
@@ -2198,6 +2191,7 @@
         }
       }
     },
+
     "OAuth2.0AuthorizationSecurityProperties_type": {
       "type": "array",
       "description": "(Deprecated) OAuth  Authorization Code Credentials. The authorization code grant is an OAuth flow where the resource owner is required to provide consent before an access token can be granted to the client application.",
@@ -2612,6 +2606,130 @@
               "AWS Region",
               "Service Name like S3"
             ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "jwtClientCredentialsAssertionForOAuthSecurityProperties_type": {
+      "type": "array",
+      "description": "Jwt Client Assertion. The jwt client assertion is an oauth flow where user needs to provide client assertion token before an access token can be granted to the client application. ",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Jwt client assertion managed security policies has pre-defined properties such as jwt header, payload, access token uri, signing key and optionally scope and  access token request. The name attribute is immutable and used to reference this property."
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy."
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page."
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "jwtUserAssertionForOAuthSecurityProperties_type": {
+      "type": "array",
+      "description": "Jwt User Assertion. The jwt user assertion is an oauth flow where user needs to provide client and user assertion token before an access token can be granted to the client application.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Jwt user assertion managed security policies has pre-defined properties such as jwt header, payload, access token uri, signing key and optionally scope and  access token request. The name attribute is immutable and used to reference this property."
+          },
+          "displayName": {
+            "$ref": "commons_v01.json#/definitions/displayNameString",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy."
+          },
+          "description": {
+            "$ref": "commons_v01.json#/definitions/longText",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page."
+          },
+          "shortDescription": {
+            "$ref": "commons_v01.json#/definitions/shortText",
             "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
           },
           "hidden": {

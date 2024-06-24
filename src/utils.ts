@@ -1,23 +1,23 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
 import * as _fs from 'fs';
-import * as fsExtra from 'fs-extra';
 
 import { createServer } from 'http';
 import * as path from 'path';
-import { Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } from 'rxjs';
+import { EMPTY, Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } from 'rxjs';
 import { catchError, defaultIfEmpty, delay, filter, map, skipWhile, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
 import { log } from './logger';
-import { ensureOpenWorkspace, initWorkspace } from './workspace-manager';
+import { initWorkspace } from './workspace-manager';
 
-import { PostmanNs, RabAddNs } from './webview-shared-lib';
+import { OpenAPINS, PostmanNs } from './webview-shared-lib';
 
-import { isWorkSpaceInitialized } from './workspace-manager';
+import { AxiosResponse } from 'axios';
 import { ConfirmOptions, showConfirmMessage, showErrorMessage, showInfoMessage, showModal } from './utils/ui-utils';
+import { isWorkSpaceInitialized } from './workspace-manager';
 
 const defaultApiCallTimeoutInSeconds = 120;
 
@@ -107,6 +107,59 @@ export namespace workspace {
       ),
     );
 
+
+  export const detectIsOpenAPIFileWithUILoading = <T>(context: vscode.ExtensionContext, file: vscode.Uri, successCallback: () => Observable<T>) => {
+
+    let externalResolve = (val: any) => { };
+    const hidePromise = new Promise((resolve) => {
+      externalResolve = resolve;
+    });
+
+    return detectIsOpenAPIFile(file, () => of(file).pipe(
+      tap(() => message.loading(
+        {
+          message: `⏱ Converting document in progress.... This may take 5-${defaultApiCallTimeoutInSeconds} seconds.`,
+          hidePromise,
+          context,
+          isBlocking: false
+        }
+      )
+      ),
+      switchMap(
+        successCallback
+      ),
+      tap(() => externalResolve(true))
+    )
+    );
+  };
+
+  export const detectIsOpenAPIFile = <T>(file: vscode.Uri, successCallback: () => Observable<T>) => fs.isFileMatching(
+    file,
+    (doc) => {
+      const specFile = JSON.parse(doc.getText()) as OpenAPINS.Root;
+      return !!specFile && !!specFile.openapi && !!specFile.info?.version && !!specFile.paths;
+    },
+    (file) => from(showErrorMessage(`The offered file is not a valid postman collection. File: ['${fs.parseFilename(file)}']`))
+  )
+    .pipe(
+      switchMap(
+        (isPostman) => successCallback(),
+      ),
+    );
+
+  export const revealADDDocument = () => switchMap(
+    (documentAndResponse: {
+      response: AxiosResponse<any, any>,
+      document: vscode.TextDocument
+    }) => from(showADDDocument(documentAndResponse.document))
+      .pipe(
+        map(editor => ({
+          editor,
+          ...documentAndResponse
+        })
+        )
+      )
+  );
 
   // export const detectIsADDWithUILoading = <T extends Observable<any>>(context: vscode.ExtensionContext, file: vscode.Uri, successCallback: () => T) => {
 
@@ -419,6 +472,10 @@ export namespace fs {
     return name.replace(/[^a-zA-Z0-9-. ]/g, '_');
   };
 
+  export const getFileNameFromOpenAPIName = (name: string) => {
+    return getFileNameFromPostmanCollectionName(name);
+  };
+
   export const checkWorkspaceInitialized = () => from(isWorkSpaceInitialized())
     .pipe(
       filter(initialized => !initialized),
@@ -578,7 +635,12 @@ export namespace fs {
       );
   }
 
-  export function confirmSaveFile(file: vscode.Uri) {
+  export function confirmSaveFile(file: vscode.Uri, emitResult?: boolean) {
+    if (!file) {
+      showErrorMessage(`Unable to save the file since the file doesn't exist`);
+      return emitResult ? of(false) : EMPTY;
+    }
+
     return isFileSaved(file)
       .pipe(
         switchMap(
@@ -605,7 +667,7 @@ export namespace fs {
           log.debug(`[confirmSaveFile] isSaved [${isSaved}]`);
         }),
 
-        filter(isSaved => isSaved)
+        filter(isSaved => emitResult || isSaved)
       );
   }
 

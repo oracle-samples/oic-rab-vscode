@@ -1,11 +1,11 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "_comment": "Copyright (c) 2022-2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$id": "#schemas",
   "title": "Schemas",
   "description": "Schema of Schema",
   "type": "object",
   "patternProperties": {
-    "^[a-zA-Z0-9\\.\\-_]{0,100}$": {
+    "^[a-zA-Z][a-zA-Z0-9\\.\\-_]{0,100}$": {
       "$ref": "#/definitions/Schema"
     }
   },
@@ -139,7 +139,7 @@
       ],
       "properties": {
         "propertyName": {
-          "description": "The name of the property in the payload that will hold the discriminator value.",
+          "description":"The name of the property in the payload that will hold the discriminator value.",
           "type": "string"
         }
       },

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -10,8 +10,8 @@ import { log } from './logger';
 import * as addLocate from './commands/add-locate';
 // import * as convertPostmanCollection from './commands/convert-postman-collection';
 import * as downloadRABBundle from './commands/download-rab-bundle';
-import * as removeRABBundle from './commands/remove-rab-bundle';
 import * as registerRABBundle from './commands/register-rab-bundle';
+import * as removeRABBundle from './commands/remove-rab-bundle';
 
 import * as createRabBundle from './commands/create-rab-bundle';
 import * as importRABBundle from './commands/import-rab-bundle';
@@ -23,18 +23,16 @@ import * as insertSecurityPolicy from './commands/insert-security-policy';
 import * as insertTestConnection from './commands/insert-test-connection';
 import * as validateAdd from './commands/validate-add';
 import * as versionCheck from './commands/version-check';
-import * as convertADD from './commands/convert-add';
 
 import * as addListProvider from './providers/add-list-provider';
 import * as addOutlineProvider from './providers/add-outline-provider';
 import * as postmanSelectRequrestWebview from './providers/copilot-webview';
 import * as profileListProvider from './providers/profile-list-provider';
 
-import { init as initProfileManager, get as getProfileManager } from './profile-manager-provider';
+import { get as getProfileManager, init as initProfileManager } from './profile-manager-provider';
 
 async function registerCommands(context: vscode.ExtensionContext) {
   addLocate.register(context);
-  convertADD.register(context);
   removeRABBundle.register(context);
   explorerOutlineActionsNew.register(context);
   explorerOutlineTriggersNew.register(context);

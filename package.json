@@ -1,11 +1,11 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "_comment": "Copyright (c) 2022-2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "name": "oic-rapid-adapter-builder",
   "displayName": "Oracle Integration Cloud Rapid Adapter Builder",
   "description": "Oracle Integration Cloud Rapid Adapter Builder is a set of tools that makes it easier for you to validate, develop and deploy the next-gen RAB adapters for Oracle Integration Cloud (OIC) straight from VS Code.",
   "publisher": "Oracle",
   "license": "UPL",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "icon": "media/images/logo.png",
   "engines": {
     "vscode": "^1.73.0"
@@ -98,11 +98,15 @@
       },
       {
         "command": "orab.add.convert",
-        "title": "RAB: Convert OpenAPI document"
+        "title": "RAB: Convert OpenAPI document..."
+      },
+      {
+        "command": "orab.add.convert.append",
+        "title": "RAB: Update actions with OpenAPI document..."
       },
       {
         "command": "orab.convert.postman.document",
-        "title": "RAB: Convert Postman Collection"
+        "title": "RAB: Convert Postman Collection..."
       },
       {
         "command": "orab.webview.copilot.open.postman.convert",
@@ -168,6 +172,10 @@
           "when": "false"
         },
         {
+          "command": "orab.add.convert.append",
+          "when": "false"
+        },
+        {
           "command": "orab.convert.postman.document",
           "when": "false"
         },
@@ -222,9 +230,14 @@
           "group": "orab@2"
         },
         {
-          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceExtname == .json",
+          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceFilename =~ /^openapi\\.resource\\.json$/",
           "command": "orab.add.convert",
           "group": "orab@3"
+        },
+        {
+          "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceFilename =~ /^openapi\\.resource\\.json$/",
+          "command": "orab.add.convert.append",
+          "group": "orab@4" 
         }
       ],
       "editor/context": [

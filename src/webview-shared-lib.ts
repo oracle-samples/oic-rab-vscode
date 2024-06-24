@@ -1,5 +1,5 @@
 /**
- * Copyright © 2023, Oracle and/or its affiliates.
+ * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -13,6 +13,10 @@ export namespace SharedNs {
     postmanDoneConvertDocument: 'postmanDoneConvertDocument' as 'postmanDoneConvertDocument',
     postmanSelectReady: 'postmanSelectReady' as 'postmanSelectReady',
 
+    openAPISelectRequests: 'openAPISelectRequests' as 'openAPISelectRequests',
+    openAPISelectReady: 'openAPISelectReady' as 'openAPISelectReady',
+    openAPIDoneConvertDocument: 'openAPIDoneConvertDocument' as 'openAPIDoneConvertDocument',
+
     rabAddReady: 'rabAddReady' as 'rabAddReady',
 
     rabAddSave: 'rabAddSave' as 'rabAddSave',
@@ -21,8 +25,11 @@ export namespace SharedNs {
   export const ExtensionCommandEnum = {
     openCopilotPostmanConvert: 'orab.webview.copilot.open.postman.convert' as 'openCopilotPostmanConvert',
     openPostmanConvertConverDocument: 'orab.convert.postman.document' as 'openPostmanConvertConverDocument',
+    openOpenAPIConvertNewDocument: 'orab.add.convert' as 'openOpenAPIConvertNewDocument',
+    openOpenAPIConvertAppendDocument: 'orab.add.convert.append' as 'openOpenAPIConvertAppendDocument',
     openCopilotAssistant: 'orab.webview.copilot.open.assistant' as 'openCopilotAssistant',
     updatePostmanRawData: 'updatePostmanRawData' as 'updatePostmanRawData',
+    updateOpenAPIRawData: 'updateOpenAPIRawData' as 'updateOpenAPIRawData',
     updateEntryType: 'updateEntryType' as 'updateEntryType',
     loadRabAddData: 'loadRabAddData' as 'loadRabAddData',
     routerNavigateTo: 'routerNavigateTo' as 'routerNavigateTo',
@@ -31,6 +38,7 @@ export namespace SharedNs {
   export enum WebviewRouteEnum {
     Root = `/`,
     PostmanAdd = `postman/add`,
+    OpenAPIAdd = `openapi/add`,
     Copilot = `copilot`,
 
   }
@@ -43,6 +51,7 @@ export namespace SharedNs {
     items: string[];
     selectedItemForTestConnection?: string;
   }
+  export type WebviewCommandPayloadOpenAPISelectRequests = OpenAPINS.UIStateForBackend
   export interface WebviewCommandPayloadRabAddSave {
     addToSave: RabAddNs.Root;
     vsCodeEditorConfig?: VsCoderEditorConfig;
@@ -53,22 +62,45 @@ export namespace SharedNs {
     webviewLifecycle: {
       type: 'close'
     };
+
     postmanSelectRequests: Omit<WebviewCommandPayloadPostmanSelectRequests, "selectedItemForTestConnection">;
     postmanDoneConvertDocument: WebviewCommandPayloadPostmanSelectRequests;
     postmanSelectReady: any;
+
+    openAPISelectRequests: WebviewCommandPayloadOpenAPISelectRequests;
+    openAPIDoneConvertDocument: WebviewCommandPayloadOpenAPISelectRequests;
+    openAPISelectReady: any;
+    
     rabAddReady: any;
 
     rabAddSave: WebviewCommandPayloadRabAddSave;
   }
 
+  export enum VscodeCommandPayloadEntryType {
+    PostmanConvertDocument = `PostmanConvertDocument`,
+    PostmanAddRequest = `PostmanAddRequest`,
+    OpenAPIConvertDocument = `OpenAPIConvertDocument`,
+    OpenAPIAddRequest = `OpenAPIAddRequest`,
+  }
 
   export type VscodeCommandPayload = {
     openCopilotPostmanConvert: any;
     openCopilotAssistant: any;
+
     updatePostmanRawData: PostmanNs.Root;
-    updateEntryType: 'convertDocument' | 'addRequest';
+    updateOpenAPIRawData: {
+      openapi: OpenAPINS.Root,
+      add?: RabAddNs.Root,
+    };
+
+    updateEntryType: VscodeCommandPayloadEntryType;
+
     openPostmanConvertConverDocument: any;
-    loadRabAddData: any;
+
+    openOpenAPIConvertNewDocument: any;
+    openOpenAPIConvertAppendDocument: any;
+    
+    loadRabAddData: RabAddNs.Root;
     routerNavigateTo: {
       href: WebviewRouteEnum;
     };
@@ -375,6 +407,7 @@ export namespace RabAddNs {
     urn: string
     input?: Input
     output?: Input,
+    $refOpenapi?: string,
 
     configuration?: Configuration[]
   }
@@ -1491,6 +1524,96 @@ export namespace RabAddNs {
 
 }
 
+export namespace OpenAPINS {
+
+  export interface UIStateActionDeltaAdd {
+    actionRef: string
+  }
+
+  export interface UIStateActionDeltaItem {
+    actionRef: string,
+    actionDisplayName: string,
+  }
+
+  export interface UIStateActionDeltaRemove extends UIStateActionDeltaItem {
+    // force?: boolean
+  }
+
+  export interface UIStateForBackend {
+    actionDelta: {
+      add: UIStateActionDeltaAdd[],
+      remove: UIStateActionDeltaRemove[],
+      selected: UIStateActionDeltaAdd[],
+    }
+  }
+
+  export type Ref = {
+    $ref?: string
+  }
+
+  export type MethodDefinition = {
+
+    isSelected?: boolean;
+    fullPathId?: string;
+
+    summary: string
+    requestBody?: {
+      [key: string]: any
+    }
+    operationId: string
+    tags?: Array<string>
+    parameters?: Array<{
+      name: string
+      in: string
+      description: string
+      required: boolean
+      schema: {
+        [key: string]: any
+      }
+    }>
+    responses?: {
+      [key: string]: any
+    }
+  };
+  export type PathDefinition = {
+    [key: string]: MethodDefinition;
+    
+  };
+  export type Root = {
+    openapi: string
+    info: {
+      version: string
+      title: string
+      license: {
+        name: string
+      }
+    }
+    servers: Array<{
+      url: string
+    }>
+    tags?: Array<{
+      name: string
+      description?: string
+      externalDocs?: {
+        description: string
+        url: string
+      }
+    }>
+    paths: {
+      [key: string]: PathDefinition
+    }
+    components: {
+      schemas: {
+        [key: string]: {
+          [key: string]: any
+        }
+      }
+    }
+
+
+
+  }
+}
 
 
 export namespace PostmanNs {

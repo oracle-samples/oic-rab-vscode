@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.2.0] - 2024-06-24
+
+### Added
+
+- OpenAPI Support.
+
+### Fixed
+
+- Improve log messages.
+
 ## [1.1.0] - 2024-04-16
 
 ### Added

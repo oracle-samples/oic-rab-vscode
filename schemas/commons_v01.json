@@ -1,5 +1,5 @@
 {
-  "_comment": "Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
+  "_comment": "Copyright (c) 2022-2024, Oracle and/or its affiliates. All rights reserved. This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "#commons",
   "type": "object",
@@ -138,6 +138,7 @@
           "$ref": "#/definitions/flowPattern"
         }
       ]
+
     },
     "stringOrArgumentJQPattern": {
       "$ref": "#/definitions/nonEmptyString"
@@ -306,17 +307,17 @@
     "httpMethod": {
       "description": "A String representing an HTTP request method. Many of these are not frequently used in practice. In practice, Simple HTTP method contains the frequently used http methods.",
       "type": "string",
-      "enum": [
-        "GET",
-        "HEAD",
-        "PUT",
-        "POST",
-        "PATCH",
-        "DELETE",
-        "CONNECT",
-        "OPTIONS",
-        "TRACE"
-      ]
+        "enum": [
+          "GET",
+          "HEAD",
+          "PUT",
+          "POST",
+          "PATCH",
+          "DELETE",
+          "CONNECT",
+          "OPTIONS",
+          "TRACE"
+        ]
     },
     "simpleHttpMethod": {
       "description": "A String representing a simple HTTP request method..",

@@ -5,12 +5,13 @@
 
 import * as vscode from 'vscode';
 
-import { exportRABBundle } from '../workspace-manager';
 import { log } from '../logger';
 import { showErrorMessage } from '../utils/ui-utils';
+import { exportRABBundle } from '../workspace-manager';
 
 
-async function callback(file: vscode.Uri): Promise<any> {
+async function callback(file?: vscode.Uri): Promise<any> {
+  
   log.info("Creating RAB bundle in current workspace");
   try {
     await exportRABBundle();
