@@ -237,8 +237,31 @@ function handleWebviewLifecycle() {
 
 }
 
-const notifyPostmanWebview = (file: vscode.Uri, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => {
-  UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updatePostmanRawData, JSON.parse(readFileSync(file.fsPath, 'utf8')) as PostmanNs.Root);
+const notifyPostmanWebview = ({
+  postmanFile,
+  addFile,
+  entryType
+}: {
+  postmanFile: vscode.Uri,
+  addFile?: vscode.Uri,
+  entryType: SharedNs.VscodeCommandPayload["updateEntryType"]
+}) => {
+
+  let ADD: RabAddNs.Root | undefined = undefined;
+  try {
+    if (addFile) {
+      ADD = JSON.parse(readFileSync(addFile.fsPath, 'utf8'));
+    }
+  } catch (error) {
+    log.error(`Unable to parse adapter definition document`, error);
+    return;
+  }
+
+  UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updatePostmanRawData, {
+    postman: JSON.parse(readFileSync(postmanFile.fsPath, 'utf8')) as PostmanNs.Root,
+    add: ADD
+  });
+
   UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updateEntryType, entryType);
 };
 
@@ -304,8 +327,17 @@ const openWebview = ({
 
     handleWebviewRouting(SharedNs.WebviewRouteEnum.PostmanAdd),
     handleWebviewLifecycle(),
-    notifyPostmanWebview(file, entryType),
-    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectReady, () => notifyPostmanWebview(file, entryType)),
+    notifyPostmanWebview({
+      postmanFile: file,
+      entryType,
+      addFile
+    }),
+    UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectReady, () => notifyPostmanWebview({
+      postmanFile: file,
+      entryType,
+      addFile
+    }
+    )),
     UtilsNs.listenWebview(SharedNs.WebviewCommandEnum.postmanSelectRequests, (data) => {
 
       const observable = fs.checkWorkspaceInitialized().pipe(
@@ -412,7 +444,7 @@ const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryT
           switchMap(
             () => openWebview(
               {
-                file, context, entryType, 
+                file, context, entryType,
                 addFile: entryType === SharedNs.VscodeCommandPayloadEntryType.PostmanAddRequest ? getAddFile() : undefined
               }
             )
@@ -449,9 +481,9 @@ const registerOpenAPIConvertCallback = (context: vscode.ExtensionContext, entryT
         .pipe(
           tap(() => UtilsNs.showWebview(context)),
           tap(() => showInfoMessage(
-            entryType === SharedNs.VscodeCommandPayloadEntryType.OpenAPIAddRequest ? 
-            "Select the OpenAPI paths and methods to add" 
-              : "Select the OpenAPI paths and methods to convert" 
+            entryType === SharedNs.VscodeCommandPayloadEntryType.OpenAPIAddRequest ?
+              "Select the OpenAPI paths and methods to add"
+              : "Select the OpenAPI paths and methods to convert"
           )),
           switchMap(
             () => openWebview({
