@@ -14,6 +14,16 @@
   "maxProperties": 600,
   "definitions": {
     "Schema": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/BasicSchema"
+        },
+        {
+          "$ref": "#/definitions/PolymorphicSchema"
+        }
+      ]
+    },
+    "BasicSchema": {
       "type": "object",
       "properties": {
         "type": {
@@ -28,10 +38,12 @@
           ]
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1000
         },
         "format": {
           "type": "string",
@@ -53,70 +65,77 @@
         "items": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Schema"
+              "$ref": "#/definitions/BasicSchema"
             },
             {
               "$ref": "#/definitions/Reference"
+            },
+            {
+              "$ref": "#/definitions/PolymorphicSchema"
             }
           ]
-        },
-        "allOf": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/Schema"
-              },
-              {
-                "$ref": "#/definitions/Reference"
-              }
-            ]
-          }
-        },
-        "oneOf": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/Schema"
-              },
-              {
-                "$ref": "#/definitions/Reference"
-              }
-            ]
-          }
-        },
-        "anyOf": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/Schema"
-              },
-              {
-                "$ref": "#/definitions/Reference"
-              }
-            ]
-          }
-        },
-        "discriminator": {
-          "$ref": "#/definitions/Discriminator"
         },
         "properties": {
           "type": "object",
           "additionalProperties": {
             "oneOf": [
               {
-                "$ref": "#/definitions/Schema"
+                "$ref": "#/definitions/BasicSchema"
               },
               {
                 "$ref": "#/definitions/Reference"
+              },
+              {
+                "$ref": "#/definitions/PolymorphicSchema"
               }
+            ]
+          },
+          "minProperties": 1
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "array"
+              }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "required": [
+              "items"
+            ]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "object"
+              }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "properties": {
+                "minProperties": 1
+              }
+            },
+            "required": [
+              "properties"
             ]
           }
         }
-      },
-      "additionalProperties": false
+      ]
     },
     "Reference": {
       "type": "object",
@@ -141,6 +160,16 @@
         "propertyName": {
           "description":"The name of the property in the payload that will hold the discriminator value.",
           "type": "string"
+        },
+        "mapping": {
+          "description":"An object to hold mappings between payload values and schema names or references.",
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9\\.\\-_]{0,100}$": {
+              "type": "string",
+              "pattern": "#/schemas/[a-zA-Z0-9\\.\\-_]{0,100}$"
+            }
+          }
         }
       },
       "additionalProperties": false
@@ -158,6 +187,62 @@
         }
       },
       "additionalProperties": false
+    },
+    "PolymorphicSchema": {
+      "type": "object",
+      "properties": {
+        "allOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        },
+        "oneOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        },
+        "anyOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        },
+        "discriminator": {
+          "$ref": "#/definitions/Discriminator"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "oneOf": {
+            },
+            "discriminator": {
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "anyOf": {
+            },
+            "discriminator": {
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "allOf": {
+            },
+            "discriminator": {
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     }
   }
 }
