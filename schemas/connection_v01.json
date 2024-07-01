@@ -21,9 +21,6 @@
       ],
       "minLength": 6,
       "maxLength": 256
-    },
-    "connectionInstance": {
-      "$ref": "#/definitions/ConnectionInstance"
     }
   },
   "required": [
@@ -266,7 +263,7 @@
                     "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
                     "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                     "AWS_SIGNATURE_VERSION4","CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
-                    "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH","OCI_SERVICE_INVOCATION"
+                    "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH"
                   ]
                 }
               },
@@ -607,22 +604,6 @@
                       "securityProperties": {
                         "$ref": "#/definitions/jwtUserAssertionForOAuthSecurityProperties_type"
                       }
-                    }
-                  }
-                },
-                {
-                  "if": {
-                    "properties": {
-                      "policy": {
-                        "const": "OCI_SERVICE_INVOCATION"
-                      }
-                    }
-                  },
-                  "then": {
-                    "not": {
-                      "required": [
-                        "securityProperties"
-                      ]
                     }
                   }
                 }
@@ -1900,7 +1881,7 @@
                   "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
                   "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                   "AWS_SIGNATURE_VERSION4", "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
-                  "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH","OCI_SERVICE_INVOCATION"
+                  "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH"
                 ]
               }
             },
@@ -2789,74 +2770,6 @@
         "additionalProperties": false
       },
       "additionalItems": false
-    },
-    "ConnectionInstance": {
-      "title": "Connection Instance",
-      "description": "Pre-defined connection instance for system adapter.",
-      "type": "object",
-      "required": [
-        "id",
-        "policy"
-      ],
-      "properties": {
-        "id": {
-          "title": "Adapter ID",
-          "description": "The 'id' field identifies the adapter universally. The 'id' MUST have a namespace prefix separated from an identifier with a colon. The format is '<publisher_namespace>:<adapter_id>'.",
-          "type": "string",
-          "pattern": "^[A-Z][A-Z0-9_]{10,32}$"
-        },
-        "policy": {
-          "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
-          "type": "string",
-          "enum": [
-            "OCI_SERVICE_INVOCATION",
-            "OCI_SIGNATURE_VERSION1",
-            "NONE"
-          ]
-        },
-        "instanceProperties": {
-          "type": "object",
-          "patternProperties": {
-            "^[a-zA-Z][a-zA-Z0-9\\-_]{0,100}$": {
-              "type": "string",
-              "maxLength": 1000
-            }
-          }
-        },
-        "attachments": {
-          "type": "array",
-          "minItems": 0,
-          "maxItems": 10,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "required": [
-              "attachmentName",
-              "propertyName",
-              "content"
-            ],
-            "properties": {
-              "attachmentName": {
-                "type": "string",
-                "description":"attachment name.",
-                "maxLength": 100
-              },
-              "propertyName": {
-                "type": "string",
-                "description":"property name.",
-                "maxLength": 100
-              },
-              "content": {
-                "type": "string",
-                "description":"attachment content.",
-                "maxLength": 10000
-              }
-            },
-            "additionalProperties": false
-          }
-        }
-      },
-      "additionalProperties": false
     }
   }
 }
