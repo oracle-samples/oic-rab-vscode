@@ -87,7 +87,10 @@ export namespace SharedNs {
     openCopilotPostmanConvert: any;
     openCopilotAssistant: any;
 
-    updatePostmanRawData: PostmanNs.Root;
+    updatePostmanRawData: {
+      postman: PostmanNs.Root,
+      add?: RabAddNs.Root,
+    };
     updateOpenAPIRawData: {
       openapi: OpenAPINS.Root,
       add?: RabAddNs.Root,
