@@ -300,6 +300,26 @@ export namespace bundle {
     }
   }
 
+  export async function validate(bundle: Buffer): Promise<DefinitionValidationResponse> {
+
+    let url = `${apiRootPath}/${resource}/validate`;
+    log.debug(`Calling '${url}'`);
+    try {
+      let res = await callAPI(async () => (await getClient()).post(url, bundle, {
+        headers: {
+          'Content-Type': 'application/zip',
+        },
+      }) as Promise<AxiosResponse<DefinitionValidationResponse>>);
+      logInfoServer(res?.data);
+      return res.data;
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        logInfoServer(err.response?.data);
+      }
+      throw new RABError(`Failed to call 'POST ${url}'`, err);
+    }
+  }
+
 }
 
 /**
