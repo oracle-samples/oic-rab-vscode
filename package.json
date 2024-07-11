@@ -89,8 +89,8 @@
         "title": "Download"
       },
       {
-        "command": "orab.add.validate",
-        "title": "RAB: Validate"
+        "command": "orab.bundle.validate",
+        "title": "RAB: Validate RAB Bundle"
       },
       {
         "command": "orab.add.version-check",
@@ -160,10 +160,6 @@
           "when": "false"
         },
         {
-          "command": "orab.add.validate",
-          "when": "false"
-        },
-        {
           "command": "orab.add.version-check",
           "when": "false"
         },
@@ -209,11 +205,6 @@
         }
       ],
       "explorer/context": [
-        {
-          "when": "resourceFilename =~ /\\.add\\.json$/",
-          "command": "orab.add.validate",
-          "group": "orab"
-        },
         {
           "when": "resourceFilename =~ /\\.add\\.json$/",
           "command": "orab.add.version-check",

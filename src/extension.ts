@@ -12,6 +12,7 @@ import * as addLocate from './commands/add-locate';
 import * as downloadRABBundle from './commands/download-rab-bundle';
 import * as registerRABBundle from './commands/register-rab-bundle';
 import * as removeRABBundle from './commands/remove-rab-bundle';
+import * as validateRABBundle from './commands/validate-rab-bundle';
 
 import * as createRabBundle from './commands/create-rab-bundle';
 import * as importRABBundle from './commands/import-rab-bundle';
@@ -21,7 +22,6 @@ import * as explorerOutlineTriggersNew from './commands/explorer-outline-trigger
 import * as initWorkspace from './commands/init-workspace';
 import * as insertSecurityPolicy from './commands/insert-security-policy';
 import * as insertTestConnection from './commands/insert-test-connection';
-import * as validateAdd from './commands/validate-add';
 import * as versionCheck from './commands/version-check';
 
 import * as addListProvider from './providers/add-list-provider';
@@ -41,9 +41,9 @@ async function registerCommands(context: vscode.ExtensionContext) {
   insertSecurityPolicy.register(context);
   insertTestConnection.register(context);
   registerRABBundle.register(context);
-  validateAdd.register(context);
   versionCheck.register(context);
   createRabBundle.register(context);
+  validateRABBundle.register(context);
   importRABBundle.register(context);
 }
 
