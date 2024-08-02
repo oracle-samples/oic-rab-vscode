@@ -182,8 +182,14 @@ export namespace UtilsNs {
   const messagePreflightSet = new Set();
 
   export const notifyWebview = async <T extends keyof typeof SharedNs.ExtensionCommandEnum>(command: T, payload: SharedNs.VscodeCommandPayload[T]) => {
+
+    const preflight = SharedNs.ExtensionCommandEnum.vscodeMessagePreflight;
+    if (command === preflight) {
+      return;
+    }
+
     notifyWebview(
-      SharedNs.ExtensionCommandEnum.vscodeMessagePreflight,
+      preflight,
       {
         knock: command
       }
@@ -201,6 +207,7 @@ export namespace UtilsNs {
         command: command,
         payload
       });
+    };
   };
 
   listenWebview(
@@ -222,7 +229,6 @@ export namespace UtilsNs {
       }
 
     });
-  };
 
   const registryMap: Map<keyof typeof SharedNs.ExtensionCommandEnum, vscode.Disposable[]> = new Map();
 
