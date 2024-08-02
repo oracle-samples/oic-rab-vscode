@@ -179,14 +179,49 @@ export namespace UtilsNs {
     );
   };
 
-  export const notifyWebview = <T extends keyof typeof SharedNs.ExtensionCommandEnum>(command: T, payload: SharedNs.VscodeCommandPayload[T]) => {
+  const messagePreflightSet = new Set();
+
+  export const notifyWebview = async <T extends keyof typeof SharedNs.ExtensionCommandEnum>(command: T, payload: SharedNs.VscodeCommandPayload[T]) => {
+    notifyWebview(
+      SharedNs.ExtensionCommandEnum.vscodeMessagePreflight,
+      {
+        knock: command
+      }
+    );
+
+    while (!messagePreflightSet.has(command)) {
+      await SharedNs.delayInSeconds(0.1);
+    }
+
+    messagePreflightSet.delete(command);
+
     if (panel) {
       panel.webview.postMessage({
         target: 'webview',
         command: command,
         payload
       });
-    }
+  };
+
+  listenWebview(
+    SharedNs.WebviewCommandEnum.webviewMessagePreflight,
+    ({ knock, ack }) => {
+      if (knock) {
+        console.error(`[webviewMessagePreflight] Got knock [${knock}]`);
+        notifyWebview(
+          SharedNs.ExtensionCommandEnum.vscodeMessagePreflight,
+          {
+            ack: knock
+          }
+        );
+      } else if (ack) {
+        console.error(`[webviewMessagePreflight] Got ack [${ack}]`);
+        messagePreflightSet.add(ack);
+      } else {
+        console.error(`either knock or ack should be set`);
+      }
+
+    });
   };
 
   const registryMap: Map<keyof typeof SharedNs.ExtensionCommandEnum, vscode.Disposable[]> = new Map();

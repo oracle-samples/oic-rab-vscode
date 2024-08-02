@@ -8,6 +8,7 @@ export namespace SharedNs {
   export const WebviewCommandEnum = {
     webviewRouterReady: 'webviewRouterReady' as 'webviewRouterReady',
     webviewLifecycle: 'webviewLifecycle' as 'webviewLifecycle',
+    webviewMessagePreflight: 'webviewMessagePreflight' as 'webviewMessagePreflight',
 
     postmanSelectRequests: 'postmanSelectRequests' as 'postmanSelectRequests',
     postmanDoneConvertDocument: 'postmanDoneConvertDocument' as 'postmanDoneConvertDocument',
@@ -22,7 +23,13 @@ export namespace SharedNs {
     rabAddSave: 'rabAddSave' as 'rabAddSave',
 
   }
+
+  export type WebviewCommandEnumKey = keyof typeof WebviewCommandEnum;
+  
   export const ExtensionCommandEnum = {
+
+    vscodeMessagePreflight: 'vscodeMessagePreflight' as 'vscodeMessagePreflight',
+
     openCopilotPostmanConvert: 'orab.webview.copilot.open.postman.convert' as 'openCopilotPostmanConvert',
     openPostmanConvertConverDocument: 'orab.convert.postman.document' as 'openPostmanConvertConverDocument',
     openOpenAPIConvertNewDocument: 'orab.add.convert' as 'openOpenAPIConvertNewDocument',
@@ -34,6 +41,9 @@ export namespace SharedNs {
     loadRabAddData: 'loadRabAddData' as 'loadRabAddData',
     routerNavigateTo: 'routerNavigateTo' as 'routerNavigateTo',
   }
+
+  export type ExtensionCommandEnumKey = keyof typeof ExtensionCommandEnum;
+
 
   export enum WebviewRouteEnum {
     Root = `/`,
@@ -57,11 +67,18 @@ export namespace SharedNs {
     vsCodeEditorConfig?: VsCoderEditorConfig;
   }
 
+  export type MessagePreflightPayload = {
+    ack?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey]
+    knock?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey]
+  };
+
   export type WebviewCommandPayload = {
     webviewRouterReady: WebviewCommandPayloadWebviewRouterReady;
     webviewLifecycle: {
       type: 'close'
     };
+
+    webviewMessagePreflight: MessagePreflightPayload;
 
     postmanSelectRequests: Omit<WebviewCommandPayloadPostmanSelectRequests, "selectedItemForTestConnection">;
     postmanDoneConvertDocument: WebviewCommandPayloadPostmanSelectRequests;
@@ -84,6 +101,8 @@ export namespace SharedNs {
   }
 
   export type VscodeCommandPayload = {
+    vscodeMessagePreflight: MessagePreflightPayload;
+
     openCopilotPostmanConvert: any;
     openCopilotAssistant: any;
 
@@ -117,6 +136,9 @@ export namespace SharedNs {
     startOffset?: number,
     endOffset?: number
   }
+
+
+  export const delayInSeconds = async (timeInSeconds: number) => new Promise(resolve => setTimeout(() => resolve(true), timeInSeconds * 1000));
 
 }
 

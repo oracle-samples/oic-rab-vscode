@@ -7,8 +7,8 @@ import * as _fs from 'fs';
 
 import { createServer } from 'http';
 import * as path from 'path';
-import { EMPTY, Observable, bindNodeCallback, firstValueFrom, from, iif, of, range } from 'rxjs';
-import { catchError, defaultIfEmpty, delay, filter, map, skipWhile, switchMap, take, takeWhile, tap } from 'rxjs/operators';
+import { EMPTY, Observable, bindNodeCallback, from, iif, of, range } from 'rxjs';
+import { catchError, defaultIfEmpty, filter, map, skipWhile, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
 import { log } from './logger';
 import { initWorkspace } from './workspace-manager';
@@ -20,10 +20,6 @@ import { ConfirmOptions, showConfirmMessage, showErrorMessage, showInfoMessage, 
 import { isWorkSpaceInitialized } from './workspace-manager';
 
 const defaultApiCallTimeoutInSeconds = 120;
-
-export namespace helpers {
-  export const delayInSeconds = (timeInSeconds: number) => firstValueFrom(of(null).pipe(delay(timeInSeconds * 1000)));
-}
 
 export namespace constants {
   export const commands = {
