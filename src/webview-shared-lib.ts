@@ -69,7 +69,8 @@ export namespace SharedNs {
 
   export type MessagePreflightPayload = {
     ack?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey]
-    knock?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey]
+    knock?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey],
+    iso8601: string
   };
 
   export type WebviewCommandPayload = {

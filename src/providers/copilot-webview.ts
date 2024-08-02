@@ -179,7 +179,7 @@ export namespace UtilsNs {
     );
   };
 
-  const messagePreflightSet = new Set();
+  const messagePreflightRecord = new Map();
 
   export const notifyWebview = async <T extends keyof typeof SharedNs.ExtensionCommandEnum>(command: T, payload: SharedNs.VscodeCommandPayload[T]) => {
 
@@ -188,18 +188,20 @@ export namespace UtilsNs {
       return;
     }
 
-    notifyWebview(
-      preflight,
-      {
-        knock: command
-      }
-    );
+    let eventTime = new Date().toISOString();
 
-    while (!messagePreflightSet.has(command)) {
+    while (!messagePreflightRecord.has(command) || messagePreflightRecord.get(command).iso8601 !== eventTime) {
+      notifyWebview(
+        preflight,
+        {
+          knock: command,
+          iso8601: eventTime
+        }
+      );
       await SharedNs.delayInSeconds(0.1);
     }
 
-    messagePreflightSet.delete(command);
+    messagePreflightRecord.delete(command);
 
     if (panel) {
       panel.webview.postMessage({
@@ -212,18 +214,21 @@ export namespace UtilsNs {
 
   listenWebview(
     SharedNs.WebviewCommandEnum.webviewMessagePreflight,
-    ({ knock, ack }) => {
+    ({ knock, ack, iso8601 }) => {
       if (knock) {
         console.error(`[webviewMessagePreflight] Got knock [${knock}]`);
         notifyWebview(
           SharedNs.ExtensionCommandEnum.vscodeMessagePreflight,
           {
-            ack: knock
+            ack: knock,
+            iso8601
           }
         );
       } else if (ack) {
         console.error(`[webviewMessagePreflight] Got ack [${ack}]`);
-        messagePreflightSet.add(ack);
+        messagePreflightRecord.set(ack, {
+          iso8601
+        });
       } else {
         console.error(`either knock or ack should be set`);
       }
