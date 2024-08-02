@@ -28,8 +28,6 @@ export namespace SharedNs {
   
   export const ExtensionCommandEnum = {
 
-    vscodeMessagePreflight: 'vscodeMessagePreflight' as 'vscodeMessagePreflight',
-
     openCopilotPostmanConvert: 'orab.webview.copilot.open.postman.convert' as 'openCopilotPostmanConvert',
     openPostmanConvertConverDocument: 'orab.convert.postman.document' as 'openPostmanConvertConverDocument',
     openOpenAPIConvertNewDocument: 'orab.add.convert' as 'openOpenAPIConvertNewDocument',
@@ -69,9 +67,8 @@ export namespace SharedNs {
 
   export type MessagePreflightPayload = {
     ack?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey]
-    knock?: (typeof ExtensionCommandEnum)[ExtensionCommandEnumKey] | (typeof WebviewCommandEnum)[WebviewCommandEnumKey],
-    iso8601: string
-  };
+    isUnlisten?: boolean
+    };
 
   export type WebviewCommandPayload = {
     webviewRouterReady: WebviewCommandPayloadWebviewRouterReady;
@@ -102,7 +99,6 @@ export namespace SharedNs {
   }
 
   export type VscodeCommandPayload = {
-    vscodeMessagePreflight: MessagePreflightPayload;
 
     openCopilotPostmanConvert: any;
     openCopilotAssistant: any;
