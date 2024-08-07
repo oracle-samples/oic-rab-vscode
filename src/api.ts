@@ -14,7 +14,7 @@ import { log } from './logger';
 import { Profile } from './profile-manager';
 import { get as getProfileManager } from './profile-manager-provider';
 import { RABError } from './utils/ui-utils';
-import { OpenAPINS, PostmanNs, SharedNs } from './webview-shared-lib';
+import { OpenAPINS, PostmanNs, RabAddNs, SharedNs } from './webview-shared-lib';
 
 export const timeout = 120;
 
@@ -376,8 +376,44 @@ export namespace conversion {
 
   const resource = 'adapterDefinitions';
 
+  export async function compress(add: vscode.Uri, compressConfig?: SharedNs.WebviewCommandPayloadADDCompressRequests) {
+    let endpoint = `${apiRootPath}/${resource}/compress`;
+    log.debug(`Calling '${endpoint}'`);
+    let client = await getClient();
+    const form = new FormData();
+    form.append('targetADD', add instanceof vscode.Uri ? fs.readFileSync(add.fsPath, 'utf8') : add);
+    log.debug("Set 'targetADD'");
+  
+
+    const compressConfigEntries: [string, any][] = [];
+
+    // part 3
+    if (compressConfig?.remove_dangling) {
+      compressConfigEntries.push(
+        [
+          SharedNs.WebviewCommandPayloadADDCompressRequestEnum.remove_dangling,
+          compressConfig.remove_dangling
+        ]
+      );
+    }
+
+
+    if (compressConfigEntries.length) {
+      log.debug("Set 'postmanConfigRequest'");
+      form.append('postmanConfigRequest', JSON.stringify(Object.fromEntries(compressConfigEntries)));
+    }
+
+    return callAPI(() => client.post(endpoint, form) as Promise<AxiosResponse<RabAddNs.Root>>, (err) => {
+      if (err instanceof AxiosError && err.response?.status !== 404) {
+        logInfoServer(err.response?.data);
+      }
+      throw new RABError(`Failed to call 'POST ${endpoint}'`, err);
+    });
+  }
+
+
   export async function postman(postmanCollection: vscode.Uri | string, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, add?: vscode.Uri | string) {
-    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=postman`;
+    let endpoint = `${apiRootPath}/${resource}/convert?type=postman`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
     const form = new FormData();
@@ -435,7 +471,7 @@ export namespace conversion {
 
   export async function openapi(openAPIDocument: vscode.Uri | string, openAPIConfig?: SharedNs.WebviewCommandPayloadOpenAPISelectRequests, add?: vscode.Uri | string): Promise<any> {
    
-    let endpoint = `${apiRootPath}/adapterDefinitions/convert?type=openapi`;
+    let endpoint = `${apiRootPath}/${resource}/convert?type=openapi`;
     log.debug(`Calling '${endpoint}'`);
     let client = await getClient();
     const form = new FormData();

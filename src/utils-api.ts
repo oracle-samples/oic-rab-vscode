@@ -2,6 +2,7 @@
  * Copyright © 2022-2024, Oracle and/or its affiliates.
  * This software is licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
+import path from 'path';
 import { Observable, from, of } from 'rxjs';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import * as vscode from 'vscode';
@@ -55,7 +56,7 @@ export const detectIsADDValidRemote = (getFile = () => getAddFile()!) => fs.chec
     )
   ),
   tap(
-    () => showInfoMessage(`🛜 Verifying the adapter definition [${workspace.presetFileMapAbs.definitionsMainAddJson}]`)
+    () => showInfoMessage(`🛜 Verifying the adapter definition [${getFile().fsPath?.split(path.sep).pop()}]`)
   ),
   switchMap(
     () => registration.validateAdd(getFile()

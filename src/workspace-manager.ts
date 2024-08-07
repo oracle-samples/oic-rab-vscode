@@ -18,6 +18,7 @@ import * as openapiSchema from "./openapi/openapi_v3.0.json";
 import { log } from './logger';
 import { fs as fsUtils } from './utils';
 import { RABError, showErrorMessage, showInfoMessage } from './utils/ui-utils';
+import { RabAddNs } from './webview-shared-lib';
 
 /**
  * This function ensures one open workspace.
@@ -209,6 +210,16 @@ export function getAddFile(fileName: string = "main", allowFallBack?: boolean, i
 
   return ret;
 
+}
+
+export function getAddName(addFile: vscode.Uri) {
+  try {
+    const add = JSON.parse(fs.readFileSync(addFile.fsPath, 'utf8')) as RabAddNs.Root;
+    return add?.info?.displayName;
+  } catch (error) {
+    log.error(`Unable to parse ADD ${addFile.fsPath}`);
+    return '';
+  }
 }
 
 export class AdapterBundle {

@@ -7,13 +7,12 @@ import * as vscode from 'vscode';
 
 import * as _fs from 'fs';
 
-import { bindNodeCallback, catchError, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
+import { bindNodeCallback, firstValueFrom, from, map, switchMap } from 'rxjs';
 import * as api from '../api';
 
-import { log } from '../logger';
 import { fs, workspace } from '../utils';
-import { showErrorMessage, withProgress } from '../utils/ui-utils';
 import { PostmanNs, SharedNs } from '../webview-shared-lib';
+import { callApiAndShowADDDocument } from './add-operation-helper';
 
 
 const getPostmanCollection = (postmanFile: vscode.Uri) => bindNodeCallback(_fs.readFile)(postmanFile.fsPath).pipe(
@@ -27,66 +26,18 @@ const getPostmanCollectionNameAsFileName = (postmanFile: vscode.Uri) => getPostm
   map(postmanCollectionName => fs.getFileNameFromPostmanCollectionName(postmanCollectionName))
 );
 
-export const callPostmanConversionApiAndShowDocument = (postmanFile: vscode.Uri, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, addFile?: vscode.Uri,) => 
-  fs.checkWorkspaceInitialized()
-  
-  .pipe(
-
-    switchMap(
-      () => getPostmanCollectionNameAsFileName(postmanFile)
-    ),
-  
-    switchMap(
-      (postmanCollectionName) => from(
-        withProgress(
-          'Converting Postman collection...',
-          () => api.conversion.postman(postmanFile, postmanConfig, !!addFile ? addFile : undefined)
-        )
-      ).pipe(
-        map(response => ({
-          postmanCollectionName,
-          response,
-        }))
-      )
-    ),
-
-    switchMap(
-      ({ postmanCollectionName, response }) => workspace.detectOverrideAndOpenADDDocument(postmanCollectionName, SharedNs.ADDJsonStringify(response.data))
-      .pipe(
-        map(
-          (document) => ({
-            response,
-            document
-          })
-        ),
-      )
-    ),
-
-    workspace.revealADDDocument(),
-    
-    tap(({ editor, response }) => {
-      let source = editor.document.getText();
-      let range = new vscode.Range(editor.document.positionAt(0), editor.document.positionAt(source.length));
-      editor.edit(edit => {
-        edit.replace(range, SharedNs.ADDJsonStringify(response?.data));
-        
-      }).then(ret => {
-        setTimeout(() => {
-          vscode.commands.executeCommand('orab.explorer.outline.refresh');
-        }, 1000);
-      });
-    }),
-
-
-    catchError(err => {
-      log.error("❌ Conversion failed", err);
-      api.logInfoServer(err?.cause?.message);
-      api.logInfoServer(err?.cause?.response?.data);
-      showErrorMessage("❌ Conversion failed");
-      return throwError(() => err);
-    })
+export const callPostmanConversionApiAndShowDocument = async (postmanFile: vscode.Uri, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, addFile?: vscode.Uri,) =>  {
+  return callApiAndShowADDDocument(
+    {
+      operationName: `Converting Postman Collection ${fs.parseFilename(postmanFile)}`,
+      newAddName: await firstValueFrom(getPostmanCollectionNameAsFileName(postmanFile)),
+      apiCall: (postmanFile, postmanConfig, addFile) => api.conversion.postman(postmanFile, postmanConfig),
+      file1: postmanFile,
+      config: postmanConfig,
+      file2: addFile
+    }
   );
-
+}
 export function postmanConvertCallback(file: vscode.Uri, context: vscode.ExtensionContext, postmanConfig: SharedNs.WebviewCommandPayloadPostmanSelectRequests) {
 
   const observable = fs.checkWorkspaceInitialized().pipe(
@@ -94,7 +45,7 @@ export function postmanConvertCallback(file: vscode.Uri, context: vscode.Extensi
       () => workspace.detectIsPostmanFileWithUILoading(
         context,
         file, 
-        () => callPostmanConversionApiAndShowDocument(file, postmanConfig)
+        () => from(callPostmanConversionApiAndShowDocument(file, postmanConfig))
       )
     )
   ) ;
