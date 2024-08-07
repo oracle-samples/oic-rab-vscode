@@ -31,7 +31,7 @@ export const callPostmanConversionApiAndShowDocument = async (postmanFile: vscod
     {
       operationName: `Converting Postman Collection ${fs.parseFilename(postmanFile)}`,
       newAddName: await firstValueFrom(getPostmanCollectionNameAsFileName(postmanFile)),
-      apiCall: (postmanFile, postmanConfig, addFile) => api.conversion.postman(postmanFile, postmanConfig),
+      apiCall: (postmanFile, postmanConfig, addFile) => api.conversion.postman(postmanFile, postmanConfig, addFile),
       file1: postmanFile,
       config: postmanConfig,
       file2: addFile
