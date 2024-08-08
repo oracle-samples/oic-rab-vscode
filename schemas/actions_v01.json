@@ -64,7 +64,29 @@
           "maxLength": 100
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [ "input" ]
+          },
+          "then": {
+            "not": {
+              "required": [ "$refOpenapi" ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [ "output" ]
+          },
+          "then": {
+            "not": {
+              "required": [ "$refOpenapi" ]
+            }
+          }
+        }
+      ]
     },
     "InputOutput": {
       "oneOf": [
@@ -346,7 +368,8 @@
         "^[a-zA-Z0-9\\.\\-_]+$": {
           "$ref": "#/definitions/Dependency"
         }
-      }
+      },
+      "minProperties": 1
     },
     "Dependency": {
       "type": "object",
@@ -361,6 +384,7 @@
           "uniqueItems": true
         }
       },
+      "required": [ "values" ],
       "additionalProperties": false
     }
   }

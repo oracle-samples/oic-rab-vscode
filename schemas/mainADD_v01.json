@@ -75,6 +75,52 @@
           }
         }
       }
+    },
+    {
+      "$comment": "connection instance is required for system connection.",
+      "if": {
+        "required": [ "info" ],
+        "properties": {
+          "info": {
+            "required": [ "systemAdapter" ],
+            "properties": {
+              "systemAdapter": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "connection": {
+            "required": [ "connectionInstance" ]
+          }
+        }
+      }
+    },
+    {
+      "$comment": "connection instance should not present for non system connection.",
+      "if": {
+        "properties": {
+          "info": {
+            "properties": {
+              "systemAdapter": {
+                "const": false
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "properties": {
+            "connection": {
+              "required": [ "connectionInstance" ]
+            }
+          }
+        }
+      }
     }
   ],
   "definitions": {

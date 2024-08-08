@@ -10,6 +10,7 @@ import path = require("path");
 
 import { filter, firstValueFrom, from, iif, of, switchMap, tap } from "rxjs";
 import { timeout as apiTimeout } from "../api";
+import { addCompressCallback } from "../commands/compress-add";
 import { callOpenAPIConversionApiAndShowDocument, openAPIConvertCallback } from "../commands/convert-openapi-document";
 import { callPostmanConversionApiAndShowDocument, postmanConvertCallback } from "../commands/convert-postman-collection";
 import { log } from "../logger";
@@ -420,6 +421,22 @@ const openWebview = ({
   ]);
 };
 
+const registerAddCompressCallback = (context: vscode.ExtensionContext) => (file: vscode.Uri) => {
+
+  const disposableList: vscode.Disposable[] = [];
+
+  const observable = detectIsADDValidRemote(() => file).pipe(
+    switchMap(
+      () => addCompressCallback(file, context)
+    )
+  );
+
+  observable.subscribe();
+
+  return disposableList;
+};
+
+
 const registerPostmanConvertCallback = (context: vscode.ExtensionContext, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => (file: vscode.Uri) => {
 
   const disposableList: vscode.Disposable[] = [];
@@ -521,6 +538,16 @@ function registerPostmanConvertConvertDocument(context: vscode.ExtensionContext)
       context,
       command: SharedNs.ExtensionCommandEnum.openPostmanConvertConverDocument,
       callback: registerPostmanConvertCallback(context, SharedNs.VscodeCommandPayloadEntryType.PostmanConvertDocument)
+    })
+  );
+}
+
+function registerAddCompressDocument(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
+    UtilsNs.registerCommandV2({
+      context,
+      command: SharedNs.ExtensionCommandEnum.openADDCompress,
+      callback: registerAddCompressCallback(context)
     })
   );
 }
@@ -685,5 +712,6 @@ export function register(context: vscode.ExtensionContext) {
   registerPostmanConvertConvertDocument(context);
   registerOpenAPIConvertAppendDocument(context);
   registerOpenAPIConvertNewDocument(context);
+  registerAddCompressDocument(context);
   // registerCopilotAssistant(context);
 }

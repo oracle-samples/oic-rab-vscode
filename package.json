@@ -97,6 +97,10 @@
         "title": "RAB: Version Check"
       },
       {
+        "command": "orab.add.compress",
+        "title": "RAB: Compress"
+      },
+      {
         "command": "orab.add.convert",
         "title": "RAB: Convert OpenAPI document..."
       },
@@ -164,6 +168,10 @@
           "when": "false"
         },
         {
+          "command": "orab.add.compress",
+          "when": "false"
+        },
+        {
           "command": "orab.add.convert",
           "when": "false"
         },
@@ -208,6 +216,11 @@
         {
           "when": "resourceFilename =~ /\\.add\\.json$/",
           "command": "orab.add.version-check",
+          "group": "orab"
+        },
+        {
+          "when": "resourceFilename =~ /\\.add\\.json$/",
+          "command": "orab.add.compress",
           "group": "orab"
         },
         {
