@@ -23,7 +23,7 @@ const getPostmanCollectionName = (postmanFile: vscode.Uri) => getPostmanCollecti
   map(postman => postman.info.name)
 );
 const getPostmanCollectionNameAsFileName = (postmanFile: vscode.Uri) => getPostmanCollectionName(postmanFile).pipe(
-  map(postmanCollectionName => fs.getFileNameFromPostmanCollectionName(postmanCollectionName))
+  map(postmanCollectionName => fs.getValidFileName(postmanCollectionName))
 );
 
 export const callPostmanConversionApiAndShowDocument = async (postmanFile: vscode.Uri, postmanConfig?: SharedNs.WebviewCommandPayloadPostmanSelectRequests, addFile?: vscode.Uri,) =>  {

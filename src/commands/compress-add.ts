@@ -9,14 +9,14 @@ import { firstValueFrom, switchMap } from 'rxjs';
 import * as api from '../api';
 import { fs } from '../utils';
 import { SharedNs } from '../webview-shared-lib';
-import { getAddName } from '../workspace-manager';
+import { getAddDisplayNameAsFilename } from '../workspace-manager';
 import { callApiAndShowADDDocument } from './add-operation-helper';
 
 export const callADDCompressApiAndShowDocument = async (addFile: vscode.Uri, config?: SharedNs.WebviewCommandPayloadADDCompressRequests) => {
   return callApiAndShowADDDocument(
     {
       operationName: `Compressing ${fs.parseFilename(addFile)}`,
-      newAddName: getAddName(addFile),
+      newAddName: getAddDisplayNameAsFilename(addFile),
       apiCall: (file1, cfg) => api.conversion.compress(file1, cfg),
       file1: addFile,
       config,

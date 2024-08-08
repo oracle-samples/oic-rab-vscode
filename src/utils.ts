@@ -468,12 +468,12 @@ export namespace fs {
     );
   };
 
-  export const getFileNameFromPostmanCollectionName = (name: string) => {
+  export const getValidFileName = (name: string) => {
     return name.replace(/[^a-zA-Z0-9-. ]/g, '_');
   };
 
   export const getFileNameFromOpenAPIName = (name: string) => {
-    return getFileNameFromPostmanCollectionName(name);
+    return getValidFileName(name);
   };
 
   export const checkWorkspaceInitialized = () => from(isWorkSpaceInitialized())
@@ -510,7 +510,7 @@ export namespace fs {
 
   export const ensureAddFile = (addFileName: string = '', defaultFileContent?: string) => {
 
-    addFileName = getFileNameFromPostmanCollectionName(addFileName);
+    addFileName = getValidFileName(addFileName);
 
     let ws = getWorkspaceRoot() || '';
 

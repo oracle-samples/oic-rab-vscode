@@ -212,10 +212,10 @@ export function getAddFile(fileName: string = "main", allowFallBack?: boolean, i
 
 }
 
-export function getAddName(addFile: vscode.Uri) {
+export function getAddDisplayNameAsFilename(addFile: vscode.Uri) {
   try {
     const add = JSON.parse(fs.readFileSync(addFile.fsPath, 'utf8')) as RabAddNs.Root;
-    return add?.info?.displayName;
+    return fsUtils.getValidFileName(add?.info?.displayName ?? '');
   } catch (error) {
     log.error(`Unable to parse ADD ${addFile.fsPath}`);
     return '';
