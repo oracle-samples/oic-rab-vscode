@@ -21,6 +21,9 @@
       ],
       "minLength": 6,
       "maxLength": 256
+    },
+    "connectionInstance": {
+      "$ref": "#/definitions/ConnectionInstance"
     }
   },
   "required": [
@@ -252,7 +255,7 @@
                     "BASIC_AUTH",
                     "OAUTH_INBOUND", "OAUTH2.0_TOKEN_VALIDATION",
                     "MULTI_TOKEN_INBOUND", "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
-                    "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION",
+                    "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION","API_KEY_VALIDATION",
                     "CUSTOM_SINGLE_TOKEN", "API_KEY_AUTHENTICATION",
                     "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
                     "OAUTH_CLIENT_CREDENTIALS",
@@ -263,7 +266,7 @@
                     "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
                     "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                     "AWS_SIGNATURE_VERSION4","CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
-                    "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH"
+                    "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH","OCI_SERVICE_INVOCATION"
                   ]
                 }
               },
@@ -343,6 +346,25 @@
                       },
                       "securityProperties": {
                         "$ref": "#/definitions/JwtValidationSecurityProperties_type"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "API_KEY_VALIDATION"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "scope" : {
+                        "const": "TRIGGER"
+                      },
+                      "securityProperties": {
+                        "$ref": "#/definitions/ApiKeyValidationSecurityProperties_type"
                       }
                     }
                   }
@@ -604,6 +626,22 @@
                       "securityProperties": {
                         "$ref": "#/definitions/jwtUserAssertionForOAuthSecurityProperties_type"
                       }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "policy": {
+                        "const": "OCI_SERVICE_INVOCATION"
+                      }
+                    }
+                  },
+                  "then": {
+                    "not": {
+                      "required": [
+                        "securityProperties"
+                      ]
                     }
                   }
                 }
@@ -1017,6 +1055,86 @@
               "Example: connectivity::jwtVerify(.request.headers.authorization; .securityProperties.signKey)",
               "alias",
               "http://hostPort/context/jwk"
+            ],
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "When set to true, a given property is masked from the securityPolicy on the connection page. If a property is marked as hidden, then it must have a default value."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When set to true, a given property is marked as required in the connection page and the user MUST provide a value for this property."
+          },
+          "default": {
+            "description": "Default value of a property if none is supplied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "hidden",
+          "required"
+        ],
+        "if": {
+          "properties": {
+            "hidden": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "default"
+          ]
+        },
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "ApiKeyValidationSecurityProperties_type": {
+      "type": "array",
+      "description": "HTTP API Key Validation is a Key based authentication mechanism. The client sends HTTP requests that contain API Key, Server validates the API key matches registered key.",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "API Key Validation policy needs information on how to lookup API key in Request, shared Key. Policy also asserts roles of user/client identity provided. For this it has pre-defined properties called `apiKeyLookup`, `apiKey`, `clientIdentity` and `clientIdentityType`. The name attribute is immutable and used to refer this property.",
+            "enum": [
+              "apiKeyLookup",
+              "apiKey",
+              "clientIdentity",
+              "clientIdentityType"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the displayName which will change the visible name of the security property under the given security policy.",
+            "examples": [
+              "API Key Location",
+              "Shared Key"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "For managed security policies, ADD developers can change the description of a property which will change the visible description of the security property under the given security policy on the connection page.",
+            "examples": [
+              "JQ Expression or Flow to lookup API key",
+              "Shared key value."
+            ]
+          },
+          "shortDescription": {
+            "type": "string",
+            "examples": [
+              "Example: .request.headers.\"api-key\"",
+              "Value"
             ],
             "description": "For managed security policies, ADD developers can change the description of a property which will change the visible ghost text of the security property under the given security policy on the connection page."
           },
@@ -1704,7 +1822,7 @@
                 "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
                 "type": "string",
                 "enum": [
-                  "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION",
+                  "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION", "API_KEY_VALIDATION",
                   "OAUTH_INBOUND", "OAUTH2.0_TOKEN_VALIDATION",
                   "MULTI_TOKEN_INBOUND", "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
                   "BASIC_AUTH"
@@ -1787,6 +1905,25 @@
                     },
                     "securityProperties": {
                       "$ref": "#/definitions/JwtValidationSecurityProperties_type"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "policy": {
+                      "const": "API_KEY_VALIDATION"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "scope" : {
+                      "const": "TRIGGER"
+                    },
+                    "securityProperties": {
+                      "$ref": "#/definitions/ApiKeyValidationSecurityProperties_type"
                     }
                   }
                 }
@@ -1881,7 +2018,7 @@
                   "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
                   "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                   "AWS_SIGNATURE_VERSION4", "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
-                  "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH"
+                  "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH","OCI_SERVICE_INVOCATION"
                 ]
               }
             },
@@ -2770,6 +2907,76 @@
         "additionalProperties": false
       },
       "additionalItems": false
+    },
+    "ConnectionInstance": {
+      "title": "Connection Instance",
+      "description": "Pre-defined connection instance for system adapter.",
+      "type": "object",
+      "required": [
+        "id",
+        "policy"
+      ],
+      "properties": {
+        "id": {
+          "title": "Adapter ID",
+          "description": "The 'id' field identifies the adapter universally. The 'id' MUST have a namespace prefix separated from an identifier with a colon. The format is '<publisher_namespace>:<adapter_id>'.",
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{10,32}$"
+        },
+        "policy": {
+          "description": "policy points to the name of the pre-defined managed security policy being used. policy should not be used in case of nonManaged security policies.",
+          "type": "string",
+          "enum": [
+            "OCI_SERVICE_INVOCATION",
+            "OCI_SIGNATURE_VERSION1",
+            "NONE",
+            "OAUTH2.0_CLIENT_CREDENTIALS",
+            "OAUTH_CLIENT_CREDENTIALS"
+          ]
+        },
+        "instanceProperties": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9\\-_]{0,100}$": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": [
+              "attachmentName",
+              "propertyName",
+              "content"
+            ],
+            "properties": {
+              "attachmentName": {
+                "type": "string",
+                "description":"attachment name.",
+                "maxLength": 100
+              },
+              "propertyName": {
+                "type": "string",
+                "description":"property name.",
+                "maxLength": 100
+              },
+              "content": {
+                "type": "string",
+                "description":"attachment content.",
+                "maxLength": 10000
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

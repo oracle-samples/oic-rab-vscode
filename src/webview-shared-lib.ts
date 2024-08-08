@@ -30,6 +30,7 @@ export namespace SharedNs {
 
     openCopilotPostmanConvert: 'orab.webview.copilot.open.postman.convert' as 'openCopilotPostmanConvert',
     openPostmanConvertConverDocument: 'orab.convert.postman.document' as 'openPostmanConvertConverDocument',
+    openADDCompress: 'orab.add.compress' as 'openADDCompress',
     openOpenAPIConvertNewDocument: 'orab.add.convert' as 'openOpenAPIConvertNewDocument',
     openOpenAPIConvertAppendDocument: 'orab.add.convert.append' as 'openOpenAPIConvertAppendDocument',
     openCopilotAssistant: 'orab.webview.copilot.open.assistant' as 'openCopilotAssistant',
@@ -59,6 +60,13 @@ export namespace SharedNs {
     items: string[];
     selectedItemForTestConnection?: string;
   }
+  export enum WebviewCommandPayloadADDCompressRequestEnum {
+    remove_dangling = 'remove_dangling'
+  }
+  export type WebviewCommandPayloadADDCompressRequests = {
+    [WebviewCommandPayloadADDCompressRequestEnum.remove_dangling]?: boolean
+  }
+
   export type WebviewCommandPayloadOpenAPISelectRequests = OpenAPINS.UIStateForBackend
   export interface WebviewCommandPayloadRabAddSave {
     addToSave: RabAddNs.Root;
@@ -115,6 +123,7 @@ export namespace SharedNs {
     updateEntryType: VscodeCommandPayloadEntryType;
 
     openPostmanConvertConverDocument: any;
+    openADDCompress: any;
 
     openOpenAPIConvertNewDocument: any;
     openOpenAPIConvertAppendDocument: any;

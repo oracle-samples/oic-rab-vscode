@@ -464,12 +464,12 @@ export namespace fs {
     );
   };
 
-  export const getFileNameFromPostmanCollectionName = (name: string) => {
+  export const getValidFileName = (name: string) => {
     return name.replace(/[^a-zA-Z0-9-. ]/g, '_');
   };
 
   export const getFileNameFromOpenAPIName = (name: string) => {
-    return getFileNameFromPostmanCollectionName(name);
+    return getValidFileName(name);
   };
 
   export const checkWorkspaceInitialized = () => from(isWorkSpaceInitialized())
@@ -506,7 +506,7 @@ export namespace fs {
 
   export const ensureAddFile = (addFileName: string = '', defaultFileContent?: string) => {
 
-    addFileName = getFileNameFromPostmanCollectionName(addFileName);
+    addFileName = getValidFileName(addFileName);
 
     let ws = getWorkspaceRoot() || '';
 
@@ -547,7 +547,7 @@ export namespace fs {
  * @returns 
  */
   export function parseFilename(file: vscode.Uri) {
-    let arr = file.fsPath?.split('/');
+    let arr = file.fsPath?.split(path.sep);
     return arr[arr.length - 1];
   }
 
@@ -645,7 +645,7 @@ export namespace fs {
             of(true),
             of(file)
               .pipe(
-                map((file) => file.path.split('/').pop()!),
+                map((file) => file.path.split(path.sep).pop()!),
                 switchMap((fileName) => showConfirmMessage(`${fileName} should be saved before continue.`, {
                   yesText: "Save and proceed",
                   useNotification: true
