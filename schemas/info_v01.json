@@ -61,11 +61,6 @@
         "1.0"
       ]
     },
-    "systemAdapter": {
-      "type": "boolean",
-      "title": "System Adapter",
-      "description": "This setting allows the adapter runs as a system adapter."
-    },
     "categories": {
       "title": "Categories",
       "description": "The categories that applies to the adapter's capabilities, typically associated with the third party system for which the adapter provides integration functionality.",
