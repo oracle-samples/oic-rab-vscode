@@ -39,7 +39,7 @@ export const callApiAndShowADDDocument = <CONFIG, RESDATA, RESPONSE extends Axio
   .pipe(
 
     tap(
-      () => showInfoMessage(`${operationName} is in progress...`)
+      () => showInfoMessage(`Start ${operationName}...`)
     ),
 
     switchMap(
@@ -83,7 +83,7 @@ export const callApiAndShowADDDocument = <CONFIG, RESDATA, RESPONSE extends Axio
     }),
 
     tap(
-      () => showInfoMessage(`${operationName} is done.`)
+      () => showInfoMessage(`Finish ${operationName}.`)
     ),
 
     catchError(err => {

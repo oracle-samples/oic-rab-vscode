@@ -20,6 +20,8 @@ import { showErrorMessage, showInfoMessage } from "../utils/ui-utils";
 import { OpenAPINS, PostmanNs, RabAddNs, SharedNs } from "../webview-shared-lib";
 import { getAddFile } from "../workspace-manager";
 
+
+const messagePreflightRecord = new Map();
 export namespace UtilsNs {
 
   export let panel: vscode.WebviewPanel | undefined;
@@ -180,14 +182,19 @@ export namespace UtilsNs {
     );
   };
 
-  export const notifyWebview = <T extends keyof typeof SharedNs.ExtensionCommandEnum>(command: T, payload: SharedNs.VscodeCommandPayload[T]) => {
+  export const notifyWebview = async <T extends keyof typeof SharedNs.ExtensionCommandEnum>(command: T, payload: SharedNs.VscodeCommandPayload[T]) => {
+
+    while (!messagePreflightRecord.get(command)) {
+      await SharedNs.delayInSeconds(0.5);
+    }
+
     if (panel) {
       panel.webview.postMessage({
         target: 'webview',
         command: command,
         payload
       });
-    }
+    };
   };
 
   const registryMap: Map<keyof typeof SharedNs.ExtensionCommandEnum, vscode.Disposable[]> = new Map();
@@ -224,6 +231,22 @@ function handleWebviewRouting(href: SharedNs.WebviewRouteEnum) {
       href
     });
   });
+
+}
+
+function handlePreflight() {
+
+  return UtilsNs.listenWebview(
+    SharedNs.WebviewCommandEnum.webviewMessagePreflight,
+    ({ ack, isUnlisten }) => {
+      if (ack) {
+        console.log(`[webviewMessagePreflight] Got ack [${ack}]`);
+        messagePreflightRecord.set(ack, !isUnlisten);
+      } else {
+        console.error(`ack should be set`);
+      }
+
+    });
 
 }
 
@@ -324,8 +347,6 @@ const openWebview = ({
 
 
   const postmanEvents = () => [
-
-
     handleWebviewRouting(SharedNs.WebviewRouteEnum.PostmanAdd),
     handleWebviewLifecycle(),
     notifyPostmanWebview({
@@ -417,6 +438,7 @@ const openWebview = ({
   const entryEvents = isPostmanEvents ? postmanEvents() : openAPIEvents();
 
   return from([
+    handlePreflight(),
     ...entryEvents,
   ]);
 };
