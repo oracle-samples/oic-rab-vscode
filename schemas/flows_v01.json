@@ -219,10 +219,10 @@
                                     "connectivity::sampleXmlToJson",
                                     "connectivity::updateSecurityProperty",
                                     "connectivity::getSecurityProperty",
-                                    "connectivity::getRuntimeSessionProperties",
-                                    "connectivity::setRuntimeSessionProperties"
+                                    "connectivity::getPersistentState",
+                                    "connectivity::setPersistentState"
                                 ],
-                                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. 'connectivity::sampleXmlToJson' -> Makes xml payload to json payload conversion at designtime.`connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property. `connectivity::getRuntimeSessionProperties` -> Gets the Runtime Session properties for OIC activity. `connectivity::setRuntimeSessionProperties` -> Sets the Runtime Session properties for OIC activity."
+                                "description": "`connectivity::rest` -> Makes outbound HTTP call, Enforces policy in connection. `connectivity::log` -> Logs message to activity stream when in debug mode. `connectivity::Oauth` -> Deprecated. To be replaced by expressions. `connectivity::avroSchemaToJsonSchema` -> Converts AVRO Schema to JSON Schema. `connectivity::avroEncode` -> Does AVRO Binary Encoding of JSON data valid against AVRO Schema. `connectivity::avroDecode` -> Decodes AVRO Binary Encoded Data `connectivity::jsonPayloadToXMLPayload` -> Makes json payload to xml payload conversion `connectivity::xmlPayloadToJsonPayload` -> Makes xml payload to json payload conversion `connectivity::xmlPayloadToJsonSchema` -> Makes xml payload to json schema conversion. 'connectivity::sampleXmlToJson' -> Makes xml payload to json payload conversion at designtime.`connectivity::updateSecurityProperty` -> Updates the value for specified security property. `connectivity::getSecurityProperty` -> Gets the value for specified security property. `connectivity::getPersistentState` -> Gets the Runtime Session properties for OIC activity. `connectivity::setPersistentState` -> Sets the Runtime Session properties for OIC activity."
                             }
                         }
                     }
@@ -695,6 +695,19 @@
                             ]
                         }
                     },
+                    "additionalProperties": false
+                },
+                {
+                    "required": [
+                        "properties"
+                    ],
+                    "properties": {
+                        "properties": {
+                            "$ref": "#/definitions/stringOrArgumentJQPattern",
+                            "description": "JSON properties"
+                        }
+                    },
+
                     "additionalProperties": false
                 }
             ]
