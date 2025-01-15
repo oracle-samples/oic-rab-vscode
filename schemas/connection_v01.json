@@ -253,15 +253,12 @@
                     "OAUTH_INBOUND", "OAUTH2.0_TOKEN_VALIDATION",
                     "MULTI_TOKEN_INBOUND", "OAUTH2.0_OR_BASIC_AUTH_VALIDATION",
                     "DIGITAL_SIGNATURE", "HMAC_SIGNATURE_VALIDATION", "RSA_SIGNATURE_VALIDATION", "JWT_VALIDATION","API_KEY_VALIDATION",
-                    "CUSTOM_SINGLE_TOKEN", "API_KEY_AUTHENTICATION",
+                    "API_KEY_AUTHENTICATION",
                     "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
                     "OAUTH_CLIENT_CREDENTIALS",
                     "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                     "OCI_SIGNATURE_VERSION1",
                     "OAUTH_ONE_TOKEN_BASED", "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
-                    "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS", "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
-                    "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
-                    "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                     "AWS_SIGNATURE_VERSION4","CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
                     "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH","OCI_SERVICE_INVOCATION"
                   ]
@@ -425,7 +422,6 @@
                     "properties": {
                       "policy": {
                         "oneOf": [
-                          { "const": "CUSTOM_SINGLE_TOKEN" },
                           { "const": "API_KEY_AUTHENTICATION" }
                         ]
                       }
@@ -519,61 +515,6 @@
                     "properties": {
                       "securityProperties": {
                         "$ref": "#/definitions/OAuth1.0SecurityProperties_type"
-                      }
-                    }
-                  }
-                },
-                {
-                  "if": {
-                    "properties": {
-                      "policy": {
-                        "oneOf": [
-                          { "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS" }
-                        ]
-                      }
-                    }
-                  },
-                  "then": {
-                    "properties": {
-                      "securityProperties": {
-                        "$ref": "#/definitions/OAuth2.0AuthorizationSecurityProperties_type"
-                      }
-                    }
-                  }
-                },
-                {
-                  "if": {
-                    "properties": {
-                      "policy": {
-                        "oneOf": [
-
-                          { "const": "OAUTH2.0_CLIENT_CREDENTIALS" }
-                        ]
-                      }
-                    }
-                  },
-                  "then": {
-                    "properties": {
-                      "securityProperties": {
-                        "$ref": "#/definitions/OAuth2.0ClientCredentialsSecurityProperties_type"
-                      }
-                    }
-                  }
-                },
-                {
-                  "if": {
-                    "properties": {
-                      "policy": {
-                        "oneOf": [
-                          { "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS" }
-                        ]
-                      }
-                    }
-                  },
-                  "then": {
-                    "properties": {
-                      "securityProperties": {
-                        "$ref": "#/definitions/OAuth2.0ROPCSecurityProperties_type"
                       }
                     }
                   }
@@ -2005,15 +1946,12 @@
                 "enum": [
                   "NONE",
                   "BASIC_AUTH",
-                  "CUSTOM_SINGLE_TOKEN", "API_KEY_AUTHENTICATION",
+                  "API_KEY_AUTHENTICATION",
                   "OAUTH_AUTHORIZATION_CODE_CREDENTIALS",
                   "OAUTH_CLIENT_CREDENTIALS",
                   "OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                   "OCI_SIGNATURE_VERSION1",
                   "OAUTH_ONE_TOKEN_BASED", "OAUTH1.0A_ONE_LEGGED_TOKEN_AUTHENTICATION",
-                  "ADD_OAUTH_AUTHORIZATION_CODE_CREDENTIALS", "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS",
-                  "ADD_OAUTH_CLIENT_CREDENTIALS", "OAUTH2.0_CLIENT_CREDENTIALS",
-                  "ADD_OAUTH_RESOURCE_OWNER_PASSWORD_CREDENTIALS", "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS",
                   "AWS_SIGNATURE_VERSION4", "CAREAWARE_MILLENNIUM_OAUTH_USER_FLOW","CAREAWARE_MILLENNIUM_OAUTH_SYSTEM_FLOW",
                   "JWT_CLIENT_CREDENTIALS_ASSERTION_FOR_OAUTH","JWT_USER_ASSERTION_FOR_OAUTH","OCI_SERVICE_INVOCATION"
                 ]
@@ -2044,7 +1982,6 @@
                   "properties": {
                     "policy": {
                       "oneOf": [
-                        { "const": "CUSTOM_SINGLE_TOKEN" },
                         { "const": "API_KEY_AUTHENTICATION" }
                       ]
                     }
@@ -2146,60 +2083,6 @@
                 "if": {
                   "properties": {
                     "policy": {
-                      "oneOf": [
-                        { "const": "OAUTH2.0_AUTHORIZATION_CODE_CREDENTIALS" }
-                      ]
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "securityProperties": {
-                      "$ref": "#/definitions/OAuth2.0AuthorizationSecurityProperties_type"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "policy": {
-                      "oneOf": [
-                        { "const": "OAUTH2.0_RESOURCE_OWNER_PASSWORD_CREDENTIALS" }
-                      ]
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "securityProperties": {
-                      "$ref": "#/definitions/OAuth2.0ROPCSecurityProperties_type"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "policy": {
-                      "oneOf": [
-                        { "const": "OAUTH2.0_CLIENT_CREDENTIALS" }
-                      ]
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "securityProperties": {
-                      "$ref": "#/definitions/OAuth2.0ClientCredentialsSecurityProperties_type"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "policy": {
                       "const": "AWS_SIGNATURE_VERSION4"
                     }
                   }
@@ -2254,12 +2137,13 @@
       "type": "object",
       "properties": {
         "headers": {
-          "$ref": "commons_v01.json#/definitions/httpHeaders"
+          "$ref": "commons_v01.json#/definitions/oauthHttpHeaders"
         },
         "params": {
           "$ref": "commons_v01.json#/definitions/singleValueMap"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "fetchRules_type": {
       "type": "object",
@@ -2289,7 +2173,8 @@
           "type": "string",
           "description": "Regex that identifies the access token type."
         }
-      }
+      },
+      "additionalProperties": false
     },
     "authExtension_type": {
       "type": "object",
@@ -2306,15 +2191,16 @@
               "description": "This object is used to define an authorization url where the user will be redirected to provide consent.",
               "$ref": "commons_v01.json#/definitions/params_type"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "accessTokenRequest": {
           "description": "HTTP request that should be used to fetch the access token.",
-          "$ref": "commons_v01.json#/definitions/httpRequest"
+          "$ref": "commons_v01.json#/definitions/oauthHttpRequest"
         },
         "refreshTokenRequest": {
           "description": "HTTP request that should be used to refresh the access token.",
-          "$ref": "commons_v01.json#/definitions/httpRequest"
+          "$ref": "commons_v01.json#/definitions/oauthHttpRequest"
         },
         "fetchRules": {
           "description": "How to retrieve information from the various steps of an oauth flow.",
@@ -2323,7 +2209,8 @@
         "accessTokenUsage": {
           "$ref": "#/definitions/accessTokenUsage_type"
         }
-      }
+      },
+      "additionalProperties": false
     },
 
     "OAuth2.0AuthorizationSecurityProperties_type": {

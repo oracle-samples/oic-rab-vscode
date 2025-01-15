@@ -61,7 +61,7 @@
         "$refOpenapi":  {
           "type": "string",
           "description":"The OpenAPI path referencing the specific path of used for generating input and output schemas as well the endpoint invoked by the action. This value should following the following format: '{method}:{resource path}'. For example: 'GET:/pet/findByStatus'. The header, query parameter, request structure as defined in the OpenAPI defines the input schema and output schema. If this property is set, the input and output is not required because they are driven by the OpenAPI.",
-          "maxLength": 100
+          "maxLength": 200
         }
       },
       "additionalProperties": false,

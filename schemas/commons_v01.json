@@ -324,9 +324,7 @@
       "type": "string",
       "enum": [
         "GET",
-        "PUT",
-        "POST",
-        "PATCH"
+        "POST"
       ]
     },
     "params_type": {
@@ -339,9 +337,10 @@
         "query": {
           "$ref": "#/definitions/singleValueMap"
         }
-      }
+      },
+      "additionalProperties": false
     },
-    "httpRequest": {
+    "oauthHttpRequest": {
       "description": "A JSON representation of an http request.",
       "type": "object",
       "properties": {
@@ -356,12 +355,44 @@
           "$ref": "#/definitions/params_type"
         },
         "headers": {
-          "$ref": "#/definitions/httpHeaders"
+          "$ref": "#/definitions/oauthHttpHeaders"
         },
         "body": {
-          "$ref": "#/definitions/httpBody"
+          "$ref": "#/definitions/oauthHttpBody"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "oauthHttpHeaders": {
+      "description": "Oauth http header",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9\\.\\-_]+$": {
+          "$ref": "#/definitions/stringOrArgumentJQPattern"
+        }
+      },
+      "minProperties": 0,
+      "maxProperties": 100
+    },
+    "oauthHttpBody": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/stringOrArgumentJQPattern",
+          "examples": [
+            "dummyBody",
+            "${.input.body}"
+          ]
+        },
+        {
+          "$ref": "#/definitions/singleValueMap",
+          "examples": [
+            {
+              "key1": "dummyBody",
+              "key2": "${.input.bodyKey2}"
+            }
+          ]
+        }
+      ]
     }
   }
 }
