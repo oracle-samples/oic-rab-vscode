@@ -139,7 +139,7 @@ export namespace workspace {
       const specFile = JSON.parse(doc.getText()) as OpenAPINS.Root;
       return !!specFile && !!specFile.openapi && !!specFile.info?.version && !!specFile.paths;
     },
-    (file) => from(showErrorMessage(`The offered file is not a valid postman collection. File: ['${fs.parseFilename(file)}']`))
+    (file) => from(showErrorMessage(`The offered file is not a valid OpenAPI spec json. File: ['${fs.parseFilename(file)}']`))
   )
     .pipe(
       switchMap(

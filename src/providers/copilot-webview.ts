@@ -238,7 +238,9 @@ function handleWebviewLifecycle() {
 }
 
 const notifyPostmanWebview = (file: vscode.Uri, entryType: SharedNs.VscodeCommandPayload["updateEntryType"]) => {
-  UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updatePostmanRawData, JSON.parse(readFileSync(file.fsPath, 'utf8')) as PostmanNs.Root);
+  UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updatePostmanRawData, {
+    postman: JSON.parse(readFileSync(file.fsPath, 'utf8')) as PostmanNs.Root
+  });
   UtilsNs.notifyWebview(SharedNs.ExtensionCommandEnum.updateEntryType, entryType);
 };
 
