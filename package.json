@@ -237,7 +237,7 @@
         {
           "when": "resourceDirname =~ /(\\/|\\\\)api$/ && resourceFilename =~ /^openapi\\.resource\\.json$/",
           "command": "orab.add.convert.append",
-          "group": "orab@4" 
+          "group": "orab@4"
         }
       ],
       "editor/context": [
@@ -429,5 +429,10 @@
     "singleQuote": true,
     "tabWidth": 2,
     "arrowParens": "avoid"
+  },
+  "overrides": {
+    "ajv@8.20.0": {
+      "fast-uri": "3.1.7"
+    }
   }
 }
